@@ -1,0 +1,77 @@
+{
+  "name": "@tjsr/user-session-middleware",
+  "version": "0.0.1",
+  "description": "User session handling middleware and utilities",
+  "type": "module",
+  "main": "dist/cjs/index.js",
+  "types": "dist/esm/index.d.ts",
+  "module": "dist/esm/index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc && tsc -p tsconfig.cjs.json",
+    "check": "npx npm-check",
+    "clean": "rimraf build dist coverage",
+    "lint": "eslint src/*.ts",
+    "lint:fix": "eslint --fix src/*.ts",
+    "prepack": "npm test && npm run build",
+    "prepublishOnly": "npm run clean && npm test && npm run build",
+    "test": "jest"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src",
+      "package.json"
+    ],
+    "extensions": "*.ts",
+    "ignore": "dist",
+    "exec": "tsc && tsc -p tsconfig.cjs.json",
+    "delay": 200
+  },
+  "test": "foobar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjsr/user-session-middleware.git"
+  },
+  "keywords": [
+    "Express",
+    "Session"
+  ],
+  "author": "Tim Rowe <tim@tjsr.id.au>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tjsr/user-session-middleware/issues"
+  },
+  "homepage": "https://github.com/tjsr/user-session-middleware#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/express-mysql-session": "^3.0.5",
+    "@types/express-session": "^1.18.0",
+    "@types/jest": "^29.5.12",
+    "@types/mysql": "^2.15.26",
+    "@types/node": "^20.12.7",
+    "@types/uuid": "^9.0.8",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.7.1"
+  },
+  "dependencies": {
+    "@tjsr/mysql-pool-utils": "^0.0.4",
+    "express-mysql-session": "^3.0.1",
+    "express-session": "^1.18.0",
+    "snowflake-uuid": "^1.0.0",
+    "uuid": "^9.0.1"
+  },
+  "peerDependencies": {
+    "dotenv-flow": "^4.1.0",
+    "express": "^4.19.2"
+  },
+  "overrides": {
+    "mysql2": ">=3.9.7"
+  },
+  "optionalDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

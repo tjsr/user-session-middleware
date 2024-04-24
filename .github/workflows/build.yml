@@ -1,0 +1,50 @@
+name: Build user-session-middleware
+run-name: ${{ github.actor }} Running user-session-middleware build.
+on: [push]
+jobs:
+  build-user-session-middleware:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Use Node.js
+      uses: actions/setup-node@main
+      with:
+        node-version: 20.12.2
+    
+    - name: Check out repository code
+      uses: actions/checkout@main
+
+    - name: Cache node modules
+      id: cache-npm
+      uses: actions/cache@main
+      env:
+        cache-name: cache-node-modules
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ~/.npm
+        # todo - change this so we are less restrictive on package-lock changes
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      name: List the state of node modules
+      continue-on-error: true
+      run: npm list
+
+    - run: npm ci
+
+    - name: Run lint
+      if: github.ref == 'refs/head/main' || github.ref == 'refs/head/prod'
+      run: npm run lint
+
+    - run: npm run test
+    - run: npm run build
+
+    - name: Run lint at end on all other branches
+      if: github.ref != 'refs/head/main' && github.ref != 'refs/head/prod'
+      run: |
+        npm run lint
+        npm publish --dry-run
+  
