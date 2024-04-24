@@ -58,7 +58,7 @@
     "typescript-eslint": "^7.7.1"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.0.4",
+    "@tjsr/mysql-pool-utils": "^0.0.5",
     "express-mysql-session": "^3.0.1",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",
