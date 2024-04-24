@@ -5,7 +5,7 @@ import { v5 as uuidv5, validate } from 'uuid';
 
 import { getSnowflake } from './snowflake.js';
 
-const LIBRARY_DEFAULT_USERID_UUID_NAMESPACE = 'd850e0d9-a02c-4a25-9ade-9711b942b8ba'
+const LIBRARY_DEFAULT_USERID_UUID_NAMESPACE = 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
 
 const getUuidNamespace = (systemDefault?: string): uuid5 => {
   const libUidNamespace: uuid5|undefined = process.env['LIBRARY_DEFAULT_USERID_UUID_NAMESPACE'];
