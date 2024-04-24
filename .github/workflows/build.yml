@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} Running user-session-middleware build.
 on: [push]
 jobs:
   build-user-session-middleware:
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
     - name: Use Node.js
