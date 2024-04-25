@@ -1,4 +1,5 @@
 version: 2
+registries:
   npm-github:
     type: npm-registry
     url: https://npm.pkg.github.com
