@@ -10,6 +10,7 @@
     "build": "rimraf dist && tsc && tsc -p tsconfig.cjs.json",
     "check": "npx npm-check",
     "clean": "rimraf build dist coverage",
+    "link": "npm link @tjsr/simple-env-utils @tjsr/mysql-pool-utils",
     "lint": "eslint src/*.ts",
     "lint:fix": "eslint --fix src/*.ts",
     "prepack": "npm test && npm run build",
@@ -58,7 +59,7 @@
     "typescript-eslint": "^7.7.1"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.0.5",
+    "@tjsr/mysql-pool-utils": "^0.1.0",
     "express-mysql-session": "^3.0.1",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",

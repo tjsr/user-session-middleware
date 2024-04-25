@@ -3,16 +3,16 @@ import * as expressSession from 'express-session';
 import mySQLStore, { MySQLStore } from 'express-mysql-session';
 
 import { getPoolConfig } from '@tjsr/mysql-pool-utils';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
-const poolConfig: mysql.PoolConfig = getPoolConfig();
+const poolOptions: mysql.PoolOptions = getPoolConfig();
 
 const sessionStoreOptions: mySQLStore.Options = {
   createDatabaseTable: true,
-  database: poolConfig.database,
-  host: poolConfig.host,
-  password: poolConfig.password,
-  port: poolConfig.port,
+  database: poolOptions.database,
+  host: poolOptions.host,
+  password: poolOptions.password,
+  port: poolOptions.port,
   schema: {
     columnNames: {
       data: 'sess',
@@ -21,7 +21,7 @@ const sessionStoreOptions: mySQLStore.Options = {
     },
     tableName: 'session',
   },
-  user: poolConfig.user,
+  user: poolOptions.user,
 };
 
 export let mysqlSessionStore: MySQLStore;
