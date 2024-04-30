@@ -12,7 +12,7 @@ export type EmailAddress = string;
 export interface SystemSessionDataType extends SessionData {
   userId: UserId;
   email: EmailAddress;
-  newId: boolean;
+  newId: boolean | undefined;
 }
 
 export interface SystemHttpRequestType<Data extends SystemSessionDataType> extends express.Request {

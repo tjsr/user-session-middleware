@@ -3,7 +3,7 @@ import * as expressSession from 'express-session';
 import mySQLStore, { MySQLStore } from 'express-mysql-session';
 
 import { getPoolConfig } from '@tjsr/mysql-pool-utils';
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 
 const poolOptions: mysql.PoolOptions = getPoolConfig();
 

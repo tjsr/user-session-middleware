@@ -22,7 +22,7 @@
       "src",
       "package.json"
     ],
-    "extensions": "*.ts",
+    "ext": "ts",
     "ignore": "dist",
     "exec": "tsc && tsc -p tsconfig.cjs.json",
     "delay": 200
@@ -59,13 +59,14 @@
     "typescript-eslint": "^7.7.1"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.1.0",
-    "express-mysql-session": "^3.0.1",
+    "@tjsr/mysql-pool-utils": ">=0.1.0",
+    "express-mysql-session": "^3.0.2",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
+    "@tjsr/mysql-pool-utils": ">=0.1.0",
     "dotenv-flow": "^4.1.0",
     "express": "^4.19.2"
   },
