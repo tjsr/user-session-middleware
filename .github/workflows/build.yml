@@ -38,12 +38,12 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
+    - run: npm ci
+
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
       continue-on-error: true
       run: npm list
-
-    - run: npm ci
 
     - name: Run lint
       if: github.ref == 'refs/head/main' || github.ref == 'refs/head/prod'
