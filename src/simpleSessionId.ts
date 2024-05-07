@@ -7,11 +7,11 @@ import { SessionData } from "express-session";
 export const simpleSessionId = <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
   res: express.Response,
-  next: () => void,
+  next: () => void
 ) => {
   req.sessionStore.get(
     req.sessionID,
-    (err: any, genericSessionData: SessionData | null | undefined) => {
+    (err: Error, genericSessionData: SessionData | null | undefined) => {
       if (err) {
         console.warn('Error getting session data', err);
         res.status(500);
@@ -47,6 +47,6 @@ export const simpleSessionId = <ApplicationDataType extends SystemSessionDataTyp
 
       req.session.save();
       next();
-    },
+    }
   );
 };
