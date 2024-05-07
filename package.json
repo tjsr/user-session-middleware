@@ -15,6 +15,7 @@
     "lint:fix": "eslint --fix src/*.ts",
     "prepack": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build",
+    "postinstall": "npm link @tjsr/mysql-pool-utils",
     "test": "eslint src/*.ts && jest"
   },
   "nodemonConfig": {
@@ -48,7 +49,7 @@
     "@types/express-session": "^1.18.0",
     "@types/jest": "^29.5.12",
     "@types/mysql": "^2.15.26",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.12.8",
     "@types/uuid": "^9.0.8",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
@@ -56,10 +57,11 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.7.1"
+    "typescript-eslint": "^7.8.0"
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": ">=0.1.0",
+    "@tjsr/simple-env-utils": "^0.0.10",
     "express-mysql-session": "^3.0.2",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",
