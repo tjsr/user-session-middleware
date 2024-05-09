@@ -49,7 +49,7 @@
     "@types/express-session": "^1.18.0",
     "@types/jest": "^29.5.12",
     "@types/mysql": "^2.15.26",
-    "@types/node": "^20.12.8",
+    "@types/node": "^20.12.11",
     "@types/uuid": "^9.0.8",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
