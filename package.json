@@ -15,7 +15,7 @@
     "lint:fix": "eslint --fix src/*.ts",
     "prepack": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build",
-    "postinstall": "npm link @tjsr/mysql-pool-utils",
+    "postinstall": "npm link @tjsr/mysql-pool-utils @tjsr/simple-env-utils",
     "test": "eslint src/*.ts && jest"
   },
   "nodemonConfig": {
