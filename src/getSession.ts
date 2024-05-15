@@ -1,15 +1,15 @@
-import * as dotenv from 'dotenv-flow';
 import * as expressSession from 'express-session';
 
 import { SystemHttpRequestType, SystemSessionDataType, uuid4 } from './types.js';
 
 import { IncomingHttpHeaders } from 'http';
+import { loadEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
 import { v4 as uuidv4 } from 'uuid';
 
 const memoryStore = new session.MemoryStore();
 
-dotenv.config();
+loadEnv();
 const IN_PROD = process.env['NODE_ENV'] === 'production';
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
