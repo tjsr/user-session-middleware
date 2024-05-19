@@ -22,7 +22,7 @@
     "prepack": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build",
     "disabled:postinstall": "npm run link",
-    "test": "eslint src/*.ts && jest"
+    "test": "vitest --run && npm run lint"
   },
   "nodemonConfig": {
     "watch": [
@@ -54,17 +54,17 @@
     "@types/express": "^4.17.21",
     "@types/express-mysql-session": "^3.0.5",
     "@types/express-session": "^1.18.0",
-    "@types/jest": "^29.5.12",
     "@types/mysql": "^2.15.26",
     "@types/node": "^20.12.12",
     "@types/uuid": "^9.0.8",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
     "rimraf": "^5.0.7",
-    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.9.0"
+    "typescript-eslint": "^7.9.0",
+    "vitest": "^1.6.0",
+    "vitest-mock-express": "^2.2.0"
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.3",
