@@ -87,6 +87,29 @@ describe('saveSessionDataToSession', () => {
   let memoryStore: Store;
   let testSessionData: SystemSessionDataType;
   let req: SystemHttpRequestType<SystemSessionDataType>;
+
+  const withTestSession = (
+    partailStoreData: Partial<SystemSessionDataType>,
+    existingSessionDataOverrides: Partial<SystemSessionDataType>,
+    noSave = false
+  ): Session & Partial<SystemSessionDataType> => {
+    const sessionData: Partial<SystemSessionDataType> = {
+      ...partailStoreData,
+      cookie: new Cookie(),
+    };
+    testSessionData = {
+      ...testSessionData,
+      ...existingSessionDataOverrides,
+    };
+
+    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
+    if (!noSave) {
+      session.save = vi.fn();
+    }
+    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
+    expect(session.save).toBeCalled();
+    return session;
+  };
   
   beforeEach(() => {
     testSessionData = {
@@ -108,68 +131,41 @@ describe('saveSessionDataToSession', () => {
     });
   });
 
-  test('Should save the session data to the session', () => {
-
-  });
-
   test('Should take session data userId if no userId is already on session', () => {
-    const sessionData: Partial<SystemSessionDataType> = {
-      cookie: new Cookie(),
-      email: 'test-email',
-      newId: undefined,
-      userId: 'test-user-id',
-    };
-    // delete testSessionData.userId;
-    testSessionData.userId = undefined!;
-    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
-    session.save = vi.fn();
-    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
-    expect(session.userId).toBe('test-user-id');
-    expect(session.save).toBeCalled();
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      {
+        email: 'test-user-email',
+        userId: 'test-user-id',
+      },
+      { userId: undefined, }
+    );
+    expect(sessionToVerify.userId).toBe('test-user-id');
   });
 
   test('Should take existing session data userId if userId is already on session', () => {
-    const sessionData: Partial<SystemSessionDataType> = {
-      cookie: new Cookie(),
-      email: 'test-email',
-      newId: undefined,
-      userId: 'test-user-id',
-    };
-    testSessionData.userId = 'existing-user-id';
-    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
-    session.save = vi.fn();
-    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
-    expect(session.userId).toBe('existing-user-id');
-    expect(session.save).toBeCalled();
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      {
+        email: 'test-user-email',
+        userId: 'test-user-id',
+      },
+      { userId: 'existing-user-id', }
+    );
+    expect(sessionToVerify.userId).toBe('existing-user-id');
   });
 
   test('Should take session data email if email is already on session', () => {
-    const sessionData: Partial<SystemSessionDataType> = {
-      cookie: new Cookie(),
-      email: 'test-user-email',
-      newId: undefined,
-      userId: undefined,
-    };
-    testSessionData.email = undefined!;
-    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
-    session.save = vi.fn();
-    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
-    expect(session.email).toBe('test-user-email');
-    expect(session.save).toBeCalled();
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      {email: 'test-user-email'},
+      {email: undefined}
+    );
+    expect(sessionToVerify.email).toBe('test-user-email');
   });
 
   test('Should take existing session data email if no email is already on session', () => {
-    const sessionData: Partial<SystemSessionDataType> = {
-      cookie: new Cookie(),
-      email: 'test-user-email',
-      newId: undefined,
-      userId: undefined,
-    };
-    testSessionData.email = 'existing-user-email';
-    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
-    session.save = vi.fn();
-    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
-    expect(session.email).toBe('existing-user-email');
-    expect(session.save).toBeCalled();
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      {email: 'test-user-emnail'},
+      {email: 'existing-user-email'}
+    );
+    expect(sessionToVerify.email).toBe('existing-user-email');
   });
 });
