@@ -1,13 +1,70 @@
 import * as express from 'express';
 
+import { Session, SessionData } from "express-session";
 import { SystemHttpRequestType, SystemSessionDataType } from './types.js';
+import {
+  endResponseIfNoSessionData,
+  endResponseOnError,
+  getStatusWhenNewIdGeneratedButSessionDataAlreadyExists,
+  getStatusWhenNoSessionId
+} from './sessionChecks.js';
 
-import { SessionData } from "express-session";
+export const saveSessionDataToSession = <ApplicationDataType extends SystemSessionDataType>(
+  sessionData: ApplicationDataType,
+  session: Session & Partial<ApplicationDataType>
+): void => {
+  session.newId = undefined;
+  if (sessionData?.userId && session.userId == undefined) {
+    session.userId = sessionData.userId;
+  }
+  if (sessionData?.email && session.email == undefined) {
+    session.email = sessionData.email;
+  }
+  if (sessionData?.newId && session.newId == undefined) {
+    // Should only ever be new the first time we write a userId received from another auth source.
+    session.newId = false;
+  }
+
+  session.save();
+};
+
+export const handleSessionFromStore = <ApplicationDataType extends SystemSessionDataType>(
+  req: SystemHttpRequestType<ApplicationDataType>,
+  res: express.Response,
+  retrievedSessionData: SessionData | null | undefined,
+  next: express.NextFunction
+//   session: Session & Partial<ApplicationDataType>,
+):void => {
+
+  const responseCode: number|undefined = getStatusWhenNoSessionId(req.sessionID) ||
+    getStatusWhenNewIdGeneratedButSessionDataAlreadyExists(req.newSessionIdGenerated, retrievedSessionData);
+
+  if (undefined !== responseCode) {
+    res.status(responseCode!);
+    res.end();
+    return;
+  }
+
+  if (req.newSessionIdGenerated === true) {
+    req.session.save();
+    next();
+    return;
+  }
+
+  if (endResponseIfNoSessionData(retrievedSessionData, req, res)) {
+    return;
+  }
+
+  const sessionData: ApplicationDataType | undefined = retrievedSessionData as ApplicationDataType;
+  saveSessionDataToSession(sessionData, req.session);
+  next();
+};
 
 export const simpleSessionId = <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
   res: express.Response,
-  next: () => void
+  next: express.NextFunction,
+  storeSessionHandler = handleSessionFromStore
 ) => {
   if (req.sessionID === undefined && req.newSessionIdGenerated === true) {
     req.session.save();
@@ -21,56 +78,10 @@ export const simpleSessionId = <ApplicationDataType extends SystemSessionDataTyp
     req.sessionStore.get(
       req.sessionID,
       (err: Error, genericSessionData: SessionData | null | undefined) => {
-        if (err) {
-          console.warn('Error getting session data', err);
-          res.status(500);
-          res.send(err);
-          res.end();
+        if (endResponseOnError(err, res)) {
           return;
         }
-
-        if (req.sessionID && req.newSessionIdGenerated === true) {
-          if (genericSessionData !== undefined && genericSessionData !== null) {
-            console.warn(`SessionID received for ${req.sessionID} but new id generated. Ending session call.`);
-            res.status(401);
-            res.end();
-            return;
-          }
-
-          req.session.save();
-          next();
-          return;
-        }
-
-        const sessionData: ApplicationDataType | undefined =
-          genericSessionData as ApplicationDataType;
-
-        // if (
-        //   req.sessionID &&
-        //   sessionData === undefined &&
-        //   !req.newSessionIdGenerated
-        // ) {
-        //   // req.session.newId = undefined;
-        //   console.debug(`SessionID received for ${req.sessionID} but no session data,
-        // with no new id generated. Ending session call.`);
-        //   // res.status(401);
-        //   // res.end();
-        //   // return;
-        // }
-        req.session.newId = undefined;
-        if (sessionData?.userId && req.session.userId == undefined) {
-          req.session.userId = sessionData.userId;
-        }
-        if (sessionData?.email && req.session.email == undefined) {
-          req.session.email = sessionData.email;
-        }
-        if (sessionData?.newId && req.session.newId == undefined) {
-          // Should only ever be new the first time we write a userId received from another auth source.
-          req.session.newId = false;
-        }
-
-        req.session.save();
-        next();
+        storeSessionHandler(req, res, genericSessionData, next);
       }
     );
   }

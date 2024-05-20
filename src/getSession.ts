@@ -14,8 +14,35 @@ const IN_PROD = process.env['NODE_ENV'] === 'production';
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
 
-export const getSession = <DataType extends SystemSessionDataType,
-  RequestType extends SystemHttpRequestType<DataType>>(useSessionStore: expressSession.Store = memoryStore) => {
+export const generateSessionId = <
+  RequestType extends SystemHttpRequestType<DataType>,
+  DataType extends SystemSessionDataType
+>(req: RequestType): string => {
+  const headers: IncomingHttpHeaders = req.headers;
+  const sessionIdHeader: string | string[] | undefined =
+    headers['x-session-id'];
+  if (
+    typeof sessionIdHeader === 'string' &&
+    sessionIdHeader !== 'undefined'
+  ) {
+    req.newSessionIdGenerated = false;
+    return sessionIdHeader;
+  }
+  if (req.session?.id) {
+    req.newSessionIdGenerated = false;
+    return req.session.id;
+  }
+  const cookieValue = req.cookies?.sessionId;
+  if (cookieValue !== undefined && cookieValue !== 'undefined') {
+    req.newSessionIdGenerated = false;
+    return cookieValue;
+  }
+  const newId: uuid4 = uuidv4(); // use UUIDs for session IDs
+  req.newSessionIdGenerated = true;
+  return newId;
+};
+
+export const getSession = (useSessionStore: expressSession.Store = memoryStore) => {
   return session({
     cookie: {
       maxAge: IN_PROD ? TWO_HOURS : TWENTYFOUR_HOURS,
@@ -23,30 +50,7 @@ export const getSession = <DataType extends SystemSessionDataType,
       sameSite: true,
       secure: IN_PROD,
     },
-    genid: function (req: RequestType) {
-      const headers: IncomingHttpHeaders = req.headers;
-      const sessionIdHeader: string | string[] | undefined =
-        headers['x-session-id'];
-      if (
-        typeof sessionIdHeader === 'string' &&
-        sessionIdHeader !== 'undefined'
-      ) {
-        req.newSessionIdGenerated = false;
-        return sessionIdHeader;
-      }
-      if (req.session?.id) {
-        req.newSessionIdGenerated = false;
-        return req.session.id;
-      }
-      const cookieValue = req.cookies?.sessionId;
-      if (cookieValue !== undefined && cookieValue !== 'undefined') {
-        req.newSessionIdGenerated = false;
-        return cookieValue;
-      }
-      const newId: uuid4 = uuidv4(); // use UUIDs for session IDs
-      req.newSessionIdGenerated = true;
-      return newId;
-    },
+    genid: generateSessionId,
     resave: false,
     rolling: false,
     saveUninitialized: false,
