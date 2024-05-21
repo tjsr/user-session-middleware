@@ -4,7 +4,6 @@ import { Session, SessionData } from "express-session";
 import { SystemHttpRequestType, SystemSessionDataType } from './types.js';
 import {
   endResponseIfNoSessionData,
-  endResponseOnError,
   getStatusWhenNewIdGeneratedButSessionDataAlreadyExists,
   getStatusWhenNoSessionId
 } from './sessionChecks.js';
@@ -33,9 +32,7 @@ export const handleSessionFromStore = <ApplicationDataType extends SystemSession
   res: express.Response,
   retrievedSessionData: SessionData | null | undefined,
   next: express.NextFunction
-//   session: Session & Partial<ApplicationDataType>,
 ):void => {
-
   const responseCode: number|undefined = getStatusWhenNoSessionId(req.sessionID) ||
     getStatusWhenNewIdGeneratedButSessionDataAlreadyExists(req.newSessionIdGenerated, retrievedSessionData);
 
@@ -58,31 +55,4 @@ export const handleSessionFromStore = <ApplicationDataType extends SystemSession
   const sessionData: ApplicationDataType | undefined = retrievedSessionData as ApplicationDataType;
   saveSessionDataToSession(sessionData, req.session);
   next();
-};
-
-export const simpleSessionId = <ApplicationDataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<ApplicationDataType>,
-  res: express.Response,
-  next: express.NextFunction,
-  storeSessionHandler = handleSessionFromStore
-) => {
-  if (req.sessionID === undefined && req.newSessionIdGenerated === true) {
-    req.session.save();
-    next();
-  } else if (req.sessionID === undefined) {
-    // If sessionID doesn't exist, we haven't called express-session middleware.
-    res.status(401);
-    res.end();
-    return;
-  } else {
-    req.sessionStore.get(
-      req.sessionID,
-      (err: Error, genericSessionData: SessionData | null | undefined) => {
-        if (endResponseOnError(err, res)) {
-          return;
-        }
-        storeSessionHandler(req, res, genericSessionData, next);
-      }
-    );
-  }
 };

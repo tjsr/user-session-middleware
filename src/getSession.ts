@@ -41,7 +41,7 @@ export const generateSessionId = <
   return newId;
 };
 
-export const getSession = (useSessionStore: expressSession.Store = memoryStore) => {
+export const sessionHandlerMiddleware = (useSessionStore: expressSession.Store = memoryStore) => {
   return session({
     cookie: {
       maxAge: IN_PROD ? TWO_HOURS : TWENTYFOUR_HOURS,
