@@ -10,17 +10,17 @@ import {
 } from './sessionChecks.js';
 
 export const saveSessionDataToSession = <ApplicationDataType extends SystemSessionDataType>(
-  sessionData: ApplicationDataType,
+  storedSessionData: ApplicationDataType,
   session: Session & Partial<ApplicationDataType>
 ): void => {
   session.newId = undefined;
-  if (sessionData?.userId && session.userId == undefined) {
-    session.userId = sessionData.userId;
+  if (storedSessionData?.userId && session.userId == undefined) {
+    session.userId = storedSessionData.userId;
   }
-  if (sessionData?.email && session.email == undefined) {
-    session.email = sessionData.email;
+  if (storedSessionData?.email && session.email == undefined) {
+    session.email = storedSessionData.email;
   }
-  if (sessionData?.newId && session.newId == undefined) {
+  if (storedSessionData?.newId !== undefined && session.newId == undefined) {
     // Should only ever be new the first time we write a userId received from another auth source.
     session.newId = false;
   }

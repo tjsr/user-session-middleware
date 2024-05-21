@@ -4,7 +4,7 @@ import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import expressSession, { Cookie, Session, SessionData, Store } from 'express-session';
 import { getMockReq, getMockRes } from "vitest-mock-express";
-import { saveSessionDataToSession, simpleSessionId } from './simpleSessionId.js';
+import { saveSessionDataToSession as saveStoredSessionDataToSession, simpleSessionId } from './simpleSessionId.js';
 
 describe('simpleSessionId', () => {
   let testSessionData: SessionData;
@@ -93,7 +93,7 @@ describe('saveSessionDataToSession', () => {
     existingSessionDataOverrides: Partial<SystemSessionDataType>,
     noSave = false
   ): Session & Partial<SystemSessionDataType> => {
-    const sessionData: Partial<SystemSessionDataType> = {
+    const storedSessionData: Partial<SystemSessionDataType> = {
       ...partailStoreData,
       cookie: new Cookie(),
     };
@@ -106,7 +106,7 @@ describe('saveSessionDataToSession', () => {
     if (!noSave) {
       session.save = vi.fn();
     }
-    saveSessionDataToSession(sessionData as SystemSessionDataType, session);
+    saveStoredSessionDataToSession(storedSessionData as SystemSessionDataType, session);
     expect(session.save).toBeCalled();
     return session;
   };
@@ -137,7 +137,7 @@ describe('saveSessionDataToSession', () => {
         email: 'test-user-email',
         userId: 'test-user-id',
       },
-      { userId: undefined, }
+      { userId: undefined }
     );
     expect(sessionToVerify.userId).toBe('test-user-id');
   });
@@ -148,24 +148,58 @@ describe('saveSessionDataToSession', () => {
         email: 'test-user-email',
         userId: 'test-user-id',
       },
-      { userId: 'existing-user-id', }
+      { userId: 'existing-user-id' }
     );
     expect(sessionToVerify.userId).toBe('existing-user-id');
   });
 
   test('Should take session data email if email is already on session', () => {
     const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
-      {email: 'test-user-email'},
-      {email: undefined}
+      { email: 'test-user-email' },
+      { email: undefined }
     );
     expect(sessionToVerify.email).toBe('test-user-email');
   });
 
   test('Should take existing session data email if no email is already on session', () => {
     const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
-      {email: 'test-user-emnail'},
-      {email: 'existing-user-email'}
+      { email: 'test-user-emnail' },
+      { email: 'existing-user-email' }
     );
     expect(sessionToVerify.email).toBe('existing-user-email');
+  });
+
+  test('Should take newId flag if not already on session', () => {
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      { newId: true },
+      { newId: undefined }
+    );
+    expect(sessionToVerify.newId).toBe(false);
+  });
+
+  test('Should not override newId flag if explicitly set to false session', () => {
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      { newId: true },
+      { newId: false }
+    );
+    expect(sessionToVerify.newId).toBe(false);
+  });
+
+  test('Should not override newId=true flag if explicitly set to false session', () => {
+    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      { newId: false },
+      { newId: true }
+    );
+    expect(sessionToVerify.newId).toBe(false);
+  });
+
+  test('Should take newId value from existing session', () => {
+    [true, false].forEach((storedNewId) => {
+      const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+        { newId: storedNewId },
+        { newId: undefined }
+      );
+      expect(sessionToVerify.newId).toBe(false);
+    });
   });
 });

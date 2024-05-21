@@ -22,8 +22,7 @@ export const generateSessionId = <
   const sessionIdHeader: string | string[] | undefined =
     headers['x-session-id'];
   if (
-    typeof sessionIdHeader === 'string' &&
-    sessionIdHeader !== 'undefined'
+    typeof sessionIdHeader === 'string' && sessionIdHeader !== 'undefined'
   ) {
     req.newSessionIdGenerated = false;
     return sessionIdHeader;
