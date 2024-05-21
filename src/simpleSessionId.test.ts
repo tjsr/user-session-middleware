@@ -1,6 +1,6 @@
 import * as Express from "express";
 
-import { Mock, beforeEach, describe, expect, test, vi } from 'vitest';
+import { Mock, afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
 import expressSession, { Cookie, Session, Store } from 'express-session';
 import { getMockReq, getMockRes } from "vitest-mock-express";
@@ -107,7 +107,8 @@ describe('handleSessionWithNewlyGeneratedId', () => {
 describe('retrieveSessionData', () => {
   let testSessionData: Session & Partial<SystemSessionDataType>;
   let memoryStore: Store;
-  
+  let tmpStdErr: typeof console.error;
+
   beforeEach(() => {
     testSessionData = {
       cookie: new Cookie(),
@@ -117,6 +118,13 @@ describe('retrieveSessionData', () => {
     memoryStore.set('some-session-id', {
       cookie: new Cookie(),
     });
+
+    tmpStdErr = console.error;
+    console.error = vi.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpStdErr;
   });
 
   test('Should reject the session if a sessionID was provided but no session data was found', async () => {
