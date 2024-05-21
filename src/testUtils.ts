@@ -29,8 +29,8 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
   type Params = Parameters<CalledMethodType>; // The parameters of the method
   type Return = ReturnType<CalledMethodType>; // The return type of the method
 
-  let resolver: (value: void | PromiseLike<void>) => void;
-  const promise = new Promise<void>((resolve: (value: void | PromiseLike<void>) => void) => {
+  let resolver: (_value: void | PromiseLike<void>) => void;
+  const promise = new Promise<void>((resolve: (_value: void | PromiseLike<void>) => void) => {
     resolver = resolve;
   });
 
