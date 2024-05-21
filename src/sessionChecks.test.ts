@@ -1,7 +1,7 @@
 import * as Express from "express";
 
 import { Cookie, SessionData } from "express-session";
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   endResponseIfNoSessionData,
   endResponseOnError,
@@ -10,11 +10,16 @@ import {
 } from './sessionChecks.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
-import { beforeEach } from "node:test";
-
 describe('endResponseOnError', () => {
+  let tmpStdErr: typeof console.error;
+
   beforeEach(() => {
-    console.warn = vi.fn();
+    tmpStdErr = console.error;
+    console.error = vi.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpStdErr;
   });
 
   test ('Should end the response when any error is received', () => {
@@ -41,8 +46,19 @@ describe('endResponseOnError', () => {
 });
 
 describe('endResponseWhenNoSessionId', () => {
+  let tmpStdErr: typeof console.error;
+  let tmpStdOut: typeof console.log;
+
   beforeEach(() => {
-    console.warn = vi.fn();
+    tmpStdErr = console.error;
+    tmpStdOut = console.log;
+    console.error = vi.fn();
+    console.log = vi.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpStdErr;
+    console.log = tmpStdOut;
   });
 
   test('Should end the response when no sessionID is received', () => {
@@ -75,8 +91,15 @@ describe('endResponseWhenNoSessionId', () => {
 });
 
 describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
+  let tmpStdErr: typeof console.error;
+
   beforeEach(() => {
-    console.warn = vi.fn();
+    tmpStdErr = console.error;
+    console.error = vi.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpStdErr;
   });
 
   test('Should end the response when a new sessionID is generated but session data already exists', () => {
@@ -134,8 +157,19 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
 });
 
 describe('endResponseIfNoSessionData', () => {
+  let tmpStdErr: typeof console.error;
+  let tmpStdOut: typeof console.log;
+
   beforeEach(() => {
-    console.warn = vi.fn();
+    tmpStdErr = console.error;
+    tmpStdOut = console.log;
+    console.error = vi.fn();
+    console.log = vi.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpStdErr;
+    console.log = tmpStdOut;
   });
 
   test('Should end the response when no session data is received', () => {
