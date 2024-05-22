@@ -10,6 +10,8 @@ import {
 } from './sessionChecks.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
+import { addIgnoredLog } from "./setup-tests.js";
+
 describe('endResponseOnError', () => {
   let tmpStdErr: typeof console.error;
 
@@ -25,6 +27,7 @@ describe('endResponseOnError', () => {
   test ('Should end the response when any error is received', () => {
     const { res, next: _next } = getMockRes<Express.Response>();
 
+    addIgnoredLog('Error getting session data');
     const result = endResponseOnError(new Error('Test error'), res);
     expect(result).toBe(true);
 
@@ -46,23 +49,9 @@ describe('endResponseOnError', () => {
 });
 
 describe('endResponseWhenNoSessionId', () => {
-  let tmpStdErr: typeof console.error;
-  let tmpStdOut: typeof console.log;
-
-  beforeEach(() => {
-    tmpStdErr = console.error;
-    tmpStdOut = console.log;
-    console.error = vi.fn();
-    console.log = vi.fn();
-  });
-
-  afterEach(() => {
-    console.error = tmpStdErr;
-    console.log = tmpStdOut;
-  });
-
   test('Should end the response when no sessionID is received', () => {
     const { res, next: _next } = getMockRes<Express.Response>();
+    addIgnoredLog('No session ID received - can\'t process retrieved session.');
 
     const req = getMockReq<Express.Request>({
       sessionID: undefined,
@@ -91,17 +80,6 @@ describe('endResponseWhenNoSessionId', () => {
 });
 
 describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
-  let tmpStdErr: typeof console.error;
-
-  beforeEach(() => {
-    tmpStdErr = console.error;
-    console.error = vi.fn();
-  });
-
-  afterEach(() => {
-    console.error = tmpStdErr;
-  });
-
   test('Should end the response when a new sessionID is generated but session data already exists', () => {
     const { res, next: _next } = getMockRes<Express.Response>();
 
@@ -113,6 +91,8 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
     const sessionData: SessionData = {
       cookie: new Cookie(),
     };
+
+    addIgnoredLog('SessionID received for test-session-id but new id generated');
 
     const result = endResponseWhenNewIdGeneratedButSessionDataAlreadyExists(req, res, sessionData);
     expect(result).toBe(true);
@@ -157,27 +137,14 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
 });
 
 describe('endResponseIfNoSessionData', () => {
-  let tmpStdErr: typeof console.error;
-  let tmpStdOut: typeof console.log;
-
-  beforeEach(() => {
-    tmpStdErr = console.error;
-    tmpStdOut = console.log;
-    console.error = vi.fn();
-    console.log = vi.fn();
-  });
-
-  afterEach(() => {
-    console.error = tmpStdErr;
-    console.log = tmpStdOut;
-  });
-
   test('Should end the response when no session data is received', () => {
     const { res, next: _next } = getMockRes<Express.Response>();
 
     const req = getMockReq<Express.Request>({
       sessionID: 'test-session-id',
     });
+
+    addIgnoredLog('SessionID received for test-session-id but no session data');
 
     const sessionData: SessionData|undefined = undefined;
     const result = endResponseIfNoSessionData(sessionData, req, res);

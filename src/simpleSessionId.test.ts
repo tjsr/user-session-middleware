@@ -1,27 +1,19 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import expressSession, { Cookie, Session, Store } from 'express-session';
 import {
   handleSessionFromStore,
   saveSessionDataToSession as saveStoredSessionDataToSession
 } from './simpleSessionId.js';
 
+import { addIgnoredLog } from "./setup-tests.js";
 import { getMockReq } from "vitest-mock-express";
 import { getMockResResp } from "./testUtils.js";
 
 describe('handleSessionFromStore', () => {
-  let tmpStdErr: typeof console.error;
-  beforeEach(() => {
-    tmpStdErr = console.error;
-    console.error = vi.fn();
-  });
-
-  afterEach(() => {
-    console.error = tmpStdErr;
-  });
-
   test('Should return 401 if no sessionID is provided', () => {
     const { req, res, next } = getMockResResp();
+    addIgnoredLog('No session ID received - can\'t process retrieved session.');
     handleSessionFromStore(req, res, undefined, next);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.end).toHaveBeenCalled();

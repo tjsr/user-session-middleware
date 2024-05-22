@@ -1,12 +1,13 @@
 import * as Express from "express";
 
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { createMockPromisePair, getMockResResp } from "./testUtils";
 import expressSession, { Cookie, Session, Store } from "express-session";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import { handleSessionWithNewlyGeneratedId, requiresSessionId, retrieveSessionData } from "./sessionMiddlewareHandlers";
 
 import { SystemSessionDataType } from "./types";
+import { addIgnoredLog } from "./setup-tests";
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   let testSessionData: Session & Partial<SystemSessionDataType>;
@@ -22,7 +23,7 @@ describe('handleSessionWithNewlyGeneratedId', () => {
       cookie: new Cookie(),
     });
   });
-  
+
   test('Should save the session and continue on if there was no sessionID, but a new session was generated', () => {
     const req = getMockReq<Express.Request>({
       newSessionIdGenerated: true,
@@ -44,7 +45,6 @@ describe('handleSessionWithNewlyGeneratedId', () => {
 describe('retrieveSessionData', () => {
   let testSessionData: Session & Partial<SystemSessionDataType>;
   let memoryStore: Store;
-  let tmpStdErr: typeof console.error;
 
   beforeEach(() => {
     testSessionData = {
@@ -55,16 +55,11 @@ describe('retrieveSessionData', () => {
     memoryStore.set('some-session-id', {
       cookie: new Cookie(),
     });
-
-    tmpStdErr = console.error;
-    console.error = vi.fn();
-  });
-
-  afterEach(() => {
-    console.error = tmpStdErr;
   });
 
   test('Should reject the session if a sessionID was provided but no session data was found', async () => {
+    // eslint-disable-next-line max-len
+    addIgnoredLog('SessionID received for nonexistent-session-id but no session data, with no new id generated. Ending session call.');
     const { req, res, next } = getMockResResp({
       newSessionIdGenerated: false,
       sessionID: 'nonexistent-session-id',
@@ -100,6 +95,7 @@ describe('retrieveSessionData', () => {
   test(
     'Should accept with a sessionID and there is data in the store, and was provided but no session data was found',
     async () => {
+      addIgnoredLog('SessionID received for nonexistent-session-id');
       testSessionData.userId = 'mutated-user-id';
       testSessionData.email = 'mutated-email';
       memoryStore.set('fake-session-id', testSessionData);
