@@ -1,4 +1,8 @@
 {
   "jest.enable": false,
-  "jest.rootPath": "${workspaceFolder}"
+  "jest.rootPath": "${workspaceFolder}",
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.options": {
+    "overrideConfigFile": "eslint.config.mjs"
+  }
 }
