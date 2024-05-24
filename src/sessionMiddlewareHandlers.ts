@@ -1,15 +1,21 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
 import { endResponseIfNoSessionData, endResponseOnError } from "./sessionChecks.js";
+import express, { NextFunction } from "express";
 
 import { SessionData } from "express-session";
-import express from "express";
 import { handleSessionFromStore } from "./simpleSessionId.js";
 
-export const requiresSessionId = (req: SystemHttpRequestType<SystemSessionDataType>, res: express.Response) => {
+export const requiresSessionId = (
+  req: SystemHttpRequestType<SystemSessionDataType>,
+  res: express.Response,
+  next: NextFunction
+) => {
   if (req.sessionID === undefined) {
     // If sessionID doesn't exist, we haven't called express-session middleware.
     res.status(401);
     res.end();
+  } else {
+    next();
   }
 };
 
@@ -20,8 +26,8 @@ export const handleSessionWithNewlyGeneratedId = (
 ) => {
   if (req.newSessionIdGenerated === true) {
     req.session.save();
-    next();
   }
+  next();
 };
 
 export const retrieveSessionData = async <ApplicationDataType extends SystemSessionDataType>(
@@ -48,5 +54,7 @@ export const retrieveSessionData = async <ApplicationDataType extends SystemSess
         handleSessionFromStore(req, res, genericSessionData, next);
       }
     );
+  } else {
+    next();
   }
 };

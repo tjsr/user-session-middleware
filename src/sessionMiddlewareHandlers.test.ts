@@ -1,13 +1,16 @@
-import * as Express from "express";
-
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { createMockPromisePair, getMockResResp } from "./testUtils";
+import express, * as Express from "express";
 import expressSession, { Cookie, Session, Store } from "express-session";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import { handleSessionWithNewlyGeneratedId, requiresSessionId, retrieveSessionData } from "./sessionMiddlewareHandlers";
 
+import { NextFunction } from "express";
 import { SystemSessionDataType } from "./types";
 import { addIgnoredLog } from "./setup-tests";
+import session from 'express-session';
+import { sessionHandlerMiddleware } from "./getSession";
+import supertest from 'supertest';
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   let testSessionData: Session & Partial<SystemSessionDataType>;
@@ -38,6 +41,40 @@ describe('handleSessionWithNewlyGeneratedId', () => {
     handleSessionWithNewlyGeneratedId(req, res, next);
 
     expect(req.session.save).toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('Should call next without saving if a new session was not generated', () => {
+    const req = getMockReq<Express.Request>({
+      newSessionIdGenerated: false,
+      sessionID: undefined,
+      sessionStore: memoryStore,
+    });
+    const { res, next } = getMockRes<Express.Response>();
+    
+    memoryStore.createSession(req, testSessionData);
+
+    vi.spyOn(req.session, 'save');
+    handleSessionWithNewlyGeneratedId(req, res, next);
+
+    expect(req.session.save).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('Should call next without saving if a newSessionIdGenerated was undefined', () => {
+    const req = getMockReq<Express.Request>({
+      newSessionIdGenerated: undefined,
+      sessionID: undefined,
+      sessionStore: memoryStore,
+    });
+    const { res, next } = getMockRes<Express.Response>();
+    
+    memoryStore.createSession(req, testSessionData);
+
+    vi.spyOn(req.session, 'save');
+    handleSessionWithNewlyGeneratedId(req, res, next);
+
+    expect(req.session.save).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalled();
   });
 });
@@ -151,9 +188,104 @@ describe('requiresSessionId', () => {
     expect(req.session).toBeDefined();
     expect(req.sessionID).toBeUndefined();
 
-    requiresSessionId(req, res);
+    requiresSessionId(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.end).toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
+  });
+
+  test('Should call next if the sessionID is defined', () => {
+    const { req, res, next } = getMockResResp({
+      sessionID: 'some-session-id',
+    });
+    memoryStore.createSession(req, testSessionData);
+    expect(req.sessionID).not.toBeUndefined();
+    requiresSessionId(req, res, next);
+    expect(next).toHaveBeenCalled();
+  });
+});
+
+describe('retrieveSessionData', () => {
+  let app: express.Express;
+  let memoryStore: session.MemoryStore;
+
+  const appWithMiddleware = (
+    ...middleware: express.RequestHandler[]
+    // additionalRootAssertions?: (req: express.Request, res: express.Response, next: NextFunction) => void
+  ) => {
+    memoryStore = new session.MemoryStore();
+
+    app = express();
+    app.use(sessionHandlerMiddleware(memoryStore));
+    // app.use(requiresSessionId, handleSessionWithNewlyGeneratedId, retrieveSessionData);
+    // app.use(retrieveSessionData);
+    app.use(middleware);
+    app.get('/', (req, res, _next) => {
+      res.status(200);
+      res.end();
+      // next();
+    });
+    app.use((err: Error, req: express.Request, res: express.Response, _next: NextFunction) => {
+      if (err) {
+        res.status(500);
+      }
+      if (!res.statusCode) {
+        res.status(501);
+      }
+      res.end();
+    });
+  };
+
+  beforeAll(async () => {
+    return Promise.resolve();
+  });
+
+  afterAll(async () => {
+    return Promise.resolve(); // closeConnectionPool();
+  });
+
+  test('Should reject a made-up SessionID that we dont know about', async () => {
+    appWithMiddleware(retrieveSessionData);
+    return new Promise<void>((done) => {
+      supertest(app)
+        .get('/')
+        .set('x-session-id', 'abcd-1234')
+        .set('Content-Type', 'application/json')
+        .expect(401, () => {
+          done();
+        });
+    });
+  });
+
+  test('Should accept a request with no sessionId', async () => {
+    appWithMiddleware(retrieveSessionData);
+    return new Promise<void>((done) => {
+      supertest(app)
+        .get('/')
+        .set('Content-Type', 'application/json')
+        .end((err, res) => {
+          expect(err).toBeNull();
+          expect(res.status).toBe(200);
+          done();
+        });
+    });
+  });
+
+  test('Should accept a request with a valid sessionId', async () => {
+    appWithMiddleware(retrieveSessionData);
+
+    return new Promise<void>((done) => {
+      memoryStore.set('abcd-1234', {
+        cookie: new Cookie(),
+      });
+
+      supertest(app)
+        .get('/')
+        .set('x-session-id', 'abcd-1234')
+        .set('Content-Type', 'application/json')
+        .expect(200, () => {
+          done();
+        });
+    });
   });
 });
