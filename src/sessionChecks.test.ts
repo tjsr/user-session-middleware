@@ -3,10 +3,11 @@ import * as Express from "express";
 import { Cookie, SessionData } from "express-session";
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
-  endResponseIfNoSessionData,
   endResponseOnError,
   endResponseWhenNewIdGeneratedButSessionDataAlreadyExists,
-  endResponseWhenNoSessionId
+  endResponseWhenNoSessionId,
+  errorToNextIfNoSessionData,
+  regenerateSessionIdIfNoSessionData
 } from './sessionChecks.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
@@ -136,9 +137,9 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
   });
 });
 
-describe('endResponseIfNoSessionData', () => {
-  test('Should end the response when no session data is received', () => {
-    const { res, next: _next } = getMockRes<Express.Response>();
+describe('regenerateSessionIdIfNoSessionData', () => {
+  test('Should regenerate the session ID when no session data is received', async () => {
+    const { next: next } = getMockRes<Express.Response>();
 
     const req = getMockReq<Express.Request>({
       sessionID: 'test-session-id',
@@ -147,15 +148,37 @@ describe('endResponseIfNoSessionData', () => {
     addIgnoredLog('SessionID received for test-session-id but no session data');
 
     const sessionData: SessionData|undefined = undefined;
-    const result = endResponseIfNoSessionData(sessionData, req, res);
+    const result = regenerateSessionIdIfNoSessionData(sessionData, req);
+    expect(result).not.toBeUndefined();
+    expect(req.sessionID).not.toBe('test-session-id');
+    expect(req.sessionID).not.toBe(undefined);
+    expect(req.sessionID).toBe(result);
+
+    expect(next).not.toHaveBeenCalled();
+  });
+});
+
+describe('errorToNextIfNoSessionData', () => {
+  test('Should end the response when no session data is received', () => {
+    const { res, next: next } = getMockRes<Express.Response>();
+
+    const req = getMockReq<Express.Request>({
+      sessionID: 'test-session-id',
+    });
+
+    addIgnoredLog('SessionID received for test-session-id but no session data');
+
+    const sessionData: SessionData|undefined = undefined;
+    const result = errorToNextIfNoSessionData(sessionData, req, res, next);
     expect(result).toBe(true);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.end).toHaveBeenCalled();
+    expect(res.end).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.any(Error));
   });
 
   test ('Should return false when session data is received', () => {
-    const { res, next: _next } = getMockRes<Express.Response>();
+    const { res, next: next } = getMockRes<Express.Response>();
 
     const req = getMockReq<Express.Request>({
       sessionID: 'test-session-id',
@@ -164,10 +187,13 @@ describe('endResponseIfNoSessionData', () => {
     const sessionData: SessionData = {
       cookie: new Cookie(),
     };
-    const result = endResponseIfNoSessionData(sessionData, req, res);
+    const statusBefore = res.statusCode;
+    const result = errorToNextIfNoSessionData(sessionData, req, res, next);
     expect(result).toBe(false);
+    expect(req.statusCode).toEqual(statusBefore);
 
     expect(res.status).not.toHaveBeenCalled();
     expect(res.end).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
   });
 });

@@ -1,15 +1,21 @@
+import { SESSION_ID_HEADER_KEY, sessionHandlerMiddleware } from "./getSession";
+import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
-import { createMockPromisePair, getMockResResp } from "./testUtils";
+import { createMockPromisePair, getMockReqResp } from "./testUtils";
 import express, * as Express from "express";
-import expressSession, { Cookie, Session, Store } from "express-session";
+import expressSession, { Cookie, Session, SessionData, Store } from "express-session";
 import { getMockReq, getMockRes } from "vitest-mock-express";
-import { handleSessionWithNewlyGeneratedId, requiresSessionId, retrieveSessionData } from "./sessionMiddlewareHandlers";
+import {
+  handleSessionWithNewlyGeneratedId,
+  requiresSessionId,
+  retrieveSessionData,
+  retrieveSessionDataFromStore
+} from "./sessionMiddlewareHandlers";
 
 import { NextFunction } from "express";
-import { SystemSessionDataType } from "./types";
 import { addIgnoredLog } from "./setup-tests";
 import session from 'express-session';
-import { sessionHandlerMiddleware } from "./getSession";
+import { setSessionCookie } from "./sessionUserHandler";
 import supertest from 'supertest';
 
 describe('handleSessionWithNewlyGeneratedId', () => {
@@ -79,7 +85,7 @@ describe('handleSessionWithNewlyGeneratedId', () => {
   });
 });
 
-describe('retrieveSessionData', () => {
+describe('retrieveSessionData with mocked async callbacks', () => {
   let testSessionData: Session & Partial<SystemSessionDataType>;
   let memoryStore: Store;
 
@@ -97,7 +103,7 @@ describe('retrieveSessionData', () => {
   test('Should reject the session if a sessionID was provided but no session data was found', async () => {
     // eslint-disable-next-line max-len
     addIgnoredLog('SessionID received for nonexistent-session-id but no session data, with no new id generated. Ending session call.');
-    const { req, res, next } = getMockResResp({
+    const { req, res, next } = getMockReqResp({
       newSessionIdGenerated: false,
       sessionID: 'nonexistent-session-id',
       sessionStore: memoryStore,
@@ -106,7 +112,7 @@ describe('retrieveSessionData', () => {
     expect(req.session).toBeDefined();
     expect(req.sessionID).toBe('nonexistent-session-id');
 
-    const [callbackPromiseEndHandler, callbackMockEndFunction]:
+    const [_callbackPromiseEndHandler, callbackMockEndFunction]:
       [Promise<void>, typeof res.end] = createMockPromisePair(res.end);
     res.end = callbackMockEndFunction;
 
@@ -120,13 +126,12 @@ describe('retrieveSessionData', () => {
 
     retrieveSessionData(req, res, next);
 
-    await callbackPromiseEndHandler;
-    expect(callbackMockEndFunction).toHaveBeenCalled();
     await callbackPromiseStatusHandler;
     expect(callbackMockStatusFunction).toHaveBeenCalledWith(401);
 
     expect(req.session.save).not.toHaveBeenCalled();
-    expect(next).not.toHaveBeenCalled();
+    expect(res.end).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.any(Error));
   });
 
   test(
@@ -136,7 +141,7 @@ describe('retrieveSessionData', () => {
       testSessionData.userId = 'mutated-user-id';
       testSessionData.email = 'mutated-email';
       memoryStore.set('fake-session-id', testSessionData);
-      const { req, res, next } = getMockResResp({
+      const { req, res, next } = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>({
         newSessionIdGenerated: false,
         sessionID: 'fake-session-id',
         sessionStore: memoryStore,
@@ -177,7 +182,7 @@ describe('requiresSessionId', () => {
   });
   
   test('Should send a 401 if the sessionID is undefined', async () => {
-    const req = getMockReq<Express.Request>({
+    const req = getMockReq<SystemHttpRequestType<SystemSessionDataType>>({
       newSessionIdGenerated: false,
       sessionID: undefined,
       sessionStore: memoryStore,
@@ -195,7 +200,7 @@ describe('requiresSessionId', () => {
   });
 
   test('Should call next if the sessionID is defined', () => {
-    const { req, res, next } = getMockResResp({
+    const { req, res, next } = getMockReqResp({
       sessionID: 'some-session-id',
     });
     memoryStore.createSession(req, testSessionData);
@@ -205,12 +210,12 @@ describe('requiresSessionId', () => {
   });
 });
 
-describe('retrieveSessionData', () => {
+describe('retrieveSessionData supertest tests', () => {
   let app: express.Express;
   let memoryStore: session.MemoryStore;
 
   const appWithMiddleware = (
-    ...middleware: express.RequestHandler[]
+    ...middleware: (express.RequestHandler|express.ErrorRequestHandler)[]
     // additionalRootAssertions?: (req: express.Request, res: express.Response, next: NextFunction) => void
   ) => {
     memoryStore = new session.MemoryStore();
@@ -220,19 +225,22 @@ describe('retrieveSessionData', () => {
     // app.use(requiresSessionId, handleSessionWithNewlyGeneratedId, retrieveSessionData);
     // app.use(retrieveSessionData);
     app.use(middleware);
-    app.get('/', (req, res, _next) => {
+    app.get('/', (req, res, next) => {
       res.status(200);
       res.end();
-      // next();
+      next();
     });
     app.use((err: Error, req: express.Request, res: express.Response, _next: NextFunction) => {
-      if (err) {
+      if (err && res.statusCode <= 300) {
         res.status(500);
       }
       if (!res.statusCode) {
         res.status(501);
       }
-      res.end();
+      console.trace('Reached error handler in test case.');
+      res.send();
+      // res.end();
+      // next();
     });
   };
 
@@ -249,7 +257,7 @@ describe('retrieveSessionData', () => {
     return new Promise<void>((done) => {
       supertest(app)
         .get('/')
-        .set('x-session-id', 'abcd-1234')
+        .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
         .set('Content-Type', 'application/json')
         .expect(401, () => {
           done();
@@ -281,11 +289,84 @@ describe('retrieveSessionData', () => {
 
       supertest(app)
         .get('/')
-        .set('x-session-id', 'abcd-1234')
+        .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
         .set('Content-Type', 'application/json')
         .expect(200, () => {
           done();
         });
     });
+  });
+
+  test(
+    'Should generate a new session ID if the current session ID given is invalid and set the new value as a cookie.',
+    async () => {
+      // const regeneratedSessionId = 'regenerated-session-id';
+      appWithMiddleware(retrieveSessionData, setSessionCookie);
+      return new Promise<void>((done) => {
+        supertest(app)
+          .get('/')
+          .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
+          .set('Content-Type', 'application/json')
+          .end((err, res) => {
+            expect(err).toBeNull();
+            expect(res.status).toBe(401);
+            // expect(res.headers['x-session-id']).toEqual(regeneratedSessionId);
+            const cookieValue = res.get('Set-Cookie')[0];
+            expect(cookieValue).not.toMatch(/sessionId=abcd-1234/);
+            expect(cookieValue).toMatch(/sessionId=/);
+            // expect(res.cookie).toHaveBeenCalledWith('sessionId', regeneratedSessionId);
+            
+            done();
+          // })
+          // .expect(401, () => {
+          //   done();
+          });
+      });
+    });
+});
+
+describe('retrieveSessionDataFromStore', () => {
+  test ('Should reject when no session ID is passed to function', async () => {
+    const memoryStore = new session.MemoryStore();
+    let result: SystemSessionDataType | undefined | null = undefined;
+    try {
+      result = await retrieveSessionDataFromStore(memoryStore, undefined!);
+    } catch (err) {
+      expect(err).toBeDefined();
+      expect(err.message).toEqual('No session ID received');
+    }
+    expect(result).toBeUndefined();
+  });
+
+  test ('Throw a generic error as a rejected promise when a load failure occurs.', async () => {
+    const memoryStore = new session.MemoryStore();
+    const testError: Error = new Error('Generic session storage error occurred.');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    memoryStore.get = vi.fn((sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
+      callback(testError, undefined);
+    }) as never;
+
+    expect(retrieveSessionDataFromStore(memoryStore, 'some-session-id'))
+      .rejects.toThrowError('Generic session storage error occurred.');
+  });
+
+  test ('Should return some session data.', async () => {
+    const memoryStore = new session.MemoryStore();
+    const testSessionId = 'test-session-id';
+    memoryStore.set(testSessionId,
+      {
+        email: 'test-email',
+        userId: 'test-user-id',
+      } as SystemSessionDataType);
+
+    expect(retrieveSessionDataFromStore(memoryStore, 'test-session-id'))
+      .resolves.not.toThrow();
+
+    const storeData: SystemSessionDataType |undefined | null = await retrieveSessionDataFromStore(
+      memoryStore, 'test-session-id');
+    expect(storeData).not.toBeUndefined();
+    expect(storeData!.email).toEqual('test-email');
+    expect(storeData!.userId).toEqual('test-user-id');
+    expect(storeData!.newId).toBeUndefined();
   });
 });

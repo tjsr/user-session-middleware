@@ -1,8 +1,9 @@
 import * as express from 'express';
 
-import { SystemHttpRequestType, SystemSessionDataType } from './types.js';
+import { SessionId, SystemHttpRequestType, SystemSessionDataType } from './types.js';
 
 import { SessionData } from "express-session";
+import { applyNewIdToSession } from './getSession.js';
 
 export const getStatusOnError = (err: Error|undefined): number|undefined => {
   if (err) {
@@ -14,7 +15,7 @@ export const getStatusOnError = (err: Error|undefined): number|undefined => {
 
 export const endResponseOnError = (err: Error|undefined, res: express.Response): boolean => {
   if (err) {
-    console.warn('Error getting session data', err);
+    console.trace('Error getting session data', err);
     res.status(500);
     res.send(err);
     res.end();
@@ -28,7 +29,7 @@ export const getStatusWhenNoSessionId = (
 ): number|undefined => {
   if (!sessionID) {
     // This should never get called.
-    console.warn('No session ID received - can\'t process retrieved session.');
+    console.trace('No session ID received - can\'t process retrieved session.');
     return 500;
   }
   return undefined;
@@ -38,10 +39,9 @@ export const endResponseWhenNoSessionId = (
   req: SystemHttpRequestType<SystemSessionDataType>,
   res: express.Response
 ): boolean => {
-  if (!req.sessionID) {
-    // This should never get called.
-    console.warn('No session ID received - can\'t process retrieved session.');
-    res.status(500);
+  const status = getStatusWhenNoSessionId(req.sessionID);
+  if (status !== undefined) {
+    res.status(status);
     res.end();
     return true;
   }
@@ -64,10 +64,10 @@ export const endResponseWhenNewIdGeneratedButSessionDataAlreadyExists = (
   res: express.Response,
   retrievedSessionData: SessionData | null | undefined
 ): boolean => {
-  if (req.newSessionIdGenerated === true && retrievedSessionData) {
-    console.warn(`SessionID received for ${req.sessionID} but new id generated - this should never ` +
-      `happen and session data shouldn't yet be in the session store. Ending session call.`);
-    res.status(401);
+  const status = getStatusWhenNewIdGeneratedButSessionDataAlreadyExists(
+    req.newSessionIdGenerated, retrievedSessionData);
+  if (status !== undefined) {
+    res.status(status);
     res.end();
     return true;
   }
@@ -84,16 +84,32 @@ export const getStatusIfNoSessionData = (
   return undefined;
 };
 
-export const endResponseIfNoSessionData = (
+export const regenerateSessionIdIfNoSessionData = (
+  retrievedSessionData: SessionData | null | undefined,
+  req: SystemHttpRequestType<SystemSessionDataType>
+): SessionId | undefined => {
+  if (!retrievedSessionData) {
+    console.debug(regenerateSessionIdIfNoSessionData,
+      `SessionID received for ${req.sessionID} but no session data, generating a new sessionId.`);
+    const newSessionId = applyNewIdToSession(req, true);
+    return newSessionId;
+  }
+  return undefined;
+};
+
+export const errorToNextIfNoSessionData = (
   retrievedSessionData: SessionData | null | undefined,
   req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response
+  res: express.Response,
+  next: express.NextFunction
 ): boolean => {
   if (!retrievedSessionData) {
-    console.debug(`SessionID received for ${req.sessionID} but no session data, ` +
-    `with no new id generated. Ending session call.`);
+    const err = new Error(`SessionID received for ${req.sessionID} but no session data, ` +
+    `with no new id generated. We should expect regenerateSessionIdIfNoSessionData to be ` +
+    `called.  Calling to next(err).`);
+    console.debug(errorToNextIfNoSessionData, err);
     res.status(401);
-    res.end();
+    next(err);
     return true;
   }
   return false;

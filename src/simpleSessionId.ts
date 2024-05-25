@@ -3,9 +3,10 @@ import * as express from 'express';
 import { Session, SessionData } from "express-session";
 import { SystemHttpRequestType, SystemSessionDataType } from './types.js';
 import {
-  endResponseIfNoSessionData,
+  errorToNextIfNoSessionData,
   getStatusWhenNewIdGeneratedButSessionDataAlreadyExists,
-  getStatusWhenNoSessionId
+  getStatusWhenNoSessionId,
+  regenerateSessionIdIfNoSessionData
 } from './sessionChecks.js';
 
 export const saveSessionDataToSession = <ApplicationDataType extends SystemSessionDataType>(
@@ -33,6 +34,7 @@ export const handleSessionFromStore = <ApplicationDataType extends SystemSession
   retrievedSessionData: SessionData | null | undefined,
   next: express.NextFunction
 ):void => {
+  // TODO: Remove 38-51
   const responseCode: number|undefined = getStatusWhenNoSessionId(req.sessionID) ||
     getStatusWhenNewIdGeneratedButSessionDataAlreadyExists(req.newSessionIdGenerated, retrievedSessionData);
 
@@ -48,7 +50,9 @@ export const handleSessionFromStore = <ApplicationDataType extends SystemSession
     return;
   }
 
-  if (endResponseIfNoSessionData(retrievedSessionData, req, res)) {
+  regenerateSessionIdIfNoSessionData(retrievedSessionData, req);
+
+  if (errorToNextIfNoSessionData(retrievedSessionData, req, res, next)) {
     return;
   }
 

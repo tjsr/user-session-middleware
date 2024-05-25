@@ -1,3 +1,4 @@
+import { assignUserIdToRequestSessionHandler, setSessionCookie } from './sessionUserHandler.js';
 import {
   handleSessionWithNewlyGeneratedId,
   requiresSessionId,
@@ -7,13 +8,13 @@ import {
 import { mysqlSessionStore } from './sessionStore.js';
 import { sessionHandlerMiddleware } from './getSession.js';
 import { setUserCookies } from './setUserCookies.js';
-import { useSessionId } from './useSessionId.js';
 
 export {
+  assignUserIdToRequestSessionHandler,
   mysqlSessionStore,
+  setSessionCookie,
   setUserCookies,
   sessionHandlerMiddleware,
-  useSessionId,
   requiresSessionId,
   handleSessionWithNewlyGeneratedId,
   retrieveSessionData

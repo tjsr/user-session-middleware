@@ -1,15 +1,31 @@
-import * as Express from "express";
-
 import { Mock, vi } from "vitest";
 import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
+import express from "express";
+import session from "express-session";
+import { sessionHandlerMiddleware } from "./getSession";
 
-export const getMockResResp = (values?: MockRequest | undefined) => {
+interface MockReqRespSet<
+  RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends express.Response = express.Response
+> {
+  clearMockReq: () => void;
+  clearMockRes: () => void;
+  mockClear: () => void;
+  next: express.NextFunction;
+  req: RequestType;
+  res: ResponseType;
+};
+
+export const getMockReqResp = <
+  RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends express.Response = express.Response
+>(values?: MockRequest | undefined): MockReqRespSet => {
   // @ts-expect-error TS6311
-  const { clearMockRes, next, res, _mockClear } = getMockRes<Express.Response>();
-  const req = getMockReq<SystemHttpRequestType<SystemSessionDataType>>(values);
+  const { clearMockRes, next, res, _mockClear } = getMockRes<ResponseType>();
+  const req: RequestType = getMockReq(values);
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
@@ -42,4 +58,28 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
     return template as unknown as Return;
   });
   return [promise, mock];
+};
+
+export const appWithMiddleware = (
+  ...middleware: express.RequestHandler[]
+): { app: express.Express, memoryStore: session.MemoryStore } => {
+  const memoryStore: session.MemoryStore = new session.MemoryStore();
+
+  const app: express.Express = express();
+  app.use(sessionHandlerMiddleware(memoryStore));
+  app.use(middleware);
+  app.get('/', (req, res, _next) => {
+    res.status(200);
+    res.end();
+  });
+  app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    if (err) {
+      res.status(500);
+    }
+    if (!res.statusCode) {
+      res.status(501);
+    }
+    res.end();
+  });
+  return { app, memoryStore };
 };

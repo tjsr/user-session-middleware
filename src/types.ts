@@ -8,6 +8,9 @@ export type uuid4 = uuid;
 export type SnowflakeType = bigint | string;
 export type UserId = uuid5;
 export type EmailAddress = string;
+export type SessionId = uuid5;
+
+export type SessionStoreData = Partial<Omit<SystemSessionDataType, 'cookie'>>;
 
 export interface SystemSessionDataType extends SessionData {
   userId: UserId;
