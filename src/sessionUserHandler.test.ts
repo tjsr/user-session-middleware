@@ -4,6 +4,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { Cookie } from "express-session";
 import { NextFunction } from "express";
 import { SESSION_ID_HEADER_KEY } from "./getSession";
+import { addIgnoredLog } from "./setup-tests";
 import { appWithMiddleware } from "./testUtils";
 import { assignUserIdToRequestSessionHandler } from "./sessionUserHandler";
 import supertest from 'supertest';
@@ -29,6 +30,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
     };
     const { app } = appWithMiddleware(assignUserIdToRequestSessionHandler, endValidator);
     const testSessionId = 'test-session-4321';
+    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
 
     return new Promise<void>((done) => {
       supertest(app)
@@ -59,6 +61,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
       userId: undefined!,
     };
     const testSessionId = 'test-session-4321';
+    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
     memoryStore.set(testSessionId, testSessionData);
 
     return new Promise<void>((done) => {
@@ -82,6 +85,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
       next();
     };
     const testSessionId = 'test-session-4321';
+    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
 
     const { app, memoryStore } = appWithMiddleware(assignUserIdToRequestSessionHandler, endValidator);
     const testSessionData: SystemSessionDataType = {

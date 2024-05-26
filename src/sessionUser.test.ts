@@ -1,5 +1,6 @@
+import { addIgnoredLog, addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { assignUserIdToRequestSession, assignUserIdToSession } from "./sessionUser";
-import { beforeEach, describe, expect, test, vi } from "vitest";
 import expressSession, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
@@ -33,6 +34,8 @@ describe('assignUserIdToSession', () => {
   });
 
   test('Should assign a new userId to the session if there is not already one set.', () => {
+    // eslint-disable-next-line
+    addIgnoredLog(/Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i);
     const { req, next } = getMockReqResp({
       ...testRequestData,
       sessionID: 'test-session-id',
@@ -126,6 +129,12 @@ describe('assignUserIdToRequestSession', () => {
       newId: undefined,
       userId: 'test-user-id',
     };
+
+    addIgnoredLogsFromFunction(assignUserIdToSession);
+  });
+
+  afterEach(() => {
+    clearIgnoredFunctions();
   });
 
   test('Should assign a new userId to the session if there is not already one set.', () => {
@@ -135,6 +144,7 @@ describe('assignUserIdToRequestSession', () => {
     });
 
     memoryStore.set('test-session-id', testSessionStoreData);
+    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-id$/);
     req.sessionStore.createSession(req, testSessionStoreData);
     
     expect(req.session).toBeDefined();

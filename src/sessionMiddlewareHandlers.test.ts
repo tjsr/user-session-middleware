@@ -1,7 +1,9 @@
 import { SESSION_ID_HEADER_KEY, sessionHandlerMiddleware } from "./getSession";
 import { SystemHttpRequestType, SystemSessionDataType } from "./types";
-import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { addIgnoredLog, addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { createMockPromisePair, getMockReqResp } from "./testUtils";
+import { errorToNextIfNoSessionData, regenerateSessionIdIfNoSessionData } from "./sessionChecks";
 import express, * as Express from "express";
 import expressSession, { Cookie, Session, SessionData, Store } from "express-session";
 import { getMockReq, getMockRes } from "vitest-mock-express";
@@ -13,7 +15,6 @@ import {
 } from "./sessionMiddlewareHandlers";
 
 import { NextFunction } from "express";
-import { addIgnoredLog } from "./setup-tests";
 import session from 'express-session';
 import { setSessionCookie } from "./sessionUserHandler";
 import supertest from 'supertest';
@@ -103,6 +104,8 @@ describe('retrieveSessionData with mocked async callbacks', () => {
   test('Should reject the session if a sessionID was provided but no session data was found', async () => {
     // eslint-disable-next-line max-len
     addIgnoredLog('SessionID received for nonexistent-session-id but no session data, with no new id generated. Ending session call.');
+
+    addIgnoredLogsFromFunction(retrieveSessionData, errorToNextIfNoSessionData, regenerateSessionIdIfNoSessionData);
     const { req, res, next } = getMockReqResp({
       newSessionIdGenerated: false,
       sessionID: 'nonexistent-session-id',
@@ -238,6 +241,10 @@ describe('retrieveSessionData supertest tests', () => {
     });
   };
 
+  afterEach(() => {
+    clearIgnoredFunctions();
+  });
+
   beforeAll(async () => {
     return Promise.resolve();
   });
@@ -247,6 +254,7 @@ describe('retrieveSessionData supertest tests', () => {
   });
 
   test('Should reject a made-up SessionID that we dont know about', async () => {
+    addIgnoredLogsFromFunction(retrieveSessionData, regenerateSessionIdIfNoSessionData, errorToNextIfNoSessionData);
     appWithMiddleware(retrieveSessionData);
     return new Promise<void>((done) => {
       supertest(app)
@@ -294,6 +302,13 @@ describe('retrieveSessionData supertest tests', () => {
   test(
     'Should generate a new session ID if the current session ID given is invalid and set the new value as a cookie.',
     async () => {
+      addIgnoredLogsFromFunction(
+        retrieveSessionData,
+        regenerateSessionIdIfNoSessionData,
+        errorToNextIfNoSessionData,
+        setSessionCookie
+      );
+      
       // const regeneratedSessionId = 'regenerated-session-id';
       appWithMiddleware(retrieveSessionData, setSessionCookie);
       return new Promise<void>((done) => {

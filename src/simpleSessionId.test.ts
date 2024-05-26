@@ -1,16 +1,25 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { addIgnoredLog, addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import expressSession, { Cookie, Session, Store } from 'express-session';
 import {
   handleSessionFromStore,
   saveSessionDataToSession as saveStoredSessionDataToSession
 } from './simpleSessionId.js';
 
-import { addIgnoredLog } from "./setup-tests.js";
+import { assignUserIdToRequestSession } from "./sessionUser.js";
 import { getMockReq } from "vitest-mock-express";
 import { getMockReqResp } from "./testUtils.js";
 
 describe('handleSessionFromStore', () => {
+  beforeAll(() => {
+    addIgnoredLogsFromFunction(assignUserIdToRequestSession);
+  });
+
+  afterAll(() => {
+    clearIgnoredFunctions();
+  });
+
   test('Should return 401 if no sessionID is provided', () => {
     const { req, res, next } = getMockReqResp();
     addIgnoredLog('No session ID received - can\'t process retrieved session.');
@@ -21,6 +30,7 @@ describe('handleSessionFromStore', () => {
   });
 
   test('Should return a 401 when a newly generated sessionID results in retrieving exising data.', () => {
+    addIgnoredLog(/New session ID generated but session data already exists - this should never happen./i);
     const testSessionId = 'some-session-id';
     const memoryStore = new expressSession.MemoryStore();
 

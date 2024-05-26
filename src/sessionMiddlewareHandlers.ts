@@ -74,7 +74,7 @@ export const retrieveSessionData = async <ApplicationDataType extends SystemSess
 
     const newSessionId = regenerateSessionIdIfNoSessionData(genericSessionData, req);
     if (newSessionId) {
-      console.debug(`New sessionId ${newSessionId} assigned.`);
+      console.debug(retrieveSessionData, `New sessionId ${newSessionId} assigned.`);
     }
 
     if (errorToNextIfNoSessionData(genericSessionData, req, res, next)) {

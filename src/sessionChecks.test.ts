@@ -1,6 +1,7 @@
 import * as Express from "express";
 
 import { Cookie, SessionData } from "express-session";
+import { addIgnoredLog, addIgnoredLogsFromFunction, clearIgnoreLogFilters } from "./setup-tests.js";
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   endResponseOnError,
@@ -10,8 +11,6 @@ import {
   regenerateSessionIdIfNoSessionData
 } from './sessionChecks.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
-
-import { addIgnoredLog } from "./setup-tests.js";
 
 describe('endResponseOnError', () => {
   let tmpStdErr: typeof console.error;
@@ -93,6 +92,8 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
       cookie: new Cookie(),
     };
 
+    addIgnoredLogsFromFunction(errorToNextIfNoSessionData);
+    addIgnoredLog(/New session ID generated but session data already exists - this should never happen./i);
     addIgnoredLog('SessionID received for test-session-id but new id generated');
 
     const result = endResponseWhenNewIdGeneratedButSessionDataAlreadyExists(req, res, sessionData);
@@ -138,6 +139,10 @@ describe('endResponseWhenNewIdGeneratedButSessionDataAlreadyExists', () => {
 });
 
 describe('regenerateSessionIdIfNoSessionData', () => {
+  afterEach(() => {
+    clearIgnoreLogFilters();
+  });
+
   test('Should regenerate the session ID when no session data is received', async () => {
     const { next: next } = getMockRes<Express.Response>();
 
@@ -145,7 +150,7 @@ describe('regenerateSessionIdIfNoSessionData', () => {
       sessionID: 'test-session-id',
     });
 
-    addIgnoredLog('SessionID received for test-session-id but no session data');
+    addIgnoredLog(/SessionID received for test-session-id but no session data/i);
 
     const sessionData: SessionData|undefined = undefined;
     const result = regenerateSessionIdIfNoSessionData(sessionData, req);
