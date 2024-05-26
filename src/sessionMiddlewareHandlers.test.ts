@@ -216,14 +216,11 @@ describe('retrieveSessionData supertest tests', () => {
 
   const appWithMiddleware = (
     ...middleware: (express.RequestHandler|express.ErrorRequestHandler)[]
-    // additionalRootAssertions?: (req: express.Request, res: express.Response, next: NextFunction) => void
   ) => {
     memoryStore = new session.MemoryStore();
 
     app = express();
     app.use(sessionHandlerMiddleware(memoryStore));
-    // app.use(requiresSessionId, handleSessionWithNewlyGeneratedId, retrieveSessionData);
-    // app.use(retrieveSessionData);
     app.use(middleware);
     app.get('/', (req, res, next) => {
       res.status(200);
@@ -237,10 +234,7 @@ describe('retrieveSessionData supertest tests', () => {
       if (!res.statusCode) {
         res.status(501);
       }
-      console.trace('Reached error handler in test case.');
       res.send();
-      // res.end();
-      // next();
     });
   };
 
@@ -249,7 +243,7 @@ describe('retrieveSessionData supertest tests', () => {
   });
 
   afterAll(async () => {
-    return Promise.resolve(); // closeConnectionPool();
+    return Promise.resolve();
   });
 
   test('Should reject a made-up SessionID that we dont know about', async () => {
@@ -310,16 +304,11 @@ describe('retrieveSessionData supertest tests', () => {
           .end((err, res) => {
             expect(err).toBeNull();
             expect(res.status).toBe(401);
-            // expect(res.headers['x-session-id']).toEqual(regeneratedSessionId);
             const cookieValue = res.get('Set-Cookie')[0];
             expect(cookieValue).not.toMatch(/sessionId=abcd-1234/);
             expect(cookieValue).toMatch(/sessionId=/);
-            // expect(res.cookie).toHaveBeenCalledWith('sessionId', regeneratedSessionId);
             
             done();
-          // })
-          // .expect(401, () => {
-          //   done();
           });
       });
     });

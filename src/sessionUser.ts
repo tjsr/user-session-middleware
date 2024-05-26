@@ -24,7 +24,7 @@ export const assignUserIdToSession = <ApplicationDataType extends SystemSessionD
   }
   if (!session.userId) {
     const userId: uuid5 = createRandomUserId();
-    console.log(
+    console.log(assignUserIdToSession,
       `Assigned a new userId ${userId} to session ${session.id}`
     );
     session.userId = userId;

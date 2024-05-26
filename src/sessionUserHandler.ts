@@ -17,7 +17,7 @@ export const setSessionCookie = (
   req: SystemHttpRequestType<SystemSessionDataType>,
   res: express.Response,
   next: express.NextFunction) => {
-  console.debug(`Setting session cookie to ${req.sessionID}.`);
+  console.debug(setSessionCookie, `Setting session cookie to ${req.sessionID}.`);
   assert(req.session !== undefined);
   assert(req.session.id !== undefined);
   res.set('Set-Cookie', `sessionId=${req.sessionID}`);

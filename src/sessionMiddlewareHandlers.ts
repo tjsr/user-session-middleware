@@ -63,10 +63,6 @@ export const retrieveSessionData = async <ApplicationDataType extends SystemSess
   if (req.sessionID === undefined && req.newSessionIdGenerated === true) {
     const err = new Error('How can we save a sesison with no sessionID?');
     throw err;
-    // res.status(500);
-    // next(err);
-    // req.session.save();
-    // next();
   }
   if (!req.newSessionIdGenerated) {
     let genericSessionData: ApplicationDataType|null|undefined;
@@ -95,20 +91,6 @@ export const retrieveSessionData = async <ApplicationDataType extends SystemSess
     }
 
     handleSessionFromStore(req, res, genericSessionData, next);
-
-    // req.sessionStore.get(
-    //   req.sessionID,
-    //   async (err: Error, genericSessionData: SessionData | null | undefined) => {
-    //     if (endResponseOnError(err, res)) {
-    //       return;
-    //     }
-    //     if (errorToNextIfNoSessionData(genericSessionData, req, res, next)) {
-    //       return;
-    //     }
-      
-    //     handleSessionFromStore(req, res, genericSessionData, next);
-    //   }
-    // );
   } else {
     next();
   }

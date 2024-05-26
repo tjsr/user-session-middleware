@@ -53,7 +53,8 @@ export const getStatusWhenNewIdGeneratedButSessionDataAlreadyExists = (
   retrievedSessionData: SessionData | null | undefined
 ): number|undefined => {
   if (newSessionIdGenerated === true && retrievedSessionData) {
-    console.warn('New session ID generated but session data already exists - this should never happen.');
+    console.warn(getStatusWhenNewIdGeneratedButSessionDataAlreadyExists,
+      'New session ID generated but session data already exists - this should never happen.');
     return 401;
   }
   return undefined;
