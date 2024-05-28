@@ -21,4 +21,6 @@ export interface SystemSessionDataType extends SessionData {
 export interface SystemHttpRequestType<Data extends SystemSessionDataType> extends express.Request {
   session: Session & Partial<Data>;
   newSessionIdGenerated?: boolean;
+  retrievedSessionData?: Data;
+  sessionID: SessionId;
 }

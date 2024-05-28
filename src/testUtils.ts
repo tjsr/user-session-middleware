@@ -5,6 +5,7 @@ import { getMockReq, getMockRes } from "vitest-mock-express";
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import express from "express";
 import session from "express-session";
+import { sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { sessionHandlerMiddleware } from "./getSession";
 
 interface MockReqRespSet<
@@ -15,8 +16,8 @@ interface MockReqRespSet<
   clearMockRes: () => void;
   mockClear: () => void;
   next: express.NextFunction;
-  req: RequestType;
-  res: ResponseType;
+  request: RequestType;
+  response: ResponseType;
 };
 
 export const getMockReqResp = <
@@ -25,7 +26,7 @@ export const getMockReqResp = <
 >(values?: MockRequest | undefined): MockReqRespSet => {
   // @ts-expect-error TS6311
   const { clearMockRes, next, res, _mockClear } = getMockRes<ResponseType>();
-  const req: RequestType = getMockReq(values);
+  const request: RequestType = getMockReq(values);
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
@@ -36,7 +37,7 @@ export const getMockReqResp = <
     // TODO: Clear response mocks
   };
   
-  return { clearMockReq, clearMockRes, mockClear: clear, next, req, res };
+  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response: res };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,14 +73,6 @@ export const appWithMiddleware = (
     res.status(200);
     res.end();
   });
-  app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    if (err) {
-      res.status(500);
-    }
-    if (!res.statusCode) {
-      res.status(501);
-    }
-    res.end();
-  });
+  app.use(sessionErrorHandler);
   return { app, memoryStore };
 };
