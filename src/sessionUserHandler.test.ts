@@ -110,7 +110,6 @@ describe('assignUserIdToRequestSessionHandler', () => {
       };
       memoryStore.set(testSessionId, testSessionData);
 
-      // return new Promise<void>((done) => {
       return supertest(app)
         .get('/')
         .set(SESSION_ID_HEADER_KEY, testSessionId)
