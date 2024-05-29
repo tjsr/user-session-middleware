@@ -1,10 +1,11 @@
 import { Mock, vi } from "vitest";
 import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 import { getMockReq, getMockRes } from "vitest-mock-express";
+import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import express from "express";
-import session from "express-session";
+import expressSession from "express-session";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { sessionHandlerMiddleware } from "./getSession";
 
@@ -19,6 +20,12 @@ export interface MockReqRespSet<
   request: RequestType;
   response: ResponseType;
 };
+
+export interface SessionDataTestContext {
+  memoryStore?: Store;
+  testRequestData: MockRequest;
+  testSessionStoreData: SystemSessionDataType;
+}
 
 export const getMockReqResp = <
   RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
@@ -75,4 +82,56 @@ export const appWithMiddleware = (
   });
   app.use(sessionErrorHandler);
   return { app, memoryStore };
+};
+
+export const createTestRequestSessionData = (
+  context: SessionDataTestContext, 
+  mockDataOverrides: MockRequest  = {},
+  { 
+    noMockSave = false,
+    skipCreateSession = false,
+  }
+): {  } & MockReqRespSet => {
+  const mocks = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(
+    {
+      ...context.testRequestData,
+      ...mockDataOverrides,
+    }
+  );
+  const { request } = mocks;
+  context.testRequestData.new = true;
+  if (!skipCreateSession) {
+    request.sessionStore.createSession(request, context.testSessionStoreData);
+  }
+  if (!noMockSave) {
+    request.session.save = vi.fn();
+  }
+
+  return { ...mocks };
+};
+
+export const createContextForSessionTest = (
+  context: SessionDataTestContext,
+  requestDataDefaults: MockRequest = {},
+  sessionStoreDefaults: Partial<SystemSessionDataType> = {}
+): void => {
+  const cookie = new Cookie();
+  context.memoryStore = new expressSession.MemoryStore();
+  context.memoryStore.set('some-session-id', {
+    cookie,
+  });
+
+  context.testRequestData = {
+    newSessionIdGenerated: requestDataDefaults.newSessionIdGenerated !== undefined
+      ? requestDataDefaults.newSessionIdGenerated : false,
+    sessionID: requestDataDefaults.sessionID !== undefined ? requestDataDefaults.sessionID : undefined,
+    sessionStore: context.memoryStore,
+  };
+
+  context.testSessionStoreData = {
+    cookie,
+    email: sessionStoreDefaults.email !== undefined ? sessionStoreDefaults.email : "test-email",
+    newId: undefined,
+    userId: sessionStoreDefaults.userId !== undefined ? sessionStoreDefaults.userId : 'test-user-id',
+  };
 };
