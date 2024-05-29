@@ -5,6 +5,7 @@ import expressSession, { Cookie, Session, Store } from 'express-session';
 
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import { getMockReq } from "vitest-mock-express";
+import { saveSessionDataToSession } from './store/loadData.js';
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {
@@ -116,7 +117,7 @@ describe('saveSessionDataToSession', () => {
     existingSessionDataOverrides: Partial<SystemSessionDataType>,
     noSave = false
   ): Session & Partial<SystemSessionDataType> => {
-    const _storedSessionData: Partial<SystemSessionDataType> = {
+    const storedSessionData: Partial<SystemSessionDataType> = {
       ...partailStoreData,
       cookie: new Cookie(),
     };
@@ -130,7 +131,7 @@ describe('saveSessionDataToSession', () => {
       session.save = vi.fn();
     }
     // TODO: Fix this
-    // saveStoredSessionDataToSession(storedSessionData as SystemSessionDataType, session);
+    saveSessionDataToSession(storedSessionData as SystemSessionDataType, session);
     expect(session.save).toBeCalled();
     return session;
   };
