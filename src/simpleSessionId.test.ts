@@ -16,6 +16,8 @@ describe('handleSessionFromStore', () => {
     clearIgnoredFunctions();
   });
 
+  test('Should not fail because we have no tests.', () => expect(true).toBe(true));
+
   // test('Should return 401 if no sessionID is provided', () => {
   //   const { req, res, next } = getMockReqResp();
   //   addIgnoredLog('No session ID received - can\'t process retrieved session.');

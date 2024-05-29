@@ -8,7 +8,7 @@ import session from "express-session";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { sessionHandlerMiddleware } from "./getSession";
 
-interface MockReqRespSet<
+export interface MockReqRespSet<
   RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
   ResponseType extends express.Response = express.Response
 > {

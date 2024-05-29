@@ -43,8 +43,12 @@ const expectVerifyHandlerFunction = <RequestType extends SystemHttpRequestType<S
     response,
   };
   const mockNext = vi.fn((params: unknown) => {
-    result.nextParams!.params = params;
-    next(params);
+    if (params) {
+      result.nextParams!.params = params;
+      next(params);
+    } else {
+      next();
+    }
   });
 
   handlerFunction(request, response, mockNext);

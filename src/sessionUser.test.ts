@@ -36,39 +36,39 @@ describe('assignUserIdToSession', () => {
   test('Should assign a new userId to the session if there is not already one set.', () => {
     // eslint-disable-next-line
     addIgnoredLog(/Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i);
-    const { req, next } = getMockReqResp({
+    const { request, next } = getMockReqResp({
       ...testRequestData,
       sessionID: 'test-session-id',
     });
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
     
-    expect(req.session).toBeDefined();
-    req.session.userId = undefined;
+    expect(request.session).toBeDefined();
+    request.session.userId = undefined;
 
-    req.session.save = vi.fn();
+    request.session.save = vi.fn();
 
-    assignUserIdToSession(req.session, next);
+    assignUserIdToSession(request.session, next);
 
-    expect(req.session.userId).not.toBe(undefined);
-    expect(req.session.save).toHaveBeenCalled();
+    expect(request.session.userId).not.toBe(undefined);
+    expect(request.session.save).toHaveBeenCalled();
 
-    expect(() => assignUserIdToSession(req.session, next)).not.toThrowError();
+    expect(() => assignUserIdToSession(request.session, next)).not.toThrowError();
   });
 
   test('Should throw an error if the session is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
-    expect(() => assignUserIdToSession(req.session, next)).toThrowError(
+    expect(() => assignUserIdToSession(request.session, next)).toThrowError(
       'Session is not defined when assigning userId to session.');
   });
 
   test('Should call next if the session is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     try {
-      assignUserIdToSession(req.session, next);
+      assignUserIdToSession(request.session, next);
     } catch (e) {
       expect (e).toBeDefined();
     }
@@ -77,27 +77,27 @@ describe('assignUserIdToSession', () => {
   });
 
   test('Should throw an error if the session has no id.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
-    expect(() => assignUserIdToSession(req.session, next)).toThrowError(
+    expect(() => assignUserIdToSession(request.session, next)).toThrowError(
       'Session ID is not defined on session when assigning userId to session.');
   });
 
   test('Should not call next if the session id is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
     try {
-      assignUserIdToSession(req.session, next);
+      assignUserIdToSession(request.session, next);
     } catch (e) {
       expect (e).toBeDefined();
     }
@@ -138,39 +138,39 @@ describe('assignUserIdToRequestSession', () => {
   });
 
   test('Should assign a new userId to the session if there is not already one set.', () => {
-    const { req, next } = getMockReqResp({
+    const { request, next } = getMockReqResp({
       ...testRequestData,
       sessionID: 'test-session-id',
     });
 
     memoryStore.set('test-session-id', testSessionStoreData);
     addIgnoredLog(/^Assigned a new userId (.*) to session test-session-id$/);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
     
-    expect(req.session).toBeDefined();
-    req.session.userId = undefined;
+    expect(request.session).toBeDefined();
+    request.session.userId = undefined;
 
-    req.session.save = vi.fn();
+    request.session.save = vi.fn();
 
-    assignUserIdToRequestSession(req, next);
+    assignUserIdToRequestSession(request, next);
 
-    expect(req.session.userId).not.toBe(undefined);
-    expect(req.session.save).toHaveBeenCalled();
+    expect(request.session.userId).not.toBe(undefined);
+    expect(request.session.save).toHaveBeenCalled();
 
-    expect(() => assignUserIdToRequestSession(req, next)).not.toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).not.toThrowError();
   });
 
   test('Should throw an error if the session is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
-    expect(() => assignUserIdToRequestSession(req, next)).toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).toThrowError();
   });
 
   test('Should call next if the session is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     try {
-      assignUserIdToRequestSession(req, next);
+      assignUserIdToRequestSession(request, next);
     } catch (e) {
       expect (e).toBeDefined();
     }
@@ -179,26 +179,26 @@ describe('assignUserIdToRequestSession', () => {
   });
 
   test('Should throw an error if the session has no id.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
-    expect(() => assignUserIdToRequestSession(req, next)).toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).toThrowError();
   });
 
   test('Should not call next if the session id is not defined on request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
     try {
-      assignUserIdToRequestSession(req, next);
+      assignUserIdToRequestSession(request, next);
     } catch (e) {
       expect (e).toBeDefined();
     }
@@ -206,34 +206,34 @@ describe('assignUserIdToRequestSession', () => {
   });
 
   test('Requires a session to be defined on the request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
-    expect(() => assignUserIdToRequestSession(req, next)).toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).toThrowError();
   });
 
   test('Requires a session id to be defined on the request.', () => {
-    const { req, next } = getMockReqResp(testRequestData);
+    const { request, next } = getMockReqResp(testRequestData);
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
-    expect(() => assignUserIdToRequestSession(req, next)).toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).toThrowError();
   });
 
   test('Requires a session id on the session to be a string.', () => {
-    const { req, next } = getMockReqResp(
+    const { request, next } = getMockReqResp(
       {
         ...testRequestData,
         sessionID: 12345 as unknown as string,
       });
 
     memoryStore.set('test-session-id', testSessionStoreData);
-    req.sessionStore.createSession(req, testSessionStoreData);
+    request.sessionStore.createSession(request, testSessionStoreData);
 
-    expect(req.session).toBeDefined();
+    expect(request.session).toBeDefined();
 
-    expect(() => assignUserIdToRequestSession(req, next)).toThrowError();
+    expect(() => assignUserIdToRequestSession(request, next)).toThrowError();
   });
 });
