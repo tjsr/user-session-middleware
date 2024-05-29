@@ -44,6 +44,9 @@ const _setupFilesPath = findViteConfigPath() + './src/setup-tests.ts';
 
 export default defineConfig({
   test: {
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+    },
     env: {
       DOTENV_FLOW_PATH: searchUpwardsForEnvFile(),
       DOTENV_FLOW_PATTERN: '.env.test',

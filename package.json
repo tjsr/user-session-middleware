@@ -23,7 +23,8 @@
     "prepack": "npm test && npm run build",
     "prepublishOnly": "npm run clean && npm test && npm run build",
     "disabled:postinstall": "npm run link",
-    "test": "vitest --run && npm run lint"
+    "test": "vitest --run && npm run lint",
+    "test:coverage": "vitest run --coverage"
   },
   "nodemonConfig": {
     "watch": [
@@ -57,6 +58,7 @@
     "@types/express-session": "^1.18.0",
     "@types/node": "^20.12.12",
     "@types/uuid": "^9.0.8",
+    "@vitest/coverage-v8": "^1.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
     "expect-cookies": "^0.2.0",
