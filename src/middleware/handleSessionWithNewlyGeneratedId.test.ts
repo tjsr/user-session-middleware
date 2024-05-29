@@ -6,7 +6,17 @@ import {
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { SessionHandlerError } from "../errors";
+import { Store } from "express-session";
+import { SystemSessionDataType } from "../types";
 import { handleSessionWithNewlyGeneratedId } from "./handleSessionId";
+
+declare module 'vitest' {
+  export interface TestContext {
+    memoryStore?: Store;
+    testRequestData: MockRequest;
+    testSessionStoreData: SystemSessionDataType;
+  }
+};
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
