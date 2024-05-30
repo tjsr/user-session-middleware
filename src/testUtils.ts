@@ -102,9 +102,9 @@ export const createTestRequestSessionData = (
   context.testRequestData.new = true;
   if (!skipCreateSession) {
     request.sessionStore.createSession(request, context.testSessionStoreData);
-  }
-  if (!noMockSave) {
-    request.session.save = vi.fn();
+    if (!noMockSave) {
+      request.session.save = vi.fn();
+    }
   }
 
   return { ...mocks };
