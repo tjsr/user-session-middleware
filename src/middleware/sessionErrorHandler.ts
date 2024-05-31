@@ -18,7 +18,7 @@ export const sessionErrorHandler = <
     return;
   }
   if (res.statusCode <= 200) {
-    console.error(err, 'Error with res.statusCode < 200.');
+    console.error(err, 'Error with res.statusCode < 200 - this test should fail.');
     res.status(500);
   }
   next(err);
@@ -39,7 +39,7 @@ export const endErrorRequest = (
   res: express.Response,
   _next: NextFunction
 ) => {
-  console.warn(endErrorRequest, 'Got end error request');
-  res.send();
+  console.warn(endErrorRequest, 'Got end error request', res.statusCode, res.status);
+  res.send(res.statusCode);
   res.end();
 };

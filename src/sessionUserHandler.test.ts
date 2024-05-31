@@ -19,30 +19,31 @@ describe('assignUserIdToRequestSessionHandler', () => {
     return Promise.resolve(); // closeConnectionPool();
   });
 
-  test('Should set and save the userId on the request session when userId ' + 
-    ' is not yet set and no existing session data in store.', async () => {
-    const endValidator = (
-      req: SystemHttpRequestType<SystemSessionDataType>,
-      _res: express.Response,
-      next: NextFunction
-    ) => {
-      expect(req.session.userId).not.toBeUndefined();
-      next();
-    };
-    const { app } = appWithMiddleware([handleAssignUserIdToRequestSessionWhenNoExistingSessionData], [endValidator]);
-    const testSessionId = 'test-session-4321';
-    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
+  test(
+    'Should set/save userId on req.session when userId is not yet set and no existing session data in store.',
+    async () => {
+      const endValidator = (
+        req: SystemHttpRequestType<SystemSessionDataType>,
+        _res: express.Response,
+        next: NextFunction
+      ) => {
+        expect(req.session.userId).not.toBeUndefined();
+        next();
+      };
+      const { app } = appWithMiddleware([handleSessionDataRetrieval,
+        handleAssignUserIdToRequestSessionWhenNoExistingSessionData], [endValidator]);
+      const testSessionId = 'test-session-4321';
+      addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
 
-    return new Promise<void>((done) => {
-      supertest(app)
+      // return new Promise<void>((done) => {
+      const response = await supertest(app)
         .get('/')
         .set(SESSION_ID_HEADER_KEY, testSessionId)
         .set('Content-Type', 'application/json')
-        .expect(200, () => {
-          done();
-        });
+        .expect(200);
+
+      expect(response.statusCode).toEqual(200);
     });
-  });
 
   test('Should set and save the userId on the request session when data in store has no userId.', async () => {
     const endValidator = (
@@ -53,9 +54,10 @@ describe('assignUserIdToRequestSessionHandler', () => {
       expect(req.session.userId).not.toBeUndefined();
       next();
     };
-    const { app, memoryStore } = appWithMiddleware(
-      [handleAssignUserIdToRequestSessionWhenNoExistingSessionData as express.RequestHandler],
-      [endValidator]);
+    const { app, memoryStore } = appWithMiddleware([
+      handleSessionDataRetrieval,
+      handleAssignUserIdToRequestSessionWhenNoExistingSessionData as express.RequestHandler],
+    [endValidator]);
     const testSessionData: SystemSessionDataType = {
       // TODO: Stored data doesn't need to store cookie.
       cookie: new Cookie(),
@@ -67,16 +69,12 @@ describe('assignUserIdToRequestSessionHandler', () => {
     addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
     memoryStore.set(testSessionId, testSessionData);
 
-    return new Promise<void>((done) => {
-      supertest(app)
-        .get('/')
-        .set(SESSION_ID_HEADER_KEY, testSessionId)
-        .set('Content-Type', 'application/json')
-        .expect(200, () => {
-          console.log(`Did we get here??`);
-          done();
-        });
-    });
+    const response = await supertest(app)
+      .get('/')
+      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Content-Type', 'application/json')
+      .expect(200);
+    expect(response.statusCode).toEqual(200);
   });
 
   test(
@@ -118,15 +116,5 @@ describe('assignUserIdToRequestSessionHandler', () => {
         .set(SESSION_ID_HEADER_KEY, testSessionId)
         .set('Content-Type', 'application/json')
         .expect(200);
-      // , () => {
-
-      // });
-      // .end((err, _res) => {
-      //   if (err) {
-      //     console.log(err, 'Got err in end'); return done(err); // throw err;
-      //   }
-      //   return done();
-      // });
-      // });
     });
 });

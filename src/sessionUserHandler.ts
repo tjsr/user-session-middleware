@@ -6,19 +6,19 @@ import express from "express";
 import { handleSessionDataRetrieval } from "./middleware/storedSessionData.js";
 
 // This comes after setting data from the session store.
-export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData = <
+export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData = async <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>,
   ResponseType extends SystemHttpResponse<SessionStoreDataType>,
   >(
-    request: RequestType,
-    response: ResponseType,
-    next: express.NextFunction
-  ) => {
+  request: RequestType,
+  response: ResponseType,
+  next: express.NextFunction
+) => {
   addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData.name);
   verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
 
   try {
-    assignUserIdToRequestSession(request);
+    await assignUserIdToRequestSession(request);
     next();
   } catch (err) {
     next(err);
