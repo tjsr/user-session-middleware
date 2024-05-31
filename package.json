@@ -82,7 +82,7 @@
     "express": "^4.19.2"
   },
   "overrides": {
-    "mysql2": ">=3.9.7",
+    "mysql2": ">=3.10.0",
     "rimraf": "^5.0.7"
   },
   "optionalDependencies": {
