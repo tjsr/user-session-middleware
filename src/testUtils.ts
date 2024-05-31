@@ -1,4 +1,4 @@
-import { Mock, vi } from "vitest";
+import { Mock, MockInstance, expect, vi } from "vitest";
 import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types";
 import { endErrorRequest, endRequest, sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { getMockReq, getMockRes } from "vitest-mock-express";
@@ -19,6 +19,7 @@ export interface MockReqRespSet<
   next: express.NextFunction;
   request: RequestType;
   response: ResponseType;
+  spies?: Map<Function, MockInstance>;
 };
 
 export interface SessionDataTestContext {
@@ -98,30 +99,52 @@ export const appWithMiddleware = (
   return { app, memoryStore };
 };
 
+interface SessionTestRunOptions {
+  noMockSave?: boolean;
+  skipCreateSession?: boolean;
+  skipAddToStore?: boolean;
+  spyOnSave?: boolean;
+  overrideSessionData?: Partial<SystemSessionDataType>;
+}
+
 export const createTestRequestSessionData = (
   context: SessionDataTestContext, 
   mockDataOverrides: MockRequest = {},
-  { 
-    noMockSave = false,
-    skipCreateSession = false,
-  }
+  testRunOptions: SessionTestRunOptions = {} 
 ): {  } & MockReqRespSet => {
-  const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(
-    {
-      ...context.testRequestData,
-      ...mockDataOverrides,
-    }
-  );
+  const mockRequestData: MockRequest = {
+    ...context.testRequestData,
+    ...mockDataOverrides,
+  };
+  const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(mockRequestData);
   const { request } = mocks;
   context.testRequestData.new = true;
-  if (!skipCreateSession) {
+  if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
+    context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
+  }
+  if (!testRunOptions.skipCreateSession) {
     request.sessionStore.createSession(request, context.testSessionStoreData);
-    if (!noMockSave) {
+    if (testRunOptions.spyOnSave) {
+      if (mocks.spies === undefined) {
+        mocks.spies = new Map();
+      }
+      const saveSpy = vi.spyOn(request.session, 'save');
+      mocks.spies.set(request.session.save, saveSpy);
+    } else if (!testRunOptions.noMockSave) {
       request.session.save = vi.fn();
+    }
+
+    expect(request.session).toBeDefined();
+
+    if (testRunOptions.overrideSessionData !== undefined) {
+      Object.keys(testRunOptions?.overrideSessionData as object).forEach((key) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (request.session as any)[key] = testRunOptions.overrideSessionData![key];
+      });
     }
   }
 
-  return { ...mocks };
+  return mocks;
 };
 
 export const createContextForSessionTest = (

@@ -10,7 +10,7 @@ import {
   createTestRequestSessionData,
 } from "./testUtils";
 import { addIgnoredLog, clearIgnoredFunctions } from "./setup-tests";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser";
 
 describe('assignUserIdToSession', () => {
@@ -20,22 +20,18 @@ describe('assignUserIdToSession', () => {
     async (context: SessionDataTestContext) => {
       // eslint-disable-next-line
       addIgnoredLog(/Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i);
-      const { request } = createTestRequestSessionData(context, {
+      const { request, spies } = createTestRequestSessionData(context, {
         sessionID: 'test-session-id',
-      }, {});
+      }, {
+        overrideSessionData: {
+          userId: undefined,
+        },
+        spyOnSave: true,
+      });
 
-      context.memoryStore?.set('test-session-id', context.testSessionStoreData);
-      request.sessionStore.createSession(request, context.testSessionStoreData);
-    
       expect(request.session).toBeDefined();
-      request.session.userId = undefined;
+      const saveMock = spies?.get(request.session.save);
 
-      const saveMock = vi.spyOn(request.session, 'save');
-      // request.session.save = vi.fn((callback: ((err: any) => void)) => {
-      //   callback(null);
-      // }) as any; // Add 'as any' to bypass type checking
-
-      // expectAsyncException(() => assignUserIdToSession(request.session)), SessionDataNotFoundError);
       await expect((async () =>
         await assignUserIdToSession(request.session))
       ()).
@@ -44,7 +40,6 @@ describe('assignUserIdToSession', () => {
         toThrowError();
 
       expect(request.session.userId).not.toBe(undefined);
-      // expect(request.session.save).toHaveBeenCalled();
       expect(saveMock).toHaveBeenCalled();
     });
 
@@ -97,18 +92,17 @@ describe('assignUserIdToRequestSession', () => {
 
   test('Should assign a new userId to the session if there is not already one set.', async (context) => {
     const sessionID = 'test-session-id';
-    const { request } = createTestRequestSessionData(context, {
+    const { request, spies } = createTestRequestSessionData(context, {
       sessionID,
-    }, { noMockSave: true });
+    }, {
+      noMockSave: true,
+      overrideSessionData: {
+        userId: undefined,
+      },
+      spyOnSave: true,
+    });
 
-    context.memoryStore?.set(sessionID, context.testSessionStoreData);
-    request.sessionStore.createSession(request, context.testSessionStoreData);
-    // addIgnoredLog(/^Assigned a new userId (.*) to session test-session-id$/);
-    // request.sessionStore.createSession(request, testSessionStoreData);
-    
-    expect(request.session).toBeDefined();
-    request.session.userId = undefined;
-    const saveMock = vi.spyOn(request.session, 'save');
+    const saveMock = spies?.get(request.session.save);
 
     await expect((async () => await assignUserIdToRequestSession(request))()).resolves.not.toThrowError();
     expect(request.session.userId).not.toBe(undefined);
