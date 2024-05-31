@@ -26,8 +26,7 @@ export const requireSessionIdInRequest = (
 ): void => {
   if (!sessionID) {
     // This should never get called.
-    throw new SessionHandlerError(
-      NO_SESSION_ID_IN_REQUEST);
+    throw new SessionHandlerError(NO_SESSION_ID_IN_REQUEST);
   }
   return;
 };
