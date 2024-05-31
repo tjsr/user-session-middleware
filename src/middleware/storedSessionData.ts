@@ -1,11 +1,12 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
+import { ERROR_RETRIEVING_SESSION_DATA, ERROR_SAVING_SESSION } from '../errors.js';
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
+import { addCalledHandler, verifyPrerequisiteHandler } from './handlerChainLog.js';
 import {
   requireNoSessionDataForNewlyGeneratedId,
   requireSessionDataForExistingId,
 } from '../sessionHandlerErrors.js';
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
 
-import { ERROR_RETRIEVING_SESSION_DATA } from '../errors.js';
 import { SessionHandlerError } from '../errors.js';
 import assert from "assert";
 import { checkNewlyGeneratedId } from './handleSessionId.js';
@@ -16,9 +17,11 @@ import {
 
 export const handleSessionDataRetrieval = async <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
-  _res: express.Response,
+  response: SystemHttpResponse<SessionStoreDataType>,
   next: express.NextFunction // handleSessionCookie
 ): Promise<void> => {
+  addCalledHandler(response, handleSessionDataRetrieval.name);
+  
   if (checkNewlyGeneratedId(req, next)) {
     return;
   }
@@ -36,17 +39,17 @@ export const handleSessionDataRetrieval = async <ApplicationDataType extends Sys
     return;
   }
 
-  req.retrievedSessionData = genericSessionData as ApplicationDataType;
+  response.locals.retrievedSessionData = genericSessionData as ApplicationDataType;
   next();
 };
 
 export const handleSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
-  _res: express.Response,
+  response: SystemHttpResponse<SessionStoreDataType>,
   next: express.NextFunction // handleSessionsWithRequiredData
 ): void => {
-  assert(req.retrievedSessionData, 'No session data retrieved.');
-  const sessionData: ApplicationDataType = req.retrievedSessionData as ApplicationDataType;
+  assert(response.locals.retrievedSessionData, 'No session data retrieved.');
+  const sessionData: ApplicationDataType = response.locals.retrievedSessionData as ApplicationDataType;
   
   try {
     const newSessionId = regenerateSessionIdIfNoSessionData(sessionData, req);
@@ -61,12 +64,14 @@ export const handleSessionWithNoSessionData = <ApplicationDataType extends Syste
 };
 
 export const handleSessionsWhichRequiredData = <ApplicationDataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<ApplicationDataType>,
-  _res: express.Response,
+  _req: SystemHttpRequestType<ApplicationDataType>,
+  response: SystemHttpResponse<SessionStoreDataType>,
   next: express.NextFunction // handleSessionIdAfterDataRetrieval
 ): void => {
-  assert(req.retrievedSessionData, 'No session data retrieved.');
-  const sessionData: ApplicationDataType = req.retrievedSessionData as ApplicationDataType;
+  addCalledHandler(response, handleSessionsWhichRequiredData.name);
+  verifyPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
+  assert(response.locals.retrievedSessionData, 'No session data retrieved.');
+  const sessionData: SessionStoreDataType = response.locals.retrievedSessionData as SessionStoreDataType;
   try {
     requireSessionDataForExistingId(sessionData);
     next();
@@ -75,14 +80,30 @@ export const handleSessionsWhichRequiredData = <ApplicationDataType extends Syst
   }
 };
 
-export const handleCopySessionStoreDataToSession = <ApplicationDataType extends SystemSessionDataType>(
+export const handleCopySessionStoreDataToSession = async <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
-  _res: express.Response,
-  next: express.NextFunction
-): void => {
-  assert(req.retrievedSessionData, 'No session data retrieved.');
+  response: SystemHttpResponse<SessionStoreDataType>,
+  next: express.NextFunction // handleAssignUserIdToRequestSessionWhenNoExistingSessionData
+): Promise<void> => {
+  try {
+    addCalledHandler(response, handleCopySessionStoreDataToSession.name);
+    verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+    // assert(response.locals.retrievedSessionData,
+    //   'No session data retrieved, handleSessionDataRetrieval must be called first.');
+  } catch (err) {
+    next(err);
+    return Promise.resolve();
+  }
 
-  const sessionData: ApplicationDataType = req.retrievedSessionData as ApplicationDataType;
-  saveSessionDataToSession(sessionData, req.session);
-  next();
+  try {
+    const sessionData: SessionStoreDataType = response.locals.retrievedSessionData as SessionStoreDataType;
+    await saveSessionDataToSession(sessionData, req.session);
+    next();
+  } catch (err) {
+    const sessionError: SessionHandlerError = new SessionHandlerError(
+      ERROR_SAVING_SESSION, 500,
+      'Error while saving session data to store after writing store data to session', err);
+    next(sessionError);
+  }
+  return Promise.resolve();
 };

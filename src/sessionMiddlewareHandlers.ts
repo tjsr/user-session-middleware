@@ -1,5 +1,4 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
-import express, { NextFunction } from "express";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types.js";
 import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval,
@@ -13,14 +12,17 @@ import {
   handleSessionWithNewlyGeneratedId
 } from "./middleware/handleSessionId.js";
 
+import express from "express";
+import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
+
 export const userSessionMiddleware: (
   ((_req: SystemHttpRequestType<SystemSessionDataType>,
-    _res: express.Response,
-    _handleSessionWithNewlyGeneratedId: NextFunction) => void) |
+    _response: SystemHttpResponse<SessionStoreDataType>,
+    _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
   ((_err: Error,
     _req: SystemHttpRequestType<SystemSessionDataType>,
-    _res: express.Response,
-    _handleSessionWithNewlyGeneratedId: NextFunction) => void)
+    _response: SystemHttpResponse<SessionStoreDataType>,
+    _handleSessionWithNewlyGeneratedId: express.NextFunction) => void)
 )[] = [
   handleSessionIdRequired,
   handleSessionWithNewlyGeneratedId,
@@ -31,4 +33,5 @@ export const userSessionMiddleware: (
   handleSessionsWhichRequiredData,
   handleSessionIdAfterDataRetrieval,
   handleCopySessionStoreDataToSession,
+  handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
 ];

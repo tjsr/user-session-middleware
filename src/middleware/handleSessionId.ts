@@ -6,11 +6,13 @@ import {
   requireSessionInitialized,
 } from '../sessionHandlerErrors.js';
 
-export const handleSessionIdRequired = (
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  _res: express.Response,
-  handleSessionWithNewlyGeneratedId: NextFunction
-): void => {
+export const handleSessionIdRequired = <
+  RequestType extends SystemHttpRequestType<SystemSessionDataType>
+>(
+    req: RequestType,
+    _res: express.Response,
+    handleSessionWithNewlyGeneratedId: NextFunction
+  ): void => {
   try {
     requireSessionIdGenerated(req.sessionID);
   } catch (sessionError) {

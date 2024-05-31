@@ -9,8 +9,9 @@ export type SnowflakeType = bigint | string;
 export type UserId = uuid5;
 export type EmailAddress = string;
 export type SessionId = uuid5;
+export type HandlerName = string;
 
-export type SessionStoreData = Partial<Omit<SystemSessionDataType, 'cookie'>>;
+export type SessionStoreDataType = Partial<Omit<SystemSessionDataType, 'cookie'>>;
 
 export interface SystemSessionDataType extends SessionData {
   userId: UserId;
@@ -18,9 +19,34 @@ export interface SystemSessionDataType extends SessionData {
   newId: boolean | undefined;
 }
 
-export interface SystemHttpRequestType<Data extends SystemSessionDataType> extends express.Request {
-  session: Session & Partial<Data>;
+export interface SessionMiddlewareErrorHandler<
+SessionData extends SystemSessionDataType,
+RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestHandler {
+  err: Error,
+  req: RequestType,
+  res: express.Response,
+  next: express.NextFunction
+}
+
+export interface SessionMiddlewareHandler<
+SessionData extends SystemSessionDataType,
+RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestHandler {
+  req: RequestType,
+  res: express.Response,
+  next: express.NextFunction
+}
+
+export interface SystemHttpRequestType<SessionData extends SystemSessionDataType> extends express.Request {
   newSessionIdGenerated?: boolean;
-  retrievedSessionData?: Data;
+  session: Session & Partial<SessionData>;
   sessionID: SessionId;
+}
+
+export interface SystemHttpResponse<StoreData extends SessionStoreDataType> extends express.Response {
+  locals: {
+    calledHandlers: HandlerName[];
+    retrievedSessionData?: StoreData;
+    skipHandlerDependencyChecks: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } | Record<string, any>
 }

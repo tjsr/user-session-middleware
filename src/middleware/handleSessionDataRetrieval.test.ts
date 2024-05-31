@@ -36,7 +36,7 @@ describe('handleSessionDataRetrieval', () => {
     // should not call store.get
     expect(request.sessionStore.get).not.toBeCalled();
     expect(next).toHaveBeenCalledWith();
-    expect(request.retrievedSessionData).toBeUndefined();
+    expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
   test('Should call next handler function for existing id that returns no data.', async (context) => {
@@ -56,7 +56,7 @@ describe('handleSessionDataRetrieval', () => {
     expect(context.memoryStore!.get).toBeCalled();
     expect(next).toBeCalled();
     expect(next).toHaveBeenCalledWith();
-    expect(request.retrievedSessionData).toBeUndefined();
+    expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
   test('Should not call next when an error occurs for an existing id.', async (context) => {
@@ -75,7 +75,7 @@ describe('handleSessionDataRetrieval', () => {
     await handleSessionDataRetrieval(request, response, next);
     expect(context.memoryStore!.get).toBeCalled();
     expect(next).toBeCalledWith(expect.any(SessionHandlerError));
-    expect(request.retrievedSessionData).toBeUndefined();
+    expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
   test('Should call next hanlder function for existing id that has data.', async (context) => {
@@ -89,7 +89,7 @@ describe('handleSessionDataRetrieval', () => {
 
     await handleSessionDataRetrieval(request, response, next);
     expect(next).toHaveBeenCalledWith();
-    expect(request.retrievedSessionData?.email).toEqual(context.testSessionStoreData.email);
-    expect(request.retrievedSessionData?.userId).toEqual(context.testSessionStoreData.userId);
+    expect(response.locals.retrievedSessionData?.email).toEqual(context.testSessionStoreData.email);
+    expect(response.locals.retrievedSessionData?.userId).toEqual(context.testSessionStoreData.userId);
   });
 });

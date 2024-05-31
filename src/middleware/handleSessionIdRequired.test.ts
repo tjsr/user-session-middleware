@@ -8,7 +8,7 @@ import express from "express";
 import { handleSessionIdRequired } from "./handleSessionId";
 import supertest from 'supertest';
 
-describe('handleSessionIdRequired', () => {
+describe('handler.handleSessionIdRequired', () => {
   test('Should fail when no sessionID is provided.', () => 
     verifyHandlerFunctionCallsNextWithError(handleSessionIdRequired, { sessionID: undefined }));
 
@@ -21,12 +21,10 @@ describe('api.handleSessionIdRequired', () => {
   let memoryStore: session.MemoryStore;
 
   beforeEach(() => {
-    ({ app, memoryStore } = appWithMiddleware(handleSessionIdRequired));
+    ({ app, memoryStore } = appWithMiddleware([handleSessionIdRequired]));
   });
 
   test('Should accept a request with a valid sessionId.', async () => {
-    appWithMiddleware(handleSessionIdRequired);
-
     memoryStore.set('abcd-1234', {
       cookie: new Cookie(),
     });
@@ -41,8 +39,6 @@ describe('api.handleSessionIdRequired', () => {
 
   test('Should not fail because no sessionId was provided.', async () => {
     // We don't expect an error here because the session generator will assign a new session ID.
-    appWithMiddleware(handleSessionIdRequired);
-
     const response = await supertest(app)
       .get('/')
       .set('Content-Type', 'application/json');

@@ -8,8 +8,7 @@ import {
   SessionHandlerError
 } from "./errors.js";
 import { Session, SessionData } from "express-session";
-
-import { SessionId } from "./types.js";
+import { SessionId, SessionStoreDataType } from "./types.js";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined
@@ -43,7 +42,7 @@ export const requireNoSessionDataForNewlyGeneratedId = (
 };
 
 export const requireSessionDataForExistingId = (
-  retrievedSessionData: SessionData | null | undefined
+  retrievedSessionData: SessionStoreDataType | null | undefined
 ): void => {
   if (!retrievedSessionData) {
     throw new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, 401,

@@ -1,17 +1,17 @@
 import { Mock, vi } from "vitest";
-import { SystemHttpRequestType, SystemSessionDataType } from "./types";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types";
+import { endErrorRequest, endRequest, sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import express from "express";
 import expressSession from "express-session";
-import { sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { sessionHandlerMiddleware } from "./getSession";
 
 export interface MockReqRespSet<
-  RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends express.Response = express.Response
+  RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -27,12 +27,20 @@ export interface SessionDataTestContext {
   testSessionStoreData: SystemSessionDataType;
 }
 
+declare module 'vitest' {
+  export interface TestContext {
+    memoryStore?: Store;
+    testRequestData: MockRequest;
+    testSessionStoreData: SystemSessionDataType;
+  }
+};
+
 export const getMockReqResp = <
-  RequestType extends express.Request = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends express.Response = express.Response
+  RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
 >(values?: MockRequest | undefined): MockReqRespSet => {
   // @ts-expect-error TS6311
-  const { clearMockRes, next, res, _mockClear } = getMockRes<ResponseType>();
+  const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>();
   const request: RequestType = getMockReq(values);
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
@@ -44,7 +52,7 @@ export const getMockReqResp = <
     // TODO: Clear response mocks
   };
   
-  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response: res };
+  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,30 +77,36 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
 };
 
 export const appWithMiddleware = (
-  ...middleware: express.RequestHandler[]
+  middleware: express.RequestHandler[],
+  endMiddleware?: express.RequestHandler[]
 ): { app: express.Express, memoryStore: session.MemoryStore } => {
   const memoryStore: session.MemoryStore = new session.MemoryStore();
 
   const app: express.Express = express();
   app.use(sessionHandlerMiddleware(memoryStore));
   app.use(middleware);
-  app.get('/', (req, res, _next) => {
+  app.get('/', (req, res, next) => {
     res.status(200);
-    res.end();
+    next();
   });
+  if (endMiddleware) {
+    app.use(endMiddleware);
+  }
   app.use(sessionErrorHandler);
+  app.use(endRequest);
+  app.use(endErrorRequest);
   return { app, memoryStore };
 };
 
 export const createTestRequestSessionData = (
   context: SessionDataTestContext, 
-  mockDataOverrides: MockRequest  = {},
+  mockDataOverrides: MockRequest = {},
   { 
     noMockSave = false,
     skipCreateSession = false,
   }
 ): {  } & MockReqRespSet => {
-  const mocks = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(
+  const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(
     {
       ...context.testRequestData,
       ...mockDataOverrides,

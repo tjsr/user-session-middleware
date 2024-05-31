@@ -1,7 +1,6 @@
-import * as Express from "express";
-
 import { addIgnoredLog, clearIgnoreLogFilters } from "./setup-tests.js";
 import { afterEach, describe, expect, test } from 'vitest';
+import express, * as Express from "express";
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
 import { SessionData } from "express-session";
@@ -107,7 +106,7 @@ describe('regenerateSessionIdIfNoSessionData', () => {
   });
 
   test('Should regenerate the session ID when no session data is received', async () => {
-    const { next: next } = getMockRes<Express.Response>();
+    const { next: next } = getMockRes<express.Response>();
 
     const req = getMockReq<Express.Request>({
       sessionID: 'test-session-id',

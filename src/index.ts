@@ -1,11 +1,11 @@
-import { assignUserIdToRequestSessionHandler } from './sessionUserHandler.js';
+import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from './sessionUserHandler.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { sessionHandlerMiddleware } from './getSession.js';
 import { setUserCookies } from './setUserCookies.js';
 import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 
 export {
-  assignUserIdToRequestSessionHandler,
+  handleAssignUserIdToRequestSessionWhenNoExistingSessionData as assignUserIdToRequestSessionHandler,
   mysqlSessionStore,
   // setSessionCookie,
   setUserCookies,
