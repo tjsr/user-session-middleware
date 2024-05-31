@@ -53,5 +53,6 @@ export default defineConfig({
     },
     globals: true,
     setupFiles: [path.resolve(__dirname, 'src/setup-tests.ts')],
+    testTimeout: 3000,
   },
 });
