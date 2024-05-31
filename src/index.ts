@@ -1,23 +1,21 @@
-import { assignUserIdToRequestSessionHandler, setSessionCookie } from './sessionUserHandler.js';
-import {
-  handleSessionWithNewlyGeneratedId,
-  requiresSessionId,
-  retrieveSessionData
-} from './sessionMiddlewareHandlers.js';
-
+import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from './sessionUserHandler.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { sessionHandlerMiddleware } from './getSession.js';
 import { setUserCookies } from './setUserCookies.js';
+import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 
 export {
-  assignUserIdToRequestSessionHandler,
+  handleAssignUserIdToRequestSessionWhenNoExistingSessionData as assignUserIdToRequestSessionHandler,
   mysqlSessionStore,
-  setSessionCookie,
+  // setSessionCookie,
   setUserCookies,
   sessionHandlerMiddleware,
-  requiresSessionId,
-  handleSessionWithNewlyGeneratedId,
-  retrieveSessionData
+  // handleSessionIdRequired,
+  // handleSessionWithNewlyGeneratedId,
+  // handleSessionDataRetrieval,
+
+  userSessionMiddleware
 };
 
 export type { SystemHttpRequestType, SystemSessionDataType } from './types.js';
+export type { SessionHandlerError } from './errors.js';

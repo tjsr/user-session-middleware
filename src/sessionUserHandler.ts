@@ -1,25 +1,26 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types.js";
+import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
 
-import assert from "assert";
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
+import { handleSessionDataRetrieval } from "./middleware/storedSessionData.js";
 
-export const assignUserIdToRequestSessionHandler = (
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  _res: express.Response,
+// This comes after setting data from the session store.
+export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData = async <
+  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends SystemHttpResponse<SessionStoreDataType>,
+  >(
+  request: RequestType,
+  response: ResponseType,
   next: express.NextFunction
 ) => {
-  assignUserIdToRequestSession(req, next);
-};
+  addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData.name);
+  verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
 
-export const setSessionCookie = (
-  err: Error,
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response,
-  next: express.NextFunction) => {
-  console.debug(setSessionCookie, `Setting session cookie to ${req.sessionID}.`);
-  assert(req.session !== undefined);
-  assert(req.session.id !== undefined);
-  res.set('Set-Cookie', `sessionId=${req.sessionID}`);
-  next(err);
+  try {
+    await assignUserIdToRequestSession(request);
+    next();
+  } catch (err) {
+    next(err);
+  }
 };

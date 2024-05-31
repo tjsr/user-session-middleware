@@ -1,6 +1,6 @@
 // vitest.config.ts
 
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -12,11 +12,11 @@ const isBaseDirectory = (p: string) => {
   return parsedPath.root === parsedPath.dir;
 };
 
-const searchUpwardsForEnvFile = (): string => {
+const searchUpwardsForFile = (filename: string): string => {
   let currentPath = __dirname;
   while ((!isWindows && currentPath !== '/') ||
     (isWindows && !isBaseDirectory(currentPath))) {
-    const envFilePath = path.join(currentPath, '.env.test');
+    const envFilePath = path.join(currentPath, filename);
     if (fs.existsSync(envFilePath)) {
       return currentPath;
     }
@@ -26,13 +26,33 @@ const searchUpwardsForEnvFile = (): string => {
   return '';
 };
 
+const searchUpwardsForEnvFile = (): string => {
+  return searchUpwardsForFile('.env.test');
+};
+
+
+const findViteConfigPath = ():string => {
+  return searchUpwardsForFile('vite.config.ts');
+};
+
+const findPackageJsonPath = ():string => {
+  return searchUpwardsForFile('package.json');
+};
+
+const _projectPath = path.dirname(findPackageJsonPath());
+const _setupFilesPath = findViteConfigPath() + './src/setup-tests.ts';
+
 export default defineConfig({
   test: {
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+    },
     env: {
       DOTENV_FLOW_PATH: searchUpwardsForEnvFile(),
       DOTENV_FLOW_PATTERN: '.env.test',
     },
     globals: true,
-    setupFiles: ['./src/setup-tests.ts'],
-  }
+    setupFiles: [path.resolve(__dirname, 'src/setup-tests.ts')],
+    testTimeout: 3000,
+  },
 });

@@ -1,14 +1,13 @@
-import * as Express from 'express';
-
 import { describe, expect, test } from 'vitest';
 
+import express from 'express';
 import { getMockRes } from 'vitest-mock-express';
 import { randomUUID } from 'crypto';
 import { setUserCookies } from './setUserCookies';
 
 describe('setUserCookies', () => {
   test('Should set cookkies fo basic user data.', () => {
-    const { res, mockClear } = getMockRes<Express.Response>();
+    const { res, mockClear } = getMockRes<express.Response>();
     mockClear();
 
     const sessionId = randomUUID();
