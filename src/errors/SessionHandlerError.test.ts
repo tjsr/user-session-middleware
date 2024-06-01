@@ -4,21 +4,24 @@ import { NO_SESSION_DATA_FROM_STORE } from './errorCodes';
 import { SessionHandlerError } from './SessionHandlerError';
 
 describe('SessionHandlerError', () => {
-  const testError = new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, undefined, 'Test message');
+  const testSessionError = new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, undefined, 'Test message');
   test(
     'Should get a http status code corresponding to the sessionErrorCode when constructor has undefined value',
     () => {
-      expect(testError.status).toBe(401);
+      expect(testSessionError.status).toBe(401);
     });
 
   test('Name of simple SessionHandlerError should have no extension', () => {
-    expect(testError.name).toBe('SessionHandlerError');
+    expect(testSessionError.name).toBe('SessionHandlerError');
   });
 
   test('Should verify type is an instance of SessionHandlerError', () => {
-    expect(SessionHandlerError.isType(testError)).toBe(true);
+    expect(SessionHandlerError.isType(testSessionError)).toBe(true);
   });
 
+  test('Should have a stack trace on a basic error object', () => {
+    expect(testSessionError.stack).toBeDefined();
+  });
 });
 
 describe('Inherited SessionHandlerError', () => {
@@ -28,13 +31,17 @@ describe('Inherited SessionHandlerError', () => {
     }
   }
 
+  const testError: TestError = new TestError('Test error message');
+
   test('Name of extended SessionHandlerError should have no extension', () => {
-    const error = new TestError('Test error message');
-    expect(error.name).toBe('TestError:SessionHandlerError');
+    expect(testError.name).toBe('TestError:SessionHandlerError');
   });
 
   test('Should verify type is an instance of SessionHandlerError', () => {
-    const error = new TestError('Test error message');
-    expect(SessionHandlerError.isType(error)).toBe(true);
+    expect(SessionHandlerError.isType(testError)).toBe(true);
+  });
+
+  test('Should have a stack trace on a basic error object', () => {
+    expect(testError.stack).toBeDefined();
   });
 });

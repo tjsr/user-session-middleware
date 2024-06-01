@@ -1,7 +1,6 @@
 import { HandlerName, SessionStoreDataType, SystemHttpResponse } from "../types.js";
 
-import { PREREQUISITE_HANDLER_NOT_CALLED } from "../errors/errorCodes.js";
-import { SessionHandlerError } from "../errors/SessionHandlerError.js";
+import { RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
 export const addCalledHandler = (
   response: SystemHttpResponse<SessionStoreDataType>,
@@ -19,8 +18,9 @@ export const verifyPrerequisiteHandler = (
 ): void => {
   if (response.locals.calledHandlers) {
     if (!response.locals.calledHandlers.includes(handlerName)) {
-      throw new SessionHandlerError(PREREQUISITE_HANDLER_NOT_CALLED, 500,
-        `Prerequisite handler ${handlerName} not called.`);
+      const lastHandler = response.locals.calledHandlers[response.locals.calledHandlers.length - 1];
+      throw new RequiredMiddlewareNotCalledError(
+        `Prerequisite handler ${handlerName} not called before ${lastHandler}.`);
     }
   }
 };

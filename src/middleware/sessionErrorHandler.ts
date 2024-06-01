@@ -10,7 +10,7 @@ export const sessionErrorHandler = <
     res: express.Response,
     next: express.NextFunction
   ) => {
-  if (err.name === 'SessionHandlerError') {
+  if (SessionHandlerError.isType(err)) {
     const sessionError: SessionHandlerError = err as SessionHandlerError;
     res.status(sessionError.status);
     res.json({ message: sessionError.message });

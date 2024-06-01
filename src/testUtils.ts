@@ -77,14 +77,15 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
   return [promise, mock];
 };
 
-export const appWithMiddleware = (
+const addExpressSessionHandler = (app: express.Express, memoryStore: session.MemoryStore): void => {
+  app.use(sessionHandlerMiddleware(memoryStore));
+};
+
+const addHandlersToApp = (
+  app: express.Express,
   middleware: express.RequestHandler[],
   endMiddleware?: express.RequestHandler[]
-): { app: express.Express, memoryStore: session.MemoryStore } => {
-  const memoryStore: session.MemoryStore = new session.MemoryStore();
-
-  const app: express.Express = express();
-  app.use(sessionHandlerMiddleware(memoryStore));
+): void => {
   app.use(middleware);
   app.get('/', (req, res, next) => {
     res.status(200);
@@ -96,6 +97,29 @@ export const appWithMiddleware = (
   app.use(sessionErrorHandler);
   app.use(endRequest);
   app.use(endErrorRequest);
+};
+
+export const sessionlessAppWithMiddleware = (
+  middleware: express.RequestHandler[],
+  endMiddleware?: express.RequestHandler[]
+): { app: express.Express, memoryStore: session.MemoryStore } => {
+
+  const app: express.Express = express();
+  addHandlersToApp(app, middleware, endMiddleware);
+
+  return { app, memoryStore: undefined! };
+};
+
+export const appWithMiddleware = (
+  middleware: express.RequestHandler[],
+  endMiddleware?: express.RequestHandler[]
+): { app: express.Express, memoryStore: session.MemoryStore } => {
+  const memoryStore: session.MemoryStore = new session.MemoryStore();
+
+  const app: express.Express = express();
+  addExpressSessionHandler(app, memoryStore);
+  addHandlersToApp(app, middleware, endMiddleware);
+
   return { app, memoryStore };
 };
 

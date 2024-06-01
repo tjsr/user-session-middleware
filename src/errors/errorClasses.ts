@@ -3,7 +3,9 @@ import {
   ERROR_SESSION_NOT_INITIALIZED,
   NO_SESSION_ID_IN_REQUEST,
   NO_SESSION_ID_ON_SESSION,
-  SESSION_ID_TYPE_ERROR
+  REQUIRED_MIDDLEWARE_NOT_CALLED,
+  SESSION_ID_TYPE_ERROR,
+  SESSION_STORE_NOT_CONFIGURED
 } from "./errorCodes.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
@@ -42,5 +44,17 @@ export class SessionDataNotFoundError extends SessionHandlerError {
 export class AssignUserIdError extends SessionHandlerError {
   constructor (message = 'Error assigning userId to session.', cause?: unknown) {
     super(ERROR_SESSION_NOT_INITIALIZED, HttpStatusCode.INTERNAL_SERVER_ERROR, message, cause);
+  }
+}
+
+export class RequiredMiddlewareNotCalledError extends SessionHandlerError {
+  constructor (message = 'Required middleware not called.', cause?: unknown) {
+    super(REQUIRED_MIDDLEWARE_NOT_CALLED, HttpStatusCode.NOT_IMPLEMENTED, message, cause);
+  }
+}
+
+export class SessionStoreNotConfiguredError extends SessionHandlerError {
+  constructor() {
+    super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');
   }
 }

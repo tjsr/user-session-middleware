@@ -4,6 +4,7 @@ import { addCalledHandler, verifyPrerequisiteHandler } from './handlerChainLog.j
 import {
   requireNoSessionDataForNewlyGeneratedId,
   requireSessionDataForExistingId,
+  requireSessionStoreConfigured,
 } from '../errors/sessionErrorChecks.js';
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
 
@@ -21,6 +22,12 @@ export const handleSessionDataRetrieval = async <ApplicationDataType extends Sys
   next: express.NextFunction // handleSessionCookie
 ): Promise<void> => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
+  try {
+    requireSessionStoreConfigured(req.sessionStore);
+  } catch (err) {
+    next(err);
+    return Promise.resolve();
+  }
   
   if (checkNewlyGeneratedId(req, next)) {
     return;

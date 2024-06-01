@@ -18,4 +18,4 @@ export {
 };
 
 export type { SystemHttpRequestType, SystemSessionDataType } from './types.js';
-export type { SessionHandlerError } from './errors/SessionHandlerError.js';
+export { SessionHandlerError } from './errors/SessionHandlerError.js';

@@ -9,6 +9,7 @@ import {
   NO_SESSION_ID_IN_REQUEST,
   NO_SESSION_ID_ON_SESSION,
   PREREQUISITE_HANDLER_NOT_CALLED,
+  REQUIRED_MIDDLEWARE_NOT_CALLED,
   SESSION_ID_NOT_GENERATED,
   SESSION_ID_TYPE_ERROR
 } from "./errorCodes.js";
@@ -48,5 +49,8 @@ export const DEFAULT_ERROR_CODES: Map<number, SessionErrorValueDefaults> = new M
     [NO_SESSION_ID_ON_SESSION, {
       message: "Request sessionID not defined on session.",
       status: HttpStatusCode.INTERNAL_SERVER_ERROR }],
+    [REQUIRED_MIDDLEWARE_NOT_CALLED, {
+      message: "Prerequisite middleware was not called.",
+      status: HttpStatusCode.NOT_IMPLEMENTED }],
   ]
 );

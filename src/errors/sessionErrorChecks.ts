@@ -6,10 +6,11 @@ import {
   NO_SESSION_ID_IN_REQUEST,
   SESSION_ID_NOT_GENERATED,
 } from "./errorCodes.js";
-import { Session, SessionData } from "express-session";
+import { Session, SessionData, Store } from "express-session";
 import { SessionId, SessionStoreDataType } from "../types.js";
 
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionStoreNotConfiguredError } from "./errorClasses.js";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined
@@ -67,3 +68,10 @@ export const requireSessionInitialized = (
   }
 };
 
+export const requireSessionStoreConfigured = (
+  sessionStore: Store | undefined
+): void => {
+  if (!sessionStore) {
+    throw new SessionStoreNotConfiguredError();
+  }
+};
