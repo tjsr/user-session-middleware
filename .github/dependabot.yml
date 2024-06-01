@@ -17,6 +17,13 @@ updates:
       interval: 'daily'
     assignees:
       - 'tjsr'
+    groups:
+      linter:
+        applies-to: version-updates
+        patterns:
+        - "@typescript-eslint/*"
+        - "eslint-*"
+        - "@tjsr/eslint-config"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
