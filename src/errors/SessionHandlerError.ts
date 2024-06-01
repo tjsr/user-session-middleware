@@ -38,7 +38,8 @@ export class SessionHandlerError implements Error {
     message?: string,
     cause?: unknown
   ) {
-    this._name = this.constructor.name + ':SessionHandlerError';
+    this._name = (this.constructor.name != 'SessionHandlerError' ? (this.constructor.name + ':') : '') +
+     'SessionHandlerError';
     this._sessionErrorCode = sesisonErrorCode;
     if (status) {
       this._status = status;
@@ -50,4 +51,8 @@ export class SessionHandlerError implements Error {
       this.cause = cause;
     }
   };
+
+  static isType(error: Error): boolean {
+    return error.name?.endsWith('SessionHandlerError');
+  }
 }
