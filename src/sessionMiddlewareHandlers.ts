@@ -30,8 +30,8 @@ export const userSessionMiddleware: (
   handleSessionCookie,
   handleSessionCookieOnError,
   handleSessionWithNoSessionData,
+  handleCopySessionStoreDataToSession,
   handleSessionsWhichRequiredData,
   handleSessionIdAfterDataRetrieval,
-  handleCopySessionStoreDataToSession,
   handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
 ];

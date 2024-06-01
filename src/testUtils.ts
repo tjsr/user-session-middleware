@@ -39,9 +39,9 @@ declare module 'vitest' {
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
   ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
->(values?: MockRequest | undefined): MockReqRespSet => {
+>(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
   // @ts-expect-error TS6311
-  const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>();
+  const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
   const request: RequestType = getMockReq(values);
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');

@@ -5,12 +5,12 @@ import { applyNewIdToSession } from './getSession.js';
 
 export const regenerateSessionIdIfNoSessionData = (
   retrievedSessionData: SessionData | null | undefined,
-  req: SystemHttpRequestType<SystemSessionDataType>
+  request: SystemHttpRequestType<SystemSessionDataType>
 ): SessionId | undefined => {
   if (!retrievedSessionData) {
-    const newSessionId = applyNewIdToSession(req, true);
+    const newSessionId = applyNewIdToSession(request, true);
     console.debug(regenerateSessionIdIfNoSessionData,
-      `SessionID received for ${req.sessionID} but no session data, generating a new sessionId ${newSessionId}.`);
+      `SessionID received for ${request.sessionID} but no session data, generating a new sessionId ${newSessionId}.`);
     return newSessionId;
   }
   return undefined;
