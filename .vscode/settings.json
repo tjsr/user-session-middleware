@@ -4,5 +4,18 @@
   "eslint.experimental.useFlatConfig": true,
   "eslint.options": {
     "overrideConfigFile": "eslint.config.mjs"
-  }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["/.vscode/launch.json"],
+      "url": "https://json.schemastore.org/launch.json"
+    },
+    {
+      "fileMatch": ["/tsconfig.json"],
+      "url": "https://json.schemastore.org/tsconfig.json"
+    }
+  ]
 }

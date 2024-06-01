@@ -11,9 +11,9 @@ import {
   PREREQUISITE_HANDLER_NOT_CALLED,
   SESSION_ID_NOT_GENERATED,
   SESSION_ID_TYPE_ERROR
-} from "./errorCodes";
+} from "./errorCodes.js";
 
-import { HttpStatusCode } from "../httpStatusCodes";
+import { HttpStatusCode } from "../httpStatusCodes.js";
 
 type SessionErrorValueDefaults = {
   status: HttpStatusCode,

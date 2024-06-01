@@ -1,7 +1,7 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "../types";
 import express, { NextFunction } from "express";
 
-import { SessionHandlerError } from "../errors.js";
+import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 
 export const sessionErrorHandler = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
