@@ -1,8 +1,9 @@
 import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types.js";
 import {
   handleCopySessionStoreDataToSession,
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData,
   handleSessionDataRetrieval,
-  handleSessionWithNoSessionData,
   handleSessionsWhichRequiredData
 } from "./middleware/storedSessionData.js";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/setSessionCookie.js";
@@ -29,7 +30,8 @@ export const userSessionMiddleware: (
   handleSessionDataRetrieval,
   handleSessionCookie,
   handleSessionCookieOnError,
-  handleSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData,
+  handleExistingSessionWithNoSessionData,
   handleCopySessionStoreDataToSession,
   handleSessionsWhichRequiredData,
   handleSessionIdAfterDataRetrieval,

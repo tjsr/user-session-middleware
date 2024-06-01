@@ -45,6 +45,7 @@ export const applyNewIdToSession = <DataType extends SystemSessionDataType>(
   const generatedId = uuidv4(); // use UUIDs for session IDs
   if (applyDirectly) {
     req.sessionID = generatedId;
+    // req.session.id = generatedId;
   }
   return generatedId;
 };

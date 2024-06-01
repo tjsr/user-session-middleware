@@ -8,9 +8,10 @@ export const regenerateSessionIdIfNoSessionData = (
   request: SystemHttpRequestType<SystemSessionDataType>
 ): SessionId | undefined => {
   if (!retrievedSessionData) {
+    const currentSessionId = request.sessionID;
     const newSessionId = applyNewIdToSession(request, true);
     console.debug(regenerateSessionIdIfNoSessionData,
-      `SessionID received for ${request.sessionID} but no session data, generating a new sessionId ${newSessionId}.`);
+      `SessionID received for ${currentSessionId} but no session data, generating a new sessionId ${newSessionId}.`);
     return newSessionId;
   }
   return undefined;

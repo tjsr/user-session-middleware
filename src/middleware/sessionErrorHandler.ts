@@ -39,7 +39,7 @@ export const endErrorRequest = (
   res: express.Response,
   _next: NextFunction
 ) => {
-  console.warn(endErrorRequest, 'Got end error request', res.statusCode, res.status);
-  res.send(res.statusCode);
+  console.warn(endErrorRequest, 'Got end error request', err, res.statusCode);
+  res.sendStatus(res.statusCode);
   res.end();
 };

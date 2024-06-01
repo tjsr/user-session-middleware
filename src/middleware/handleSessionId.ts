@@ -1,13 +1,12 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
+import { handleExistingSessionWithNoSessionData, handleNewSessionWithNoSessionData } from "./storedSessionData.js";
 import {
   requireSessionIdGenerated,
   requireSessionIdWhenNewSessionIdGenerated,
   requireSessionInitialized,
 } from '../errors/sessionErrorChecks.js';
-
-import { handleSessionWithNoSessionData } from "./storedSessionData.js";
 
 export const handleSessionIdRequired = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>
@@ -66,7 +65,8 @@ export const handleSessionIdAfterDataRetrieval = <ApplicationDataType extends Sy
   next: express.NextFunction // handleCopySessionStoreDataToSession
 ): void => {
   addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
-  verifyPrerequisiteHandler(response, handleSessionWithNoSessionData.name);
+  verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
+  verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
 
   try {
     requireSessionIdGenerated(request.sessionID);

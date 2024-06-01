@@ -1,7 +1,12 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import express, { NextFunction } from "express";
-import { handleCopySessionStoreDataToSession, handleSessionDataRetrieval } from './middleware/storedSessionData.js';
+import {
+  handleCopySessionStoreDataToSession,
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData,
+  handleSessionDataRetrieval
+} from './middleware/storedSessionData.js';
 
 import { Cookie } from "express-session";
 import { SESSION_ID_HEADER_KEY } from "./getSession";
@@ -30,8 +35,13 @@ describe('assignUserIdToRequestSessionHandler', () => {
         expect(req.session.userId).not.toBeUndefined();
         next();
       };
-      const { app } = appWithMiddleware([handleSessionDataRetrieval,
-        handleAssignUserIdToRequestSessionWhenNoExistingSessionData], [endValidator]);
+      const { app } = appWithMiddleware([
+        handleSessionDataRetrieval,
+        handleCopySessionStoreDataToSession,
+        handleNewSessionWithNoSessionData,
+        handleExistingSessionWithNoSessionData,
+        handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+      ], [endValidator]);
       const testSessionId = 'test-session-4321';
       addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
 
@@ -40,9 +50,9 @@ describe('assignUserIdToRequestSessionHandler', () => {
         .get('/')
         .set(SESSION_ID_HEADER_KEY, testSessionId)
         .set('Content-Type', 'application/json')
-        .expect(200);
+        .expect(401);
 
-      expect(response.statusCode).toEqual(200);
+      expect(response.statusCode).toEqual(401);
     });
 
   test('Should set and save the userId on the request session when data in store has no userId.', async () => {
@@ -56,14 +66,17 @@ describe('assignUserIdToRequestSessionHandler', () => {
     };
     const { app, memoryStore } = appWithMiddleware([
       handleSessionDataRetrieval,
-      handleAssignUserIdToRequestSessionWhenNoExistingSessionData as express.RequestHandler],
+      handleCopySessionStoreDataToSession,
+      handleNewSessionWithNoSessionData,
+      handleExistingSessionWithNoSessionData,
+      handleAssignUserIdToRequestSessionWhenNoExistingSessionData],
     [endValidator]);
     const testSessionData: SystemSessionDataType = {
       // TODO: Stored data doesn't need to store cookie.
       cookie: new Cookie(),
       email: 'test-email',
       newId: false,
-      userId: undefined!,
+      userId: 'some-user-id'!,
     };
     const testSessionId = 'test-session-4321';
     addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
@@ -99,6 +112,8 @@ describe('assignUserIdToRequestSessionHandler', () => {
       const { app, memoryStore } = appWithMiddleware([
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
+        handleNewSessionWithNoSessionData,
+        handleExistingSessionWithNoSessionData,
         handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
       ], [endValidator]);
       const testSessionData: SystemSessionDataType = {

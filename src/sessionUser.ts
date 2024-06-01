@@ -2,6 +2,7 @@ import {
   RequestSessionIdRequiredError,
   SaveSessionError,
   SessionDataNotFoundError,
+  SessionIDValueMismatch,
   SessionIdRequiredError,
   SessionIdTypeError
 } from './errors/errorClasses.js';
@@ -73,14 +74,24 @@ const requireSessionInitialized = (session: Session) => {
   }
 };
 
+const requireSessionIDValuesMatch = (
+  sessionID: string,
+  sessionIDFromSession: string
+) => {
+  if (sessionID !== sessionIDFromSession) {
+    throw new SessionIDValueMismatch(sessionID, sessionIDFromSession);
+  }
+};
+
 export const assignUserIdToRequestSession = async <ApplicationDataType extends SystemSessionDataType>(
   request: SystemHttpRequestType<ApplicationDataType>
-) => {
+): Promise<void> => {
   try {
     requireRequestSessionId(request.sessionID);
     requireSessionInitialized(request.session);
     requireSessionId(request.session);
     requireSessionIsIsString(request.session);
+    requireSessionIDValuesMatch(request.sessionID, request.session.id);
 
     return assignUserIdToSession(request.session);
   } catch (err) {

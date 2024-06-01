@@ -1,16 +1,18 @@
 import {
   ERROR_SESSION_NOT_INITIALIZED,
-  NEW_SESSION_ID_DATA_EXISTS,
-  NO_SESSION_DATA_FROM_STORE,
   NO_SESSION_ID_FOR_NEW_REQUEST_TRUE,
   NO_SESSION_ID_IN_REQUEST,
   SESSION_ID_NOT_GENERATED,
 } from "./errorCodes.js";
+import {
+  NoSessionDataFoundError,
+  SessionDataNotExpectedError,
+  SessionStoreNotConfiguredError
+} from "./errorClasses.js";
 import { Session, SessionData, Store } from "express-session";
 import { SessionId, SessionStoreDataType } from "../types.js";
 
 import { SessionHandlerError } from "./SessionHandlerError.js";
-import { SessionStoreNotConfiguredError } from "./errorClasses.js";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined
@@ -38,16 +40,16 @@ export const requireNoSessionDataForNewlyGeneratedId = (
   retrievedSessionData: SessionData | null | undefined
 ): void => {
   if (newSessionIdGenerated === true && retrievedSessionData) {
-    throw new SessionHandlerError(NEW_SESSION_ID_DATA_EXISTS);
+    throw new SessionDataNotExpectedError();
   }
 };
 
 export const requireSessionDataForExistingId = (
+  newSessionIdGenerated: boolean | undefined,
   retrievedSessionData: SessionStoreDataType | null | undefined
 ): void => {
-  if (!retrievedSessionData) {
-    throw new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, 401,
-      'SessionID received but no session data, with no new id generated.');
+  if (newSessionIdGenerated !== true && !retrievedSessionData) {
+    throw new NoSessionDataFoundError();
   }
 };
 

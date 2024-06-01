@@ -5,7 +5,7 @@ import { setUserCookies } from './setUserCookies.js';
 import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 
 export {
-  handleAssignUserIdToRequestSessionWhenNoExistingSessionData as assignUserIdToRequestSessionHandler,
+  handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
   mysqlSessionStore,
   // setSessionCookie,
   setUserCookies,
