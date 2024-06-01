@@ -1,7 +1,7 @@
 import { SessionDataTestContext, createContextForSessionTest, createTestRequestSessionData } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { SessionHandlerError } from "../errors.js";
+import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import { checkNewlyGeneratedId } from "./handleSessionId.js";
 
 describe('checkNewlyGeneratedId', () => {

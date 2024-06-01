@@ -1,5 +1,7 @@
 import { HandlerName, SessionStoreDataType, SystemHttpResponse } from "../types.js";
-import { PREREQUISITE_HANDLER_NOT_CALLED, SessionHandlerError } from "../errors.js";
+
+import { PREREQUISITE_HANDLER_NOT_CALLED } from "../errors/errorCodes.js";
+import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 
 export const addCalledHandler = (
   response: SystemHttpResponse<SessionStoreDataType>,

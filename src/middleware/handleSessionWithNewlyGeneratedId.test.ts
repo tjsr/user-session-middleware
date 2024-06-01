@@ -2,10 +2,11 @@ import {
   SessionDataTestContext,
   createContextForSessionTest,
   createTestRequestSessionData,
-} from "../testUtils";
+} from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { SessionHandlerError } from "../errors";
+import { MockRequest } from "vitest-mock-express/dist/src/request/index.js";
+import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import { Store } from "express-session";
 import { SystemSessionDataType } from "../types";
 import { handleSessionWithNewlyGeneratedId } from "./handleSessionId";

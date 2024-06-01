@@ -1,13 +1,13 @@
-import { ERROR_RETRIEVING_SESSION_DATA, ERROR_SAVING_SESSION } from '../errors.js';
+import { ERROR_RETRIEVING_SESSION_DATA, ERROR_SAVING_SESSION } from "../errors/errorCodes.js";
 import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from './handlerChainLog.js';
 import {
   requireNoSessionDataForNewlyGeneratedId,
   requireSessionDataForExistingId,
-} from '../sessionHandlerErrors.js';
+} from '../errors/sessionErrorChecks.js';
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
 
-import { SessionHandlerError } from '../errors.js';
+import { SessionHandlerError } from '../errors/SessionHandlerError.js';
 import assert from "assert";
 import { checkNewlyGeneratedId } from './handleSessionId.js';
 import express from "express";

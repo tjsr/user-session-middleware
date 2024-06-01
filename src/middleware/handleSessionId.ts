@@ -4,7 +4,7 @@ import {
   requireSessionIdGenerated,
   requireSessionIdWhenNewSessionIdGenerated,
   requireSessionInitialized,
-} from '../sessionHandlerErrors.js';
+} from '../errors/sessionErrorChecks.js';
 
 export const handleSessionIdRequired = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>

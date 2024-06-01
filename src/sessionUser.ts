@@ -4,7 +4,7 @@ import {
   SessionDataNotFoundError,
   SessionIdRequiredError,
   SessionIdTypeError
-} from './errors.js';
+} from './errors/errorClasses.js';
 import { SystemHttpRequestType, SystemSessionDataType, uuid5 } from './types.js';
 
 import { Session } from 'express-session';

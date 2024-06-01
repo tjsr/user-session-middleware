@@ -2,7 +2,7 @@ import { Assertion, expect, vi } from "vitest";
 import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
-import { SessionHandlerError } from "./errors";
+import { SessionHandlerError } from "./errors/SessionHandlerError";
 import express from "express";
 import { getMockReqResp } from "./testUtils";
 

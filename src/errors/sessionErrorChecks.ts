@@ -5,10 +5,11 @@ import {
   NO_SESSION_ID_FOR_NEW_REQUEST_TRUE,
   NO_SESSION_ID_IN_REQUEST,
   SESSION_ID_NOT_GENERATED,
-  SessionHandlerError
-} from "./errors.js";
+} from "./errorCodes.js";
 import { Session, SessionData } from "express-session";
-import { SessionId, SessionStoreDataType } from "./types.js";
+import { SessionId, SessionStoreDataType } from "../types.js";
+
+import { SessionHandlerError } from "./SessionHandlerError.js";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined

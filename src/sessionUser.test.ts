@@ -3,7 +3,7 @@ import {
   SessionDataNotFoundError,
   SessionIdRequiredError,
   SessionIdTypeError
-} from "./errors";
+} from "./errors/errorClasses.js";
 import {
   SessionDataTestContext,
   createContextForSessionTest,

@@ -2,7 +2,7 @@ import { SessionDataTestContext, createContextForSessionTest, createTestRequestS
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { SessionData } from "express-session";
-import { SessionHandlerError } from "../errors.js";
+import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import { handleSessionDataRetrieval } from './storedSessionData.js';
 
 describe('handleSessionDataRetrieval', () => {
