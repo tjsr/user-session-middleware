@@ -13,7 +13,6 @@ import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { addCalledHandler } from "./middleware/handlerChainLog.js";
-import exp from "constants";
 import express from "express";
 import expressSession from "express-session";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";

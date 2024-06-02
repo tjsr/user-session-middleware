@@ -5,7 +5,24 @@ import { isTestMode } from "@tjsr/simple-env-utils";
 
 const HANDLER_ASSERTIONS_ENABLED = process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : false;
 
+let FORCE_HANDLER_ASSERTIONS = false;
+let DISABLE_HANDLER_ASSERTIONS = false;
+
+export const forceHandlerAssertions = (force = true): void => {
+  FORCE_HANDLER_ASSERTIONS = force;
+};
+
+export const disableHandlerAssertions = (disabled = false): void => {
+  DISABLE_HANDLER_ASSERTIONS = disabled;
+};
+
 const handlerAssertionsEnabled = (): boolean => {
+  if (FORCE_HANDLER_ASSERTIONS) {
+    return true;
+  }
+  if (DISABLE_HANDLER_ASSERTIONS) {
+    return false;
+  }
   return !isTestMode() && process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : HANDLER_ASSERTIONS_ENABLED;
 };
 

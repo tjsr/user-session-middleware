@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
 import { RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
+import { forceHandlerAssertions } from "./handlerChainLog.js";
 import { handleSessionIdAfterDataRetrieval } from "./handleSessionId.js";
 
 describe('chain.handleSessionIdAfterDataRetrieval', () => {
@@ -19,20 +20,14 @@ describe('chain.handleSessionIdAfterDataRetrieval', () => {
   });
 
   test('Should error out when prerequisite handler has not been called.', () => {
-    const unsetEnvAfter = process.env['HANDLER_ASSERTIONS_ENABLED'] === undefined;
-    const resetEnvAfter = process.env['HANDLER_ASSERTIONS_ENABLED'];
-    process.env['HANDLER_ASSERTIONS_ENABLED'] = 'true';
+    forceHandlerAssertions();
 
     try {
       expect(() => verifyHandlerFunctionCallsNextWithError(
         handleSessionIdAfterDataRetrieval, { sessionID: undefined }))
         .toThrowError(expect.any(RequiredMiddlewareNotCalledError));
     } finally {
-      if (unsetEnvAfter) {
-        delete process.env['HANDLER_ASSERTIONS_ENABLED'];
-      } else if (resetEnvAfter) {
-        process.env['HANDLER_ASSERTIONS_ENABLED'] = resetEnvAfter;
-      }
+      forceHandlerAssertions(false);
     };
   });
 });
