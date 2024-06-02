@@ -1,15 +1,17 @@
+import { SESSION_ID_HEADER_KEY, generateNewSessionId } from "../getSession.js";
 import {
   SessionDataTestContext,
   appWithMiddleware,
   createContextForSessionTest,
   createTestRequestSessionData,
+  expectResponseSetsSessionIdCookie,
   sessionlessAppWithMiddleware
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
 import { MemoryStore } from "express-session";
-import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { SessionStoreNotConfiguredError } from "../errors/errorClasses.js";
 import { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
 import supertest from 'supertest';
@@ -58,13 +60,18 @@ describe('api.handleSessionStoreRequired', () => {
   });
 
   test('Should accept a request when the session store is configured.', async () => {
-    const { app, memoryStore } = appWithMiddleware([handleSessionStoreRequired]);
+    const testSessionId = generateNewSessionId();
+    const { app, memoryStore } = appWithMiddleware([
+      handleSessionStoreRequired,
+      handleSessionCookie,
+      handleSessionCookieOnError]);
     expect(memoryStore).not.toBeUndefined();
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
+      .set(SESSION_ID_HEADER_KEY, testSessionId)
       .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(200);
+    expectResponseSetsSessionIdCookie(response, testSessionId);
   });
 });

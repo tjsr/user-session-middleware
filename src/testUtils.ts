@@ -1,20 +1,24 @@
 import {
   HandlerName,
+  SessionId,
   SessionStoreDataType,
   SystemHttpRequestType,
   SystemHttpResponse,
   SystemSessionDataType
 } from "./types";
 import { Mock, MockInstance, expect, vi } from "vitest";
-import { endErrorRequest, endRequest, sessionErrorHandler } from "./middleware/sessionErrorHandler";
+import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
-import { addCalledHandler } from "./middleware/handlerChainLog";
+import { addCalledHandler } from "./middleware/handlerChainLog.js";
+import exp from "constants";
 import express from "express";
 import expressSession from "express-session";
-import { sessionHandlerMiddleware } from "./getSession";
+import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
+import { sessionHandlerMiddleware } from "./getSession.js";
+import supertest from "supertest";
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
@@ -63,6 +67,11 @@ export const getMockReqResp = <
   return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
+export const getMockRequestResponse = getMockReqResp;
+
+export const getMockRequest = getMockReq;
+export const getMockResponse = getMockRes;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
   type CalledMethodType = typeof template;
@@ -90,8 +99,8 @@ const addExpressSessionHandler = (app: express.Express, memoryStore: session.Mem
 
 const addHandlersToApp = (
   app: express.Express,
-  middleware: express.RequestHandler[],
-  endMiddleware?: express.RequestHandler[]
+  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
+  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
 ): void => {
   app.use(middleware);
   app.get('/', (req, res, next) => {
@@ -107,8 +116,8 @@ const addHandlersToApp = (
 };
 
 export const sessionlessAppWithMiddleware = (
-  middleware: express.RequestHandler[],
-  endMiddleware?: express.RequestHandler[]
+  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
+  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
 ): { app: express.Express, memoryStore: session.MemoryStore } => {
 
   const app: express.Express = express();
@@ -118,8 +127,8 @@ export const sessionlessAppWithMiddleware = (
 };
 
 export const appWithMiddleware = (
-  middleware: express.RequestHandler[],
-  endMiddleware?: express.RequestHandler[]
+  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
+  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
 ): { app: express.Express, memoryStore: session.MemoryStore } => {
   const memoryStore: session.MemoryStore = new session.MemoryStore();
 
@@ -147,6 +156,9 @@ export const createTestRequestSessionData = (
     silentCallHandlers: true,
   }
 ): {  } & MockReqRespSet => {
+  if (context.testRequestData === undefined) {
+    createContextForSessionTest(context);
+  }
   const mockRequestData: MockRequest = {
     ...context.testRequestData,
     ...mockDataOverrides,
@@ -211,4 +223,19 @@ export const createContextForSessionTest = (
     newId: undefined,
     userId: sessionStoreDefaults.userId !== undefined ? sessionStoreDefaults.userId : 'test-user-id',
   };
+};
+
+export const expectResponseSetsSessionIdCookie = (
+  response: supertest.Response, expectedSessionId: SessionId
+) => {
+  const cookieValue = response.get('Set-Cookie')![0];
+  expect(cookieValue).toMatch(new RegExp(`sessionId=${expectedSessionId}`));
+};
+
+export const expectResponseResetsSessionIdCookie = (
+  response: supertest.Response, originalSessionId: SessionId
+) => {
+  const cookieValue = response.get('Set-Cookie')![0];
+  expect(cookieValue).not.toMatch(new RegExp(`sessionId=${originalSessionId}`));
+  expect(cookieValue).toMatch(/sessionId=/);
 };

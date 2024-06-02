@@ -19,8 +19,20 @@ describe('chain.handleSessionIdAfterDataRetrieval', () => {
   });
 
   test('Should error out when prerequisite handler has not been called.', () => {
-    expect(() => verifyHandlerFunctionCallsNextWithError(
-      handleSessionIdAfterDataRetrieval, { sessionID: undefined }))
-      .toThrowError(expect.any(RequiredMiddlewareNotCalledError));
+    const unsetEnvAfter = process.env['HANDLER_ASSERTIONS_ENABLED'] === undefined;
+    const resetEnvAfter = process.env['HANDLER_ASSERTIONS_ENABLED'];
+    process.env['HANDLER_ASSERTIONS_ENABLED'] = 'true';
+
+    try {
+      expect(() => verifyHandlerFunctionCallsNextWithError(
+        handleSessionIdAfterDataRetrieval, { sessionID: undefined }))
+        .toThrowError(expect.any(RequiredMiddlewareNotCalledError));
+    } finally {
+      if (unsetEnvAfter) {
+        delete process.env['HANDLER_ASSERTIONS_ENABLED'];
+      } else if (resetEnvAfter) {
+        process.env['HANDLER_ASSERTIONS_ENABLED'] = resetEnvAfter;
+      }
+    };
   });
 });

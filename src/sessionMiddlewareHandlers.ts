@@ -1,11 +1,13 @@
 import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types.js";
 import {
   handleCopySessionStoreDataToSession,
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData,
   handleSessionDataRetrieval,
 } from "./middleware/storedSessionData.js";
-import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/setSessionCookie.js";
+import {
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData
+} from './middleware/handleSessionWithNoData.js';
+import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handleSessionCookie.js";
 import {
   handleSessionIdAfterDataRetrieval,
   handleSessionIdRequired,

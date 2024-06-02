@@ -2,10 +2,12 @@ import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, System
 import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
 import {
   handleCopySessionStoreDataToSession,
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData,
   handleSessionDataRetrieval,
 } from "./middleware/storedSessionData.js";
+import {
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData
+} from './middleware/handleSessionWithNoData.js';
 
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";

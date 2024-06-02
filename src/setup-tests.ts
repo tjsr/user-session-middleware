@@ -1,6 +1,6 @@
 const { info, log, warn, error } = console;
 
-import { loadEnv } from '@tjsr/simple-env-utils';
+import { loadEnv, setTestMode } from '@tjsr/simple-env-utils';
 
 let ignored: (string|RegExp)[] = ['You are running Vue in development mode.', 'Found no env files to load.'];
 
@@ -62,3 +62,5 @@ export const clearIgnoreLogFilters = () => {
 };
 
 loadEnv({ silent: true });
+
+setTestMode();

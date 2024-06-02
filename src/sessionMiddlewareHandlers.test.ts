@@ -277,34 +277,7 @@ describe('retrieveSessionData supertest tests', () => {
   
   // });
 
-  // test(
-  //   'Should generate a new session ID if the current session ID given is invalid and set the new value as a cookie.',
-  //   async () => {
-  //     // addIgnoredLogsFromFunction(
-  //     //   retrieveSessionData,
-  //     //   regenerateSessionIdIfNoSessionData,
-  //     //   errorToNextIfNoSessionData,
-  //     //   setSessionCookie
-  //     // );
-      
-  //     // const regeneratedSessionId = 'regenerated-session-id';
-  //     appWithMiddleware(handleSessionDataRetrieval, setSessionCookie);
-  //     return new Promise<void>((done) => {
-  //       supertest(app)
-  //         .get('/')
-  //         .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
-  //         .set('Content-Type', 'application/json')
-  //         .end((err, res) => {
-  //           expect(err).toBeNull();
-  //           expect(res.status).toBe(401);
-  //           const cookieValue = res.get('Set-Cookie')[0];
-  //           expect(cookieValue).not.toMatch(/sessionId=abcd-1234/);
-  //           expect(cookieValue).toMatch(/sessionId=/);
-            
-  //           done();
-  //         });
-  //     });
-  //   });
+
 });
 
 describe('retrieveSessionDataFromStore', () => {

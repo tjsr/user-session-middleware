@@ -1,7 +1,10 @@
 import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
-import { handleExistingSessionWithNoSessionData, handleNewSessionWithNoSessionData } from "./storedSessionData.js";
+import {
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData
+} from './handleSessionWithNoData.js';
 import {
   requireSessionIdGenerated,
   requireSessionIdWhenNewSessionIdGenerated,

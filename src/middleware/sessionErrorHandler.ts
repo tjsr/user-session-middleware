@@ -1,45 +1,30 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "../types";
-import express, { NextFunction } from "express";
+import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
+import express from "express";
+import { handleSessionCookieOnError } from "./handleSessionCookie.js";
 
 export const sessionErrorHandler = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
     err: Error,
     req: RequestType,
-    res: express.Response,
+    response: express.Response,
     next: express.NextFunction
   ) => {
+  addCalledHandler(response, sessionErrorHandler.name);
+  verifyPrerequisiteHandler(response, handleSessionCookieOnError.name);
+
   if (SessionHandlerError.isType(err)) {
     const sessionError: SessionHandlerError = err as SessionHandlerError;
-    res.status(sessionError.status);
-    res.json({ message: sessionError.message });
+    response.status(sessionError.status);
+    response.json({ message: sessionError.message });
     next(err);
     return;
   }
-  if (res.statusCode <= 200) {
+  if (response.statusCode <= 200) {
     console.error(err, 'Error with res.statusCode < 200 - this test should fail.');
-    res.status(500);
+    response.status(500);
   }
   next(err);
-};
-
-export const endRequest = (
-  _req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response,
-  _next: NextFunction
-) => {
-  res.send();
-  res.end();
-};
-
-export const endErrorRequest = (
-  err: Error,
-  _req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response,
-  _next: NextFunction
-) => {
-  console.warn(endErrorRequest, 'Got end error request', err, res.statusCode);
-  res.sendStatus(res.statusCode);
-  res.end();
 };

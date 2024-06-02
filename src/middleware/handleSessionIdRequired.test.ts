@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "vitest";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.ts";
 import session, { Cookie } from "express-session";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils";
 
@@ -21,7 +22,11 @@ describe('api.handleSessionIdRequired', () => {
   let memoryStore: session.MemoryStore;
 
   beforeEach(() => {
-    ({ app, memoryStore } = appWithMiddleware([handleSessionIdRequired]));
+    ({ app, memoryStore } = appWithMiddleware([
+      handleSessionIdRequired,
+      handleSessionCookie,
+      handleSessionCookieOnError,
+    ]));
   });
 
   test('Should accept a request with a valid sessionId.', async () => {

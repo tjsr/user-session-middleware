@@ -1,5 +1,6 @@
 import {
   ERROR_SAVING_SESSION,
+  ERROR_SESSION_ID_NOT_GENERATED,
   ERROR_SESSION_NOT_INITIALIZED,
   NEW_SESSION_ID_DATA_EXISTS,
   NO_SESSION_DATA_FROM_STORE,
@@ -88,5 +89,12 @@ export class SessionDataNotExpectedError extends SessionHandlerError {
   constructor() {
     super(NEW_SESSION_ID_DATA_EXISTS, HttpStatusCode.UNAUTHORIZED,
       'Session data received for new session ID.');
+  }
+}
+
+export class SessionIDNotGeneratedError extends SessionHandlerError {
+  constructor() {
+    super(ERROR_SESSION_ID_NOT_GENERATED, HttpStatusCode.NOT_IMPLEMENTED,
+      'Session ID not generated for request.');
   }
 }

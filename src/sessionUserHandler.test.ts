@@ -3,10 +3,12 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import express, { NextFunction } from "express";
 import {
   handleCopySessionStoreDataToSession,
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData,
   handleSessionDataRetrieval
 } from './middleware/storedSessionData.js';
+import {
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData
+} from "./middleware/handleSessionWithNoData.js";
 
 import { Cookie } from "express-session";
 import { SESSION_ID_HEADER_KEY } from "./getSession";
