@@ -114,7 +114,7 @@ export const handleExistingSessionWithNoSessionData = <ApplicationDataType exten
     next();
     return;
   }
-  console.debug('Continuing to regenerateSessionIdIfNoSessionData');
+  console.debug(handleExistingSessionWithNoSessionData, 'Continuing to regenerateSessionIdIfNoSessionData');
 
   const sessionData: ApplicationDataType = response.locals?.retrievedSessionData as ApplicationDataType;
   try {
