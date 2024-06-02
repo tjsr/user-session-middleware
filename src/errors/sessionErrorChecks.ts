@@ -4,15 +4,14 @@ import {
   NO_SESSION_ID_IN_REQUEST,
   SESSION_ID_NOT_GENERATED,
 } from "./errorCodes.js";
+import { Session, SessionData, Store } from "express-session";
 import {
-  NoSessionDataFoundError,
   SessionDataNotExpectedError,
   SessionStoreNotConfiguredError
 } from "./errorClasses.js";
-import { Session, SessionData, Store } from "express-session";
-import { SessionId, SessionStoreDataType } from "../types.js";
 
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionId } from "../types.js";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined
@@ -44,14 +43,14 @@ export const requireNoSessionDataForNewlyGeneratedId = (
   }
 };
 
-export const requireSessionDataForExistingId = (
-  newSessionIdGenerated: boolean | undefined,
-  retrievedSessionData: SessionStoreDataType | null | undefined
-): void => {
-  if (newSessionIdGenerated !== true && !retrievedSessionData) {
-    throw new NoSessionDataFoundError();
-  }
-};
+// export const requireSessionDataForExistingId = (
+//   newSessionIdGenerated: boolean | undefined,
+//   retrievedSessionData: SessionStoreDataType | null | undefined
+// ): void => {
+//   if (newSessionIdGenerated !== true && !retrievedSessionData) {
+//     throw new NoSessionDataFoundError();
+//   }
+// };
 
 export const requireSessionIdWhenNewSessionIdGenerated = (
   sessionId: SessionId | undefined,

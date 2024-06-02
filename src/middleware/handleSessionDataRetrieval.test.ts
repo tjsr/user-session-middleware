@@ -1,4 +1,9 @@
-import { SessionDataTestContext, createContextForSessionTest, createTestRequestSessionData } from "../testUtils.js";
+import {
+  SessionDataTestContext,
+  createContextForSessionTest,
+  createMockPromisePair,
+  createTestRequestSessionData
+} from "../testUtils.js";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { SessionData } from "express-session";
@@ -12,30 +17,38 @@ describe('handleSessionDataRetrieval', () => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: true,
       sessionID: undefined,
-    }, {});
+    }, {
+      markHandlersCalled: ['handleSessionIdRequired'],
+    });
 
     // should not call store.get
     request.sessionStore.get = vi.fn();
 
-    handleSessionDataRetrieval(request, response, next);
+    const [ callbackPromiseNext, callbackMockNext ]: [Promise<void>, typeof next] = createMockPromisePair(next);
+    handleSessionDataRetrieval(request, response, callbackMockNext);
     // should not call store.get
     expect(request.sessionStore.get).not.toBeCalled();
-    expect(next).toHaveBeenCalledWith(expect.any(SessionHandlerError));
+    await callbackPromiseNext;
+    expect(callbackMockNext).toHaveBeenCalledWith(expect.any(SessionHandlerError));
   });
 
-  test('Should call next hanlder function for a newly generated session.', async (context) => {
+  test('Should call next handler function for a newly generated session.', async (context) => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: true,
       sessionID: 'session-1234',
-    }, {});
+    }, {
+      markHandlersCalled: ['handleSessionIdRequired'],
+    });
 
     // should not call store.get
     request.sessionStore.get = vi.fn();
+    const [ callbackPromiseNext, callbackMockNext ]: [Promise<void>, typeof next] = createMockPromisePair(next);
 
-    handleSessionDataRetrieval(request, response, next);
+    handleSessionDataRetrieval(request, response, callbackMockNext);
     // should not call store.get
     expect(request.sessionStore.get).not.toBeCalled();
-    expect(next).toHaveBeenCalledWith();
+    await callbackPromiseNext;
+    expect(callbackMockNext).toHaveBeenCalledWith();
     expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
@@ -44,7 +57,9 @@ describe('handleSessionDataRetrieval', () => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
-    }, {});
+    }, {
+      markHandlersCalled: ['handleSessionIdRequired'],
+    });
     context.memoryStore?.set(testSessionId, context.testSessionStoreData);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,10 +67,13 @@ describe('handleSessionDataRetrieval', () => {
       callback(undefined, undefined);
     }) as never;
 
-    await handleSessionDataRetrieval(request, response, next);
+    const [ callbackPromiseNext, callbackMockNext ]: [Promise<void>, typeof next] = createMockPromisePair(next);
+
+    handleSessionDataRetrieval(request, response, callbackMockNext);
     expect(context.memoryStore!.get).toBeCalled();
-    expect(next).toBeCalled();
-    expect(next).toHaveBeenCalledWith();
+    await callbackPromiseNext;
+    expect(callbackMockNext).toBeCalled();
+    expect(callbackMockNext).toHaveBeenCalledWith();
     expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
@@ -64,17 +82,21 @@ describe('handleSessionDataRetrieval', () => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
-    }, {});
+    }, {
+      markHandlersCalled: ['handleSessionIdRequired'],
+    });
 
     const testError: Error = new Error('Generic session storage error occurred.');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context.memoryStore!.get = vi.fn((sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
       callback(testError, undefined);
     }) as never;
+    const [callbackPromiseNext, callbackMockNext]: [Promise<void>, typeof next] = createMockPromisePair(next);
 
-    await handleSessionDataRetrieval(request, response, next);
+    handleSessionDataRetrieval(request, response, callbackMockNext);
     expect(context.memoryStore!.get).toBeCalled();
-    expect(next).toBeCalledWith(expect.any(SessionHandlerError));
+    await callbackPromiseNext;
+    expect(callbackMockNext).toBeCalledWith(expect.any(SessionHandlerError));
     expect(response.locals.retrievedSessionData).toBeUndefined();
   });
 
@@ -83,12 +105,18 @@ describe('handleSessionDataRetrieval', () => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
-    }, {});
+    }, {
+      markHandlersCalled: ['handleSessionIdRequired'],
+    });
+
+    response.locals.calledHandlers = ['handleSessionIdRequired'];
 
     context.memoryStore?.set(testSessionId, context.testSessionStoreData);
+    const [callbackPromiseNext, callbackMockNext]: [Promise<void>, typeof next] = createMockPromisePair(next);
 
-    await handleSessionDataRetrieval(request, response, next);
-    expect(next).toHaveBeenCalledWith();
+    handleSessionDataRetrieval(request, response, callbackMockNext);
+    await callbackPromiseNext;
+    expect(callbackMockNext).toHaveBeenCalledWith();
     expect(response.locals.retrievedSessionData?.email).toEqual(context.testSessionStoreData.email);
     expect(response.locals.retrievedSessionData?.userId).toEqual(context.testSessionStoreData.userId);
   });

@@ -1,10 +1,17 @@
+import {
+  HandlerName,
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponse,
+  SystemSessionDataType
+} from "./types";
 import { Mock, MockInstance, expect, vi } from "vitest";
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types";
 import { endErrorRequest, endRequest, sessionErrorHandler } from "./middleware/sessionErrorHandler";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
+import { addCalledHandler } from "./middleware/handlerChainLog";
 import express from "express";
 import expressSession from "express-session";
 import { sessionHandlerMiddleware } from "./getSession";
@@ -74,7 +81,7 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
     }
     return template as unknown as Return;
   });
-  return [promise, mock];
+  return [ promise, mock ];
 };
 
 const addExpressSessionHandler = (app: express.Express, memoryStore: session.MemoryStore): void => {
@@ -129,19 +136,23 @@ interface SessionTestRunOptions {
   skipAddToStore?: boolean;
   spyOnSave?: boolean;
   overrideSessionData?: Partial<SystemSessionDataType>;
+  markHandlersCalled?: HandlerName[],
+  silentCallHandlers?: boolean;
 }
 
 export const createTestRequestSessionData = (
   context: SessionDataTestContext, 
   mockDataOverrides: MockRequest = {},
-  testRunOptions: SessionTestRunOptions = {} 
+  testRunOptions: SessionTestRunOptions = {
+    silentCallHandlers: true,
+  }
 ): {  } & MockReqRespSet => {
   const mockRequestData: MockRequest = {
     ...context.testRequestData,
     ...mockDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(mockRequestData);
-  const { request } = mocks;
+  const { request, response } = mocks;
   context.testRequestData.new = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
     context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
@@ -166,6 +177,11 @@ export const createTestRequestSessionData = (
         (request.session as any)[key] = testRunOptions.overrideSessionData![key];
       });
     }
+  }
+  if (testRunOptions.markHandlersCalled) {
+    testRunOptions.markHandlersCalled.forEach((handlerName) => {
+      addCalledHandler(response, handlerName, testRunOptions.silentCallHandlers);
+    });
   }
 
   return mocks;

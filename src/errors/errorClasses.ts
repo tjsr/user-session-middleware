@@ -13,6 +13,7 @@ import {
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionId } from "../types.js";
 
 export class SaveSessionError extends SessionHandlerError {
   constructor (message = 'Error writing session data to store.', cause?: unknown) {
@@ -70,9 +71,9 @@ export class SessionStoreNotConfiguredError extends SessionHandlerError {
 }
 
 export class NoSessionDataFoundError extends SessionHandlerError {
-  constructor () {
+  constructor (originalSessionId: SessionId, newSessionId: SessionId) {
     super(NO_SESSION_DATA_FROM_STORE, HttpStatusCode.UNAUTHORIZED,
-      'SessionID received but no session data, with no new id generated.');
+      `SessionID ${originalSessionId} received but no session data, replaced with ${newSessionId}.`);
   }
 }
 

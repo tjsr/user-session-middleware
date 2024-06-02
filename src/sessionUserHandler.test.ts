@@ -13,6 +13,7 @@ import { SESSION_ID_HEADER_KEY } from "./getSession";
 import { addIgnoredLog } from "./setup-tests";
 import { appWithMiddleware } from "./testUtils";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler";
+import { handleSessionIdRequired } from "./middleware/handleSessionId.js";
 import supertest from 'supertest';
 
 describe('assignUserIdToRequestSessionHandler', () => {
@@ -36,6 +37,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
         next();
       };
       const { app } = appWithMiddleware([
+        handleSessionIdRequired,
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
         handleNewSessionWithNoSessionData,
@@ -65,6 +67,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
       next();
     };
     const { app, memoryStore } = appWithMiddleware([
+      handleSessionIdRequired,
       handleSessionDataRetrieval,
       handleCopySessionStoreDataToSession,
       handleNewSessionWithNoSessionData,
@@ -110,6 +113,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
       // handleCopySessionStoreDataToSession must be called first and is responsible for assigment
       // of the data from the store to session
       const { app, memoryStore } = appWithMiddleware([
+        handleSessionIdRequired,
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
         handleNewSessionWithNoSessionData,

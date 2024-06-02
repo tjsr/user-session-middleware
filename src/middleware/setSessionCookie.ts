@@ -1,5 +1,6 @@
 import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
 
+import { addCalledHandler } from "./handlerChainLog.js";
 import assert from "assert";
 import express from "express";
 
@@ -14,20 +15,22 @@ export const setSessionCookie = (
 };
 
 export const handleSessionCookie = (
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response,
+  request: SystemHttpRequestType<SystemSessionDataType>,
+  response: express.Response,
   next: express.NextFunction
 ) => {
-  setSessionCookie(req, res);
+  addCalledHandler(response, handleSessionCookie.name);
+  setSessionCookie(request, response);
   next();
 };
 
 export const handleSessionCookieOnError = (
   err: Error,
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  res: express.Response,
+  request: SystemHttpRequestType<SystemSessionDataType>,
+  response: express.Response,
   nextErrorHandler: express.NextFunction
 ) => {
-  setSessionCookie(req, res);
+  addCalledHandler(response, handleSessionCookieOnError.name);
+  setSessionCookie(request, response);
   nextErrorHandler(err);
 };

@@ -11,12 +11,15 @@ export type EmailAddress = string;
 export type SessionId = uuid5;
 export type HandlerName = string;
 
-export type SessionStoreDataType = Partial<Omit<SystemSessionDataType, 'cookie'>>;
+export interface SessionStoreDataType extends SessionDataFields {}
 
-export interface SystemSessionDataType extends SessionData {
+interface SessionDataFields {
   userId: UserId;
   email: EmailAddress;
   newId: boolean | undefined;
+}
+
+export interface SystemSessionDataType extends SessionData, SessionDataFields {
 }
 
 export interface SessionMiddlewareErrorHandler<

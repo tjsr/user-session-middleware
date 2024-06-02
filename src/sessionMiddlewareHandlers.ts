@@ -4,7 +4,6 @@ import {
   handleExistingSessionWithNoSessionData,
   handleNewSessionWithNoSessionData,
   handleSessionDataRetrieval,
-  handleSessionsWhichRequiredData
 } from "./middleware/storedSessionData.js";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/setSessionCookie.js";
 import {
@@ -28,12 +27,12 @@ export const userSessionMiddleware: (
   handleSessionIdRequired,
   handleSessionWithNewlyGeneratedId,
   handleSessionDataRetrieval,
-  handleSessionCookie,
-  handleSessionCookieOnError,
   handleNewSessionWithNoSessionData,
   handleExistingSessionWithNoSessionData,
+  handleSessionCookie,
+  handleSessionCookieOnError,
   handleCopySessionStoreDataToSession,
-  handleSessionsWhichRequiredData,
+  // handleSessionsWhichRequiredData,
   handleSessionIdAfterDataRetrieval,
   handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
 ];

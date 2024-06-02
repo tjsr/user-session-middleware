@@ -1,4 +1,4 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
 import { handleExistingSessionWithNoSessionData, handleNewSessionWithNoSessionData } from "./storedSessionData.js";
@@ -9,14 +9,16 @@ import {
 } from '../errors/sessionErrorChecks.js';
 
 export const handleSessionIdRequired = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType>
+  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends SystemHttpResponse<SessionStoreDataType>
 >(
-    req: RequestType,
-    _res: express.Response,
+    request: RequestType,
+    response: ResponseType,
     handleSessionWithNewlyGeneratedId: NextFunction
   ): void => {
+  addCalledHandler(response, handleSessionIdRequired.name);
   try {
-    requireSessionIdGenerated(req.sessionID);
+    requireSessionIdGenerated(request.sessionID);
   } catch (sessionError) {
     handleSessionWithNewlyGeneratedId(sessionError);
     return;
@@ -24,35 +26,40 @@ export const handleSessionIdRequired = <
   handleSessionWithNewlyGeneratedId();
 };
 
-export const handleSessionWithNewlyGeneratedId = (
-  req: SystemHttpRequestType<SystemSessionDataType>,
-  _res: express.Response,
-  handleSessionDataRetrieval: express.NextFunction
-) => {
+export const handleSessionWithNewlyGeneratedId = <
+RequestType extends SystemHttpRequestType<SystemSessionDataType>,
+ResponseType extends SystemHttpResponse<SessionStoreDataType>
+>(
+    request: RequestType,
+    response: ResponseType,
+    handleSessionDataRetrieval: express.NextFunction
+  ) => {
+  addCalledHandler(response, handleSessionWithNewlyGeneratedId.name);
+
   try {
-    requireSessionInitialized(req.session);
+    requireSessionInitialized(request.session);
   } catch (sessionErr) {
     handleSessionDataRetrieval(sessionErr);
     return;
   };
 
-  if (req.newSessionIdGenerated === true) {
-    req.session.save();
+  if (request.newSessionIdGenerated === true) {
+    request.session.save();
   }
   handleSessionDataRetrieval();
 };
 
 export const checkNewlyGeneratedId = <ApplicationDataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<ApplicationDataType>,
+  request: SystemHttpRequestType<ApplicationDataType>,
   next: express.NextFunction // handleRetrievedSessionDataOrErrorHandler
 ): boolean => {
   try {
-    requireSessionIdWhenNewSessionIdGenerated(req.sessionID, req.newSessionIdGenerated);
+    requireSessionIdWhenNewSessionIdGenerated(request.sessionID, request.newSessionIdGenerated);
   } catch (sessionErr) {
     next(sessionErr);
     return true;
   }
-  if (req.newSessionIdGenerated) {
+  if (request.newSessionIdGenerated) {
     next();
     return true;
   }
