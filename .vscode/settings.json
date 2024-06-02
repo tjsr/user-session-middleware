@@ -17,5 +17,7 @@
       "fileMatch": ["/tsconfig.json"],
       "url": "https://json.schemastore.org/tsconfig.json"
     }
-  ]
+  ],
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js"
 }
