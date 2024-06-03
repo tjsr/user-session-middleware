@@ -1,6 +1,7 @@
 import {
   SessionDataTestContext,
   createContextForSessionTest,
+  createMockPromisePair,
   createTestRequestSessionData,
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
@@ -19,18 +20,33 @@ declare module 'vitest' {
   }
 };
 
-describe('handleSessionWithNewlyGeneratedId', () => {
+describe('handler.handleSessionWithNewlyGeneratedId', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
-  test('Should call save when a session is newly generated.', (context) => {
+  test('Should call save when a session is newly generated.', async (context) => {
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: true,
       sessionID: 'session-1234',
-    }, {});
+    });
 
     handleSessionWithNewlyGeneratedId(request, response, next);
-    expect(next).toHaveBeenCalledWith();
     expect(request.session.save).toHaveBeenCalled();
+  });
+
+  test('Should call next when a session is newly generated.', async (context) => {
+    const { next, request, response } = createTestRequestSessionData(context, {
+      newSessionIdGenerated: true,
+      sessionID: 'session-1234',
+    }, {
+      noMockSave: true,
+    });
+
+    const [nextPromise, nextMock] = createMockPromisePair(next);
+
+    handleSessionWithNewlyGeneratedId(request, response, nextMock);
+    console.debug('Awaiting next promise...');
+    await nextPromise;
+    expect(nextMock).toHaveBeenCalledWith();
   });
 
   test('Should not save when a session is pre-existing.', (context) => {

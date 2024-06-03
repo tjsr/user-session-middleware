@@ -42,12 +42,20 @@ ResponseType extends SystemHttpResponse<SessionStoreDataType>
   try {
     requireSessionInitialized(request.session);
   } catch (sessionErr) {
+    console.error(handleSessionWithNewlyGeneratedId, 'request.session was not initialised.', sessionErr);
     next(sessionErr);
     return;
   };
 
   if (request.newSessionIdGenerated === true) {
-    request.session.save((err) => next(err));
+    request.session.save((err) => {
+      if (err) {
+        console.error(handleSessionWithNewlyGeneratedId, 'Error saving session data.', err);
+        next(err);
+      } else {
+        next();
+      }
+    });
   } else {
     next();
   }
