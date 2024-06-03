@@ -35,21 +35,22 @@ ResponseType extends SystemHttpResponse<SessionStoreDataType>
 >(
     request: RequestType,
     response: ResponseType,
-    handleSessionDataRetrieval: express.NextFunction
+    next: express.NextFunction
   ) => {
   addCalledHandler(response, handleSessionWithNewlyGeneratedId.name);
 
   try {
     requireSessionInitialized(request.session);
   } catch (sessionErr) {
-    handleSessionDataRetrieval(sessionErr);
+    next(sessionErr);
     return;
   };
 
   if (request.newSessionIdGenerated === true) {
-    request.session.save();
+    request.session.save((err) => next(err));
+  } else {
+    next();
   }
-  handleSessionDataRetrieval();
 };
 
 export const checkNewlyGeneratedId = <ApplicationDataType extends SystemSessionDataType>(
