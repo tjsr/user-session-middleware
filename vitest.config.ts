@@ -53,6 +53,6 @@ export default defineConfig({
     },
     globals: true,
     setupFiles: [path.resolve(__dirname, 'src/setup-tests.ts')],
-    testTimeout: 3000,
+    testTimeout: (process.env['VITEST_VSCODE'] !== undefined ? 120 : 3) * 1000,
   },
 });
