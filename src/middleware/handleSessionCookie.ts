@@ -12,13 +12,21 @@ export const handleSessionCookie = (
 ) => {
   addCalledHandler(response, handleSessionCookie.name);
   if (request.sessionID === undefined) {
-    console.error('Got to handleSessionCookie with undefined request.sessionID');
+    console.error(handleSessionCookie, 'Got to handleSessionCookie with undefined request.sessionID');
     const err = new SessionIDNotGeneratedError();
     next(err);
     return;
   }
   setSessionCookie(request, response);
-  next();
+  request.session.save((err) => {
+    if (err) {
+      console.error(handleSessionCookie, 'Error saving session in handleSessionCookie', err);
+      next(err);
+      return;
+    }
+    console.log(handleSessionCookie, `Saved session ${request.sessionID} set in cookie handler.`);
+    next();
+  });
 };
 
 export const handleSessionCookieOnError = (
@@ -34,5 +42,13 @@ export const handleSessionCookieOnError = (
   } else {
     setSessionCookie(request, response);
   }
-  nextErrorHandler(err);
+  request.session.save((saveErr) => {
+    if (saveErr) {
+      console.error(handleSessionCookieOnError, 'Error saving session in handleSessionCookie', saveErr);
+      nextErrorHandler(saveErr);
+      return;
+    }
+    console.log(handleSessionCookieOnError, `Saved session ${request.sessionID} set in error handler.`);
+    nextErrorHandler(err);
+  });
 };
