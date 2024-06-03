@@ -43,7 +43,6 @@ export const sessionIdFromRequest = <
 >(req: RequestType): string => {
   if (req.regenerateSessionId) {
     const generatedId = uuidv4();
-    console.log('Regenerated new session id', generatedId);
     req.newSessionIdGenerated = true;
     return generatedId;
   }
