@@ -43,6 +43,7 @@ export interface SystemHttpRequestType<SessionData extends SystemSessionDataType
   newSessionIdGenerated?: boolean;
   session: Session & Partial<SessionData>;
   sessionID: SessionId;
+  regenerateSessionId?: boolean;
 }
 
 export interface SystemHttpResponse<StoreData extends SessionStoreDataType> extends express.Response {

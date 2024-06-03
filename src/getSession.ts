@@ -37,23 +37,17 @@ export const generateNewSessionId = (sessionSecret = SESSION_SECRET): SessionId 
   return uuidv5(uuidv4(), sessionSecret);
 };
 
-export const applyNewIdToSession = <DataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<DataType>,
-  applyDirectly: boolean = true
-): SessionId => {
-  req.newSessionIdGenerated = true;
-  const generatedId = uuidv4(); // use UUIDs for session IDs
-  if (applyDirectly) {
-    req.sessionID = generatedId;
-    // req.session.id = generatedId;
-  }
-  return generatedId;
-};
-
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
   DataType extends SystemSessionDataType
 >(req: RequestType): string => {
+  if (req.regenerateSessionId) {
+    const generatedId = uuidv4();
+    console.log('Regenerated new session id', generatedId);
+    req.newSessionIdGenerated = true;
+    return generatedId;
+  }
+
   const sessionIdFromRequest: string|undefined = getSessionIdFromRequestHeader(req);
   if (sessionIdFromRequest) {
     req.newSessionIdGenerated = false;
@@ -69,7 +63,10 @@ export const sessionIdFromRequest = <
     req.newSessionIdGenerated = false;
     return sessionIdFromCookie;
   }
-  return applyNewIdToSession(req);
+
+  const generatedId = uuidv4();
+  req.newSessionIdGenerated = true;
+  return generatedId;
 };
 
 export const sessionHandlerMiddleware = (useSessionStore: expressSession.Store = memoryStore) => {
@@ -85,6 +82,6 @@ export const sessionHandlerMiddleware = (useSessionStore: expressSession.Store =
     rolling: false,
     saveUninitialized: false,
     secret: SESSION_SECRET,
-    store: useSessionStore !== undefined ? useSessionStore : memoryStore,
+    store: useSessionStore,
   });
 };

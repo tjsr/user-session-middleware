@@ -1,12 +1,14 @@
-import { addIgnoredLog, clearIgnoreLogFilters } from "./setup-tests.js";
-import { afterEach, describe, expect, test } from 'vitest';
-import express, * as Express from "express";
-import { getMockReq, getMockRes } from 'vitest-mock-express';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.js';
 
 import { SessionData } from "express-session";
+import { SessionNotGeneratedError } from './errors/errorClasses.js';
+import { SessionOptions } from 'express-session';
+import { clearIgnoreLogFilters } from "./setup-tests.js";
 import {
   regenerateSessionIdIfNoSessionData
 } from './sessionChecks.js';
+import session from 'express-session';
 
 describe('endResponseWhenNoSessionId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));
@@ -105,23 +107,33 @@ describe('regenerateSessionIdIfNoSessionData', () => {
     clearIgnoreLogFilters();
   });
 
-  test('Should regenerate the session ID when no session data is received', async () => {
-    const { next: next } = getMockRes<express.Response>();
+  beforeEach((context) => createContextForSessionTest(context));
 
-    const req = getMockReq<Express.Request>({
-      sessionID: 'test-session-id',
-    });
+  test('Should regenerate the session ID when no session data is received', async (context) => {
+    const { request, response, next } = createTestRequestSessionData(context, { sessionID: 'test-session-id' },
+      { noMockSave: true });
 
-    addIgnoredLog(/SessionID received for test-session-id but no session data/i);
+    session({ store: context.memoryStore } as SessionOptions)(request, response, next);
 
     const sessionData: SessionData|undefined = undefined;
-    const result = regenerateSessionIdIfNoSessionData(sessionData, req);
+    const result = await regenerateSessionIdIfNoSessionData(sessionData, request);
     expect(result).not.toBeUndefined();
-    expect(req.sessionID).not.toBe('test-session-id');
-    expect(req.sessionID).not.toBe(undefined);
-    expect(req.sessionID).toBe(result);
+    expect(request.sessionID).not.toBe('test-session-id');
+    expect(request.sessionID).not.toBe(undefined);
+    expect(request.sessionID).toBe(result);
+  });
 
-    expect(next).not.toHaveBeenCalled();
+  test('Should throw an errow when requesting to regenerate a session that was never initiated.', async (context) => {
+    const { request } = createTestRequestSessionData(context, { sessionID: 'test-session-id' },
+      { skipCreateSession: true });
+
+    const sessionData: SessionData|undefined = undefined;
+
+    expect(async () => await regenerateSessionIdIfNoSessionData(sessionData, request)).rejects
+      .toThrowError(expect.any(SessionNotGeneratedError));
+    expect(request.regenerateSessionId).toBe(undefined);
+    expect(request.newSessionIdGenerated).toBe(false);
+    expect(request.sessionID).toBe('test-session-id');
   });
 });
 

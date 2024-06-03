@@ -14,13 +14,13 @@ import {
 } from '../errors/sessionErrorChecks.js';
 
 export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<ApplicationDataType>,
+  request: SystemHttpRequestType<ApplicationDataType>,
   response: SystemHttpResponse<SessionStoreDataType>,
   next: express.NextFunction // handleSessionCookie
 ): void => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
   try {
-    requireSessionStoreConfigured(req.sessionStore);
+    requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers);
   } catch (err) {
     next(err);
     return;
@@ -28,15 +28,16 @@ export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSes
 
   verifyPrerequisiteHandler(response, handleSessionIdRequired.name);
   
-  if (checkNewlyGeneratedId(req, next)) {
+  if (checkNewlyGeneratedId(request, next)) {
     return;
   }
 
   // let genericSessionData: ApplicationDataType|null|undefined;
   // genericSessionData = await retrieveSessionDataFromStore<ApplicationDataType>(req.sessionStore, req.sessionID!);
-  retrieveSessionDataFromStore<ApplicationDataType>(req.sessionStore, req.sessionID!).then((genericSessionData) => {
+  retrieveSessionDataFromStore<ApplicationDataType>(
+    request.sessionStore, request.sessionID!).then((genericSessionData) => {
     if (genericSessionData) {
-      console.log(handleSessionDataRetrieval, `Successfully retrieved session ${req.sessionID} data from store.`);
+      console.log(handleSessionDataRetrieval, `Successfully retrieved session ${request.sessionID} data from store.`);
       response.locals.retrievedSessionData = genericSessionData as ApplicationDataType;
     }
     next();

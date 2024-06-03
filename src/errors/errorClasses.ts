@@ -1,4 +1,5 @@
 import {
+  ERROR_REQUEST_SESSION_NOT_INITIALIZED,
   ERROR_SAVING_SESSION,
   ERROR_SESSION_ID_NOT_GENERATED,
   ERROR_SESSION_NOT_INITIALIZED,
@@ -8,13 +9,15 @@ import {
   NO_SESSION_ID_ON_SESSION,
   REQUIRED_MIDDLEWARE_CALLED_INCORRECTLY,
   REQUIRED_MIDDLEWARE_NOT_CALLED,
+  SESSION_ID_GENERATION_ERROR,
+  SESSION_ID_MISMATCH_ERROR,
   SESSION_ID_TYPE_ERROR,
   SESSION_STORE_NOT_CONFIGURED
 } from "./errorCodes.js";
+import { HandlerName, SessionId } from "../types.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SessionHandlerError } from "./SessionHandlerError.js";
-import { SessionId } from "../types.js";
 
 export class SaveSessionError extends SessionHandlerError {
   constructor (message = 'Error writing session data to store.', cause?: unknown) {
@@ -66,8 +69,9 @@ export class MiddlewareCallOrderError extends SessionHandlerError {
 }
 
 export class SessionStoreNotConfiguredError extends SessionHandlerError {
-  constructor() {
+  constructor(handlerChain: HandlerName[]) {
     super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');
+    super.handlerChain = handlerChain;
   }
 }
 
@@ -98,3 +102,24 @@ export class SessionIDNotGeneratedError extends SessionHandlerError {
       'Session ID not generated for request.');
   }
 }
+
+export class RegeneratingSessionIdError extends SessionHandlerError {
+  constructor(cause: unknown) {
+    super(SESSION_ID_GENERATION_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Error regenerating session ID.', cause);
+  }
+}
+
+export class RegeneratedSessionIdIncorrectError extends SessionHandlerError {
+  constructor() {
+    super(SESSION_ID_MISMATCH_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Regenerated session.id did not get correctly assigned as new sessionID.');
+  }
+}
+
+export class SessionNotGeneratedError extends SessionHandlerError {
+  constructor() {
+    super(ERROR_REQUEST_SESSION_NOT_INITIALIZED, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Expected session to exist but was undefined on request.');
+  }
+};

@@ -1,4 +1,5 @@
 import { DEFAULT_ERROR_CODES } from "./defaultErrorCodes.js";
+import { HandlerName } from "../types.js";
 
 export class SessionHandlerError extends Error {
   public get status(): number {
@@ -17,6 +18,15 @@ export class SessionHandlerError extends Error {
     return defaultMessage;
   }
 
+  public set handlerChain(chain: HandlerName[]) {
+    this._handlerChain = chain;
+  }
+
+  public get handlerChain(): HandlerName[]|undefined {
+    return this._handlerChain;
+  }
+
+  private _handlerChain?: HandlerName[];
   private readonly _status?: number;
   private readonly _sessionErrorCode: number;
   private readonly _message?: string;

@@ -21,6 +21,8 @@ export const createRandomUserId = (): uuid5 => {
 
 export const saveSessionPromise = async (session: Session): Promise<void> => {
   return new Promise((resolve, reject) => {
+    console.debug(saveSessionPromise, `Saving session ${session.id} data to store.`);
+
     session.save((err) => {
       if (err) {
         return reject(err);
@@ -44,7 +46,7 @@ export const assignUserIdToSession = async <ApplicationDataType extends SystemSe
     try {
       return saveSessionPromise(session);
     } catch (err) {
-      throw new SaveSessionError('Error saving session data to store.', err);
+      throw new SaveSessionError(`Error saving session ${session.id} data to store.`, err);
     }
   }
 };

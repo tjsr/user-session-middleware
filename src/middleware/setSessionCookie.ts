@@ -8,14 +8,14 @@ export const COOKIE_WITH_HEADER = true;
 export const setSessionCookie = (
   request: SystemHttpRequestType<SystemSessionDataType>,
   response: express.Response
-) => {
+):void => {
   assert(request.sessionID !== undefined);
   console.debug(setSessionCookie, `Setting session cookie to ${request.sessionID}.`);
   assert(request.session !== undefined);
   assert(request.session.id !== undefined);
   if (COOKIE_WITH_HEADER) {
-    response.set('Set-Cookie', `sessionId=${request.sessionID}`);
+    response.set('Set-Cookie', `sessionId=${request.sessionID}; Path=/; HttpOnly; SameSite=Strict`);
   } else {
-    response.cookie('sessionId', request.sessionID, { httpOnly: true });
+    response.cookie('sessionId', request.sessionID, { httpOnly: true, path: '/', sameSite: 'strict' });
   }
 };

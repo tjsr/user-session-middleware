@@ -7,13 +7,13 @@ import { requireSessionStoreConfigured } from "../errors/sessionErrorChecks.js";
 export const handleSessionStoreRequired = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>
 >(
-    req: RequestType,
+    request: RequestType,
     response: express.Response,
     next: express.NextFunction
   ): void => {
   addCalledHandler(response, handleSessionStoreRequired.name);
   try {
-    requireSessionStoreConfigured(req.sessionStore);
+    requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers);
   } catch (sessionError) {
     next(sessionError);
     return;

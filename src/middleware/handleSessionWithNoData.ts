@@ -1,4 +1,10 @@
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
+import {
+  SessionId,
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponse,
+  SystemSessionDataType
+} from "../types.js";
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { ERROR_SESSION_ID_WITH_NO_DATA } from "../errors/errorCodes.js";
@@ -71,26 +77,31 @@ export const handleExistingSessionWithNoSessionData = <ApplicationDataType exten
   const sessionData: ApplicationDataType = response.locals?.retrievedSessionData as ApplicationDataType;
   try {
     const originalSessionId = request.sessionID;
-    const newSessionId = regenerateSessionIdIfNoSessionData(sessionData, request);
-    let error: SessionHandlerError;
-    if (newSessionId) {
-      error = new NoSessionDataFoundError(originalSessionId, newSessionId);
-      console.debug(handleSessionDataRetrieval, `New sessionId ${newSessionId} assigned.`);
-    } else {
-      error = new SessionHandlerError(ERROR_SESSION_ID_WITH_NO_DATA, HttpStatusCode.INTERNAL_SERVER_ERROR,
-        'Unknown state: no new sessionId generated and no session data found.');
-    }
-    // await saveSessionPromise(request.session);
-    saveSessionPromise(request.session).then(() => {
-      // Finally, send us to the error handler
-      // Essentially this is requireSessionDataForExistingId
-      next(error);
-      return;
+    regenerateSessionIdIfNoSessionData(sessionData, request).then((newSessionId: SessionId | undefined) => {
+      let error: SessionHandlerError;
+      if (newSessionId) {
+        error = new NoSessionDataFoundError(originalSessionId, newSessionId);
+        console.debug(handleSessionDataRetrieval, `New sessionId ${newSessionId} assigned.`);
+      } else {
+        error = new SessionHandlerError(ERROR_SESSION_ID_WITH_NO_DATA, HttpStatusCode.INTERNAL_SERVER_ERROR,
+          'Unknown state: no new sessionId generated and no session data found.');
+      }
+      // await saveSessionPromise(request.session);
+      saveSessionPromise(request.session).then(() => {
+        // Finally, send us to the error handler
+        // Essentially this is requireSessionDataForExistingId
+        next(error);
+        return;
+      }).catch((err) => {
+        console.error(handleExistingSessionWithNoSessionData, 'promiseReject',
+          'Failed while saving session wrapped as promise.', err);
+        next(err);
+      });
     }).catch((err) => {
-      console.error(handleExistingSessionWithNoSessionData, 'promiseReject',
-        'Failed while saving session wrapped as promise.', err);
+      console.error(handleExistingSessionWithNoSessionData, 'Failed while regenerating session ID.', err);
       next(err);
     });
+    
   } catch (err) {
     console.error(handleExistingSessionWithNoSessionData, 'Failed while saving session wrapped as promise.', err);
     next(err);
