@@ -1,4 +1,4 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "../types";
+import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
@@ -8,7 +8,7 @@ import { handleSessionCookieOnError } from "./handleSessionCookie.js";
 export const sessionErrorHandler = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
     err: Error,
-    req: RequestType,
+    _request: RequestType,
     response: express.Response,
     next: express.NextFunction
   ) => {
@@ -21,10 +21,6 @@ export const sessionErrorHandler = <
     response.json({ message: sessionError.message });
     next(err);
     return;
-  }
-  if (response.statusCode <= 200) {
-    console.error(err, 'Error with res.statusCode < 200 - this test should fail.');
-    response.status(500);
   }
   next(err);
 };

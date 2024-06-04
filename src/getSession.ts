@@ -1,6 +1,6 @@
 import * as expressSession from 'express-session';
 
-import { SessionId, SystemHttpRequestType, SystemSessionDataType } from './types.js';
+import { SessionId, SystemHttpRequestType, SystemSessionDataType, UserSessionOptions } from './types.js';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 import { IncomingHttpHeaders } from 'http';
@@ -68,19 +68,49 @@ export const sessionIdFromRequest = <
   return generatedId;
 };
 
-export const sessionHandlerMiddleware = (useSessionStore: expressSession.Store = memoryStore) => {
-  return session({
-    cookie: {
-      maxAge: IN_PROD ? TWO_HOURS : TWENTYFOUR_HOURS,
-      path: '/',
-      sameSite: true,
-      secure: IN_PROD,
-    },
+const defaultExpressSessionCookieOptions = (
+  cookieOptions?: expressSession.CookieOptions | undefined
+): expressSession.CookieOptions => {
+  const defaultCookie: expressSession.CookieOptions = {
+    maxAge: IN_PROD ? TWO_HOURS : TWENTYFOUR_HOURS,
+    path: '/',
+    sameSite: true,
+    secure: IN_PROD,
+  };
+  return {
+    ...defaultCookie,
+    ...cookieOptions,
+  };
+};
+
+const defaultExpressSessionOptions = (options?: Partial<expressSession.SessionOptions> | undefined,
+  useSessionStore: expressSession.Store = memoryStore
+): expressSession.SessionOptions => {
+  const defaults: expressSession.SessionOptions = {
     genid: sessionIdFromRequest,
     resave: false,
     rolling: false,
     saveUninitialized: false,
     secret: SESSION_SECRET,
     store: useSessionStore,
-  });
+  };
+  return {
+    ...defaults,
+    ...options,
+    cookie: defaultExpressSessionCookieOptions(options?.cookie),
+  };
+};
+
+const defaultUserSessionOptions = (options: UserSessionOptions): expressSession.SessionOptions => {
+  return {
+    ...options,
+  };
+};
+
+export const expressSessionHandlerMiddleware = (
+  options?: Partial<expressSession.SessionOptions> | undefined,
+  useSessionStore: expressSession.Store = memoryStore) => {
+  let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
+  sessionOptions = defaultUserSessionOptions(sessionOptions);
+  return session(sessionOptions);
 };

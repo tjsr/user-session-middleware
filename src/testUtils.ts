@@ -15,8 +15,8 @@ import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { addCalledHandler } from "./middleware/handlerChainLog.js";
 import express from "express";
 import expressSession from "express-session";
+import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
-import { sessionHandlerMiddleware } from "./getSession.js";
 import supertest from "supertest";
 
 export interface MockReqRespSet<
@@ -93,7 +93,7 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
 };
 
 const addExpressSessionHandler = (app: express.Express, memoryStore: session.MemoryStore): void => {
-  app.use(sessionHandlerMiddleware(memoryStore));
+  app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
 };
 
 const addHandlersToApp = (

@@ -1,4 +1,10 @@
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types.js";
+import {
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponse,
+  SystemSessionDataType,
+  UserSessionOptions
+} from "./types.js";
 import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval,
@@ -15,9 +21,11 @@ import {
 } from "./middleware/handleSessionId.js";
 
 import express from "express";
+import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
+import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
-export const userSessionMiddleware: (
+export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
   ((_req: SystemHttpRequestType<SystemSessionDataType>,
     _response: SystemHttpResponse<SessionStoreDataType>,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
@@ -25,16 +33,21 @@ export const userSessionMiddleware: (
     _req: SystemHttpRequestType<SystemSessionDataType>,
     _response: SystemHttpResponse<SessionStoreDataType>,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void)
-)[] = [
-  handleSessionIdRequired,
-  handleSessionWithNewlyGeneratedId,
-  handleSessionDataRetrieval,
-  handleNewSessionWithNoSessionData,
-  handleExistingSessionWithNoSessionData,
-  handleSessionCookie,
-  handleSessionCookieOnError,
-  handleCopySessionStoreDataToSession,
-  // handleSessionsWhichRequiredData,
-  handleSessionIdAfterDataRetrieval,
-  handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
-];
+)[] => {
+  const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
+
+  return [
+    expressSessionHandlerMiddleware(expressSessionOptions),
+    handleSessionIdRequired,
+    handleSessionWithNewlyGeneratedId,
+    handleSessionDataRetrieval,
+    handleNewSessionWithNoSessionData,
+    handleExistingSessionWithNoSessionData,
+    handleSessionCookie,
+    handleSessionCookieOnError,
+    handleCopySessionStoreDataToSession,
+    handleSessionIdAfterDataRetrieval,
+    handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+    sessionErrorHandler,
+  ];
+};
