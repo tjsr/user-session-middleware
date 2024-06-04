@@ -64,4 +64,7 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
 
   // Don't set * as the Access-Control-Allow-Origin header
   skipExposeHeaders?: boolean | undefined;
+
+  // Look for the session id in the X-Session-Id header
+  useForwardedSessions?: boolean | undefined;
 }
