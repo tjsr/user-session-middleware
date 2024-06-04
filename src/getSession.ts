@@ -68,7 +68,7 @@ export const sessionIdFromRequest = <
   return generatedId;
 };
 
-const defaultExpressSessionCookieOptions = (
+export const defaultExpressSessionCookieOptions = (
   cookieOptions?: expressSession.CookieOptions | undefined
 ): expressSession.CookieOptions => {
   const defaultCookie: expressSession.CookieOptions = {
@@ -83,7 +83,7 @@ const defaultExpressSessionCookieOptions = (
   };
 };
 
-const defaultExpressSessionOptions = (options?: Partial<expressSession.SessionOptions> | undefined,
+export const defaultExpressSessionOptions = (options?: Partial<expressSession.SessionOptions> | undefined,
   useSessionStore: expressSession.Store = memoryStore
 ): expressSession.SessionOptions => {
   const defaults: expressSession.SessionOptions = {
@@ -101,7 +101,7 @@ const defaultExpressSessionOptions = (options?: Partial<expressSession.SessionOp
   };
 };
 
-const defaultUserSessionOptions = (options: UserSessionOptions): expressSession.SessionOptions => {
+export const defaultUserSessionOptions = (options: UserSessionOptions): expressSession.SessionOptions => {
   return {
     ...options,
   };

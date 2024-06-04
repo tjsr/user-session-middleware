@@ -246,3 +246,35 @@ export const expectResponseResetsSessionIdCookie = (
   const cookieValue = response.get('Set-Cookie')![0];
   expectDifferentSetCookieSessionId(originalSessionId, cookieValue);
 };
+
+export const checkForDefault = <OptionsType extends object>(
+  defaultOptions: OptionsType,
+  contextOptions: Partial<OptionsType>,
+  key: string,
+  defaultOptionsMethod: (_options: Partial<OptionsType>) => OptionsType) => {
+  expect(defaultOptions[key]).not.toBeUndefined();
+  delete contextOptions[key];
+  const updatedOptions = defaultOptionsMethod(contextOptions);
+  console.log(`Checking ${key}: ${updatedOptions[key]} === ${defaultOptions[key]}`);
+  expect(updatedOptions[key]).toEqual(defaultOptions[key]);
+};
+
+export const checkForOverride = <OptionsType extends object>(
+  defaultOptions: OptionsType,
+  contextOptions: Partial<OptionsType>,
+  key: string,
+  defaultOptionsMethod: (_options: Partial<OptionsType>) => OptionsType
+) => {
+  const overrideData: Partial<OptionsType> = {
+    [key]: contextOptions[key],
+  } as const as Partial<OptionsType>;
+  const updatedOptions = defaultOptionsMethod(overrideData);
+  console.log(`Checking ${key}: ${updatedOptions[key]} === ${defaultOptions[key]}`);
+
+  if (contextOptions[key] !== defaultOptions[key]) {
+    expect(updatedOptions[key], `For ${key} updated value ${updatedOptions[key]} should not match default.`)
+      .not.toEqual(defaultOptions[key]);
+  };
+  expect(updatedOptions[key], `For ${key} updated value ${updatedOptions[key]} should match context`)
+    .toEqual(contextOptions[key]);
+};
