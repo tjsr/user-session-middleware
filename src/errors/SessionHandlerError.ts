@@ -1,7 +1,8 @@
 import { DEFAULT_ERROR_CODES } from "./defaultErrorCodes.js";
 import { HandlerName } from "../types.js";
+import { SessionMiddlewareError } from "./SessionMiddlewareError.js";
 
-export class SessionHandlerError extends Error {
+export class SessionHandlerError extends SessionMiddlewareError {
   public get status(): number {
     if (this._status) {
       return this._status;
@@ -11,8 +12,8 @@ export class SessionHandlerError extends Error {
   }
 
   public override get message(): string {
-    if (this._message) {
-      return this._message;
+    if (super.message === undefined) {
+      return super.message;
     }
     const defaultMessage = DEFAULT_ERROR_CODES.get(this._sessionErrorCode)?.message || 'Unknown error';
     return defaultMessage;
@@ -40,7 +41,6 @@ export class SessionHandlerError extends Error {
   private _handlerChain?: HandlerName[];
   private readonly _status?: number;
   private readonly _sessionErrorCode: number;
-  private readonly _message?: string;
   private _clientMessage?: string;
 
   constructor (
@@ -57,14 +57,14 @@ export class SessionHandlerError extends Error {
       this._status = status;
     }
     if (message) {
-      this._message = message;
+      super.message = message;
     }
     if (cause) {
       this.cause = cause;
     }
   };
 
-  static isType(error: Error): boolean {
+  static override isType(error: Error): boolean {
     return error.name?.endsWith('SessionHandlerError');
   }
 }

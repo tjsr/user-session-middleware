@@ -122,4 +122,4 @@ export class SessionNotGeneratedError extends SessionHandlerError {
     super(ERROR_REQUEST_SESSION_NOT_INITIALIZED, HttpStatusCode.INTERNAL_SERVER_ERROR,
       'Expected session to exist but was undefined on request.');
   }
-};
+}
