@@ -19,8 +19,6 @@ export const sessionErrorHandler = <
     const sessionError: SessionHandlerError = err as SessionHandlerError;
     response.status(sessionError.status);
     response.json({ message: sessionError.message });
-    next(err);
-    return;
   }
   next(err);
 };
