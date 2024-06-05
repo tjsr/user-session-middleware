@@ -26,10 +26,22 @@ export class SessionHandlerError extends Error {
     return this._handlerChain;
   }
 
+  public get clientMessage(): string {
+    if (this._clientMessage) {
+      return this._clientMessage;
+    }
+    return this.message;
+  }
+
+  public set clientMessage(message: string) {
+    this._clientMessage = message;
+  }
+
   private _handlerChain?: HandlerName[];
   private readonly _status?: number;
   private readonly _sessionErrorCode: number;
   private readonly _message?: string;
+  private _clientMessage?: string;
 
   constructor (
     sesisonErrorCode: number,
