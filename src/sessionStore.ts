@@ -29,12 +29,11 @@ const sessionStoreOptions: mySQLStore.Options & {
     user: poolOptions.user,
   };
 
-console.log(`Session store options: ${JSON.stringify(sessionStoreOptions, elideValues)}`);
-
+  
 export let mysqlSessionStore: MySQLStore;
 try {
   if (process.env['PRINT_SESSION_DB_CONN'] === 'true') {
-    console.log(`Session DB connection: ${JSON.stringify(poolOptions, elideValues)}`);
+    console.debug(`Session store options: ${JSON.stringify(sessionStoreOptions, elideValues)}`);
   }
   
   const MysqlSessionStore = mySQLStore(expressSession);
