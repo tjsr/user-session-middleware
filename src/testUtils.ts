@@ -47,12 +47,14 @@ declare module 'vitest' {
 };
 
 export const getMockReqResp = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
+  RequestType extends SystemHttpRequestType<SystemSessionDataType>  |
+    Partial<SystemHttpRequestType<SystemSessionDataType, SessionStoreDataType>> =
+    SystemHttpRequestType<SystemSessionDataType>,
   ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
 >(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
-  const request: RequestType = getMockReq(values);
+  const request: RequestType = getMockReq(values) as RequestType;
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
@@ -93,7 +95,7 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
 };
 
 const addExpressSessionHandler = (app: express.Express, memoryStore: session.MemoryStore): void => {
-  app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
+  app.use(expressSessionHandlerMiddleware({ store: memoryStore }));
 };
 
 const addHandlersToApp = (

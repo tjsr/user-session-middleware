@@ -1,9 +1,15 @@
 import * as EmailValidator from 'email-validator';
 
 import { AuthenticationRestResult, createUserIdFromEmail } from '../auth/user.js';
-import { EmailAddress, SystemHttpRequestType, SystemSessionDataType } from '../types.js';
-import express, { NextFunction } from 'express';
+import {
+  EmailAddress,
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponseType,
+  SystemSessionDataType
+} from '../types.js';
 
+import { NextFunction } from 'express';
 import { SESSION_ID_HEADER_KEY } from '../getSession.js';
 import { UserModel } from '../types.js';
 
@@ -25,9 +31,11 @@ export const getDbUserByEmail = (email: EmailAddress): UserModel => {
 
 export const login = <
   RequestType extends SystemHttpRequestType<SessionType>,
-  SessionType extends SystemSessionDataType
+  SessionType extends SystemSessionDataType,
+  ResponseType extends SystemHttpResponseType<StoreType>,
+  StoreType extends SessionStoreDataType
 >(
-    req: RequestType, res: express.Response, next: NextFunction) => {
+    req: RequestType, res: ResponseType, next: NextFunction) => {
   try {
     const email: string = req.body.email;
     if (!EmailValidator.validate(email)) {

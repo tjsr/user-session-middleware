@@ -37,8 +37,8 @@ export const generateNewSessionId = (sessionSecret = SESSION_SECRET): SessionId 
 };
 
 export const sessionIdFromRequest = <
-  RequestType extends SystemHttpRequestType<DataType>,
-  DataType extends SystemSessionDataType
+  DataType extends SystemSessionDataType = SystemSessionDataType,
+  RequestType extends SystemHttpRequestType<DataType> = SystemHttpRequestType<DataType>,
 >(req: RequestType): string => {
   if (req.regenerateSessionId) {
     const generatedId = uuidv4();
@@ -109,7 +109,7 @@ export const defaultUserSessionOptions = (options: UserSessionOptions): expressS
 // type TempHandler = RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>;
 
 // ,
-  // useSessionStore: Store = memoryStore
+// useSessionStore: Store = memoryStore
 export const expressSessionHandlerMiddleware = (
   options: Partial<expressSession.SessionOptions> | undefined
 ) => {

@@ -1,7 +1,5 @@
 import {
-  SessionStoreDataType,
   SystemHttpRequestType,
-  SystemHttpResponseType,
   SystemSessionDataType,
   UserSessionOptions
 } from "./types.js";
@@ -27,13 +25,22 @@ import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./s
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
 export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
-  ((_req: SystemHttpRequestType<SystemSessionDataType>,
-    _response: SystemHttpResponseType<SessionStoreDataType>,
+  express.RequestHandler | 
+  // ((_request: SystemHttpRequestType<SystemSessionDataType>,
+  //   _response: SystemHttpResponseType<SessionStoreDataType>,
+  //   _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
+  ((_request: SystemHttpRequestType<SystemSessionDataType>,
+    _response: express.Response,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
-  ((_err: Error,
-    _req: SystemHttpRequestType<SystemSessionDataType>,
-    _response: SystemHttpResponseType<SessionStoreDataType>,
+  // ((_error: Error,
+  //   _request: SystemHttpRequestType<SystemSessionDataType>,
+  //   _response: SystemHttpResponseType<SessionStoreDataType>,
+  //   _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
+  ((_error: Error,
+    _request: SystemHttpRequestType<SystemSessionDataType>,
+    _response: express.Response,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void)
+  
 )[] => {
   const expressSessionOptions: Partial<SessionOptions> = { ...sessionOptions };
 
