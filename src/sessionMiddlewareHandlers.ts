@@ -20,6 +20,7 @@ import {
   handleSessionWithNewlyGeneratedId
 } from "./middleware/handleSessionId.js";
 
+import { SessionOptions } from "express-session";
 import express from "express";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
@@ -34,7 +35,7 @@ export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOption
     _response: SystemHttpResponseType<SessionStoreDataType>,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void)
 )[] => {
-  const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
+  const expressSessionOptions: Partial<SessionOptions> = { ...sessionOptions };
 
   return [
     expressSessionHandlerMiddleware(expressSessionOptions),
