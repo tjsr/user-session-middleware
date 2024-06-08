@@ -1,5 +1,5 @@
 import { Assertion, expect, vi } from "vitest";
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponseType, SystemSessionDataType } from "./types";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { SessionHandlerError } from "./errors/SessionHandlerError";
@@ -28,16 +28,17 @@ export type HandlerErrorResult = {
 };
 
 const expectVerifyHandlerFunction = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponse<SessionStoreDataType>
+  RequestType extends SystemHttpRequestType<SystemSessionDataType, SystemSessionDataType> |
+  Partial<SystemHttpRequestType<SystemSessionDataType, SessionStoreDataType>>,
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType>
   >(
     handlerFunction: HandlerFunction,
-    mockRequest = {} as Partial<RequestType>,
-    mockRespose = {} as Partial<ResponseType>
+    mockRequest: Partial<RequestType> = {} as Partial<RequestType>,
+    mockResponse: Partial<ResponseType> = {} as Partial<ResponseType>
   ): HandlerExpectionResult => {
   const { request, response, next } = getMockReqResp<RequestType>(
     { ...mockRequest } as MockRequest,
-    { ...mockRespose } as Partial<ResponseType>
+    { ...mockResponse } as Partial<ResponseType>
   );
 
   const paramsWrapper: ParamsWrapper = { };
@@ -64,12 +65,13 @@ const expectVerifyHandlerFunction = <
 
 export const verifyHandlerFunctionCallsNextWithError = 
 <
-RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponse<SessionStoreDataType>
+RequestType extends SystemHttpRequestType<SystemSessionDataType, SessionStoreDataType> |
+  Partial<SystemHttpRequestType<SystemSessionDataType, SessionStoreDataType>>,
+ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     handlerFunction: HandlerFunction,
-    mockRequest = {} as Partial<RequestType>,
-    mockResponse = {} as Partial<ResponseType>,
+    mockRequest: Partial<RequestType> = {} as Partial<RequestType>,
+    mockResponse: Partial<ResponseType> = {} as Partial<ResponseType>,
     expectNextArgs = expect.any(SessionHandlerError)
   ): HandlerErrorResult => {
   const { response, expected, next, nextParams } = expectVerifyHandlerFunction(
@@ -84,7 +86,7 @@ ResponseType extends SystemHttpResponse<SessionStoreDataType>
 export const verifyHandlerFunctionCallsNext = 
 <
 RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponse<SessionStoreDataType>
+ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,

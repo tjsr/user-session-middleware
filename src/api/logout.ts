@@ -1,10 +1,15 @@
 import { AuthenticationRestResult, getUserIdFromSession } from '../auth/user.js';
-import { SystemHttpRequestType, SystemSessionDataType, UserId } from '../types.js';
+import {
+  SystemHttpRequestType,
+  SystemSessionDataType,
+  UserId
+} from '../types.js';
+
 import express, { NextFunction } from 'express';
 
 export const logout = async <
-RequestType extends SystemHttpRequestType<SessionType>,
-SessionType extends SystemSessionDataType
+  RequestType extends SystemHttpRequestType<SessionType>,
+  SessionType extends SystemSessionDataType
 >(
   request: RequestType, res: express.Response, next:NextFunction
 ): Promise<void> => {

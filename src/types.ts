@@ -1,5 +1,7 @@
 import expressSession, { Session, SessionData } from "express-session";
 
+import { ParamsDictionary } from "express-serve-static-core";
+import QueryString from 'qs';
 import express from "express";
 
 export type uuid = string;
@@ -21,39 +23,72 @@ interface SessionDataFields {
   newId: boolean | undefined;
 }
 
-export interface SystemSessionDataType extends SessionData, SessionDataFields {
+// export interface ISystemSessionData extends SessionData {
+// }
+
+// export type SystemSessionDataType = ISystemSessionData & SessionDataFields;
+
+export interface SystemSessionDataType extends SessionData, SessionDataFields {}
+
+export interface UserSessionResponseLocals<StoreData extends SessionStoreDataType> {
+  calledHandlers: HandlerName[];
+  retrievedSessionData?: StoreData;
+  skipHandlerDependencyChecks: boolean;
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface SystemHttpRequestType<
+  SessionDataType extends SystemSessionDataType = SystemSessionDataType,
+  StoreData extends SessionStoreDataType = SessionStoreDataType,
+  P = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = QueryString.ParsedQs,
+  Locals extends Record<string, any> = Record<string, any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+> extends express.Request<P, ResBody, ReqBody, ReqQuery, Locals & UserSessionResponseLocals<StoreData>> {
+  newSessionIdGenerated?: boolean;
+  session: Session & SessionDataType;
+  sessionID: SessionId;
+  regenerateSessionId?: boolean;
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+export interface SystemHttpResponseType<
+  StoreData extends SessionStoreDataType,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ResBody = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+> extends express.Response<ResBody, UserSessionResponseLocals<StoreData> | Record<string, any>> {
+  // locals: {
+  //   calledHandlers: HandlerName[];
+  //   retrievedSessionData?: StoreData;
+  //   skipHandlerDependencyChecks: boolean;
+  // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // } | Record<string, any>
 }
 
 export interface SessionMiddlewareErrorHandler<
-SessionData extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionData>,
-StoreData extends SessionStoreDataType,
-ResponseType extends SystemHttpResponseType<StoreData>
+  SessionData extends SystemSessionDataType,
+  RequestType extends SystemHttpRequestType<SessionData>,
+  StoreData extends SessionStoreDataType,
+  ResponseType extends SystemHttpResponseType<StoreData>
 > extends express.RequestHandler {
-  err: Error,
+  error: Error,
   request: RequestType,
   response: ResponseType,
   next: express.NextFunction
 }
 
 export interface SessionMiddlewareHandler<
-SessionData extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionData>,
-StoreData extends SessionStoreDataType,
-ResponseType extends SystemHttpResponseType<StoreData>
+  SessionData extends SystemSessionDataType,
+  RequestType extends SystemHttpRequestType<SessionData>,
+  StoreData extends SessionStoreDataType,
+  ResponseType extends SystemHttpResponseType<StoreData>
 > extends express.RequestHandler {
   request: RequestType,
   response: ResponseType,
   next: express.NextFunction
-}
-
-export interface SystemHttpRequestType<
-  SessionDataType extends SystemSessionDataType = SystemSessionDataType>
-extends express.Request {
-  newSessionIdGenerated?: boolean;
-  session: Session & SessionDataType;
-  sessionID: SessionId;
-  regenerateSessionId?: boolean;
 }
 
 export interface SystemHttpResponseType<StoreData extends SessionStoreDataType> extends express.Response {
