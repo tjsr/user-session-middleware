@@ -3,7 +3,6 @@ import { createUserIdFromEmail, getUserIdFromRequest, getUserIdFromSession } fro
 import { HttpStatusCode } from './httpStatusCodes.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
-import { createUserIdFromEmail } from './auth/user.js';
 import { endWithJsonMessage } from './utils/apiMiddlewareUtils.js';
 import { getIp } from './utils/getIp.js';
 import { mysqlSessionStore } from './sessionStore.js';
@@ -19,7 +18,6 @@ export {
   getIp,
   getUserIdFromRequest,
   getUserIdFromSession,
-  createUserIdFromEmail,
   HttpStatusCode,
   mysqlSessionStore,
   setUserIdNamespace,
@@ -38,7 +36,6 @@ export type {
   SystemHttpResponseType,
   SystemSessionDataType,
   SessionStoreDataType,
-  UserModel,
   UserSessionOptions
 } from './types.js';
 export type { 
