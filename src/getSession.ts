@@ -1,9 +1,8 @@
-import * as expressSession from 'express-session';
-
 import { SessionId, SystemHttpRequestType, SystemSessionDataType, UserSessionOptions } from './types.js';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 import { IncomingHttpHeaders } from 'http';
+import expressSession from 'express-session';
 import { loadEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
 
@@ -107,10 +106,14 @@ export const defaultUserSessionOptions = (options: UserSessionOptions): expressS
   };
 };
 
+// type TempHandler = RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>>;
+
+// ,
+  // useSessionStore: Store = memoryStore
 export const expressSessionHandlerMiddleware = (
-  options?: Partial<expressSession.SessionOptions> | undefined,
-  useSessionStore: expressSession.Store = memoryStore) => {
-  let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
+  options: expressSession.SessionOptions
+) => {
+  let sessionOptions: expressSession.SessionOptions = defaultExpressSessionOptions(options);
   sessionOptions = defaultUserSessionOptions(sessionOptions);
   return session(sessionOptions);
 };

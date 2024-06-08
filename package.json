@@ -13,10 +13,10 @@
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsc && tsc -p tsconfig.cjs.json",
+    "build": "npx rimraf dist && tsc && tsc -p tsconfig.cjs.json",
     "check": "npx npm-check",
-    "clean": "rimraf build dist coverage",
-    "clean:all": "rimraf build dist coverage node_modules",
+    "clean": "npx rimraf build dist coverage",
+    "clean:all": "npm run clean && npx rimraf node_modules",
     "link": "npm link @tjsr/eslint-config @tjsr/simple-env-utils @tjsr/mysql-pool-utils",
     "lint": "eslint --config eslint.config.mjs src/*.ts",
     "lint:fix": "eslint --fix src/*.ts",
@@ -74,6 +74,7 @@
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.7",
     "@tjsr/simple-env-utils": "^0.0.16",
+    "email-validator": "^2.0.4",
     "express-mysql-session": "^3.0.2",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",
