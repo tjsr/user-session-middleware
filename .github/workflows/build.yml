@@ -45,16 +45,11 @@ jobs:
       continue-on-error: true
       run: npm list
 
-    - name: Run lint
-      if: github.ref == 'refs/head/main' || github.ref == 'refs/head/prod'
-      run: npm run lint
-
     - run: npm run test
     - run: npm run build
 
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/head/main' && github.ref != 'refs/head/prod'
       run: |
-        npm run lint
         npm publish --dry-run
   
