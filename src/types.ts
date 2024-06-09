@@ -10,6 +10,7 @@ export type UserId = uuid5;
 export type EmailAddress = string;
 export type SessionId = uuid5;
 export type HandlerName = string;
+export type IdNamespace = uuid5;
 
 export interface SessionStoreDataType extends SessionDataFields {}
 
