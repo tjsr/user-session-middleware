@@ -42,10 +42,10 @@ RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestH
 }
 
 export interface SystemHttpRequestType<
-  SessionData extends SystemSessionDataType = SystemSessionDataType>
+  SessionDataType extends SystemSessionDataType = SystemSessionDataType>
 extends express.Request {
   newSessionIdGenerated?: boolean;
-  session: Session & SessionData;
+  session: Session & SessionDataType;
   sessionID: SessionId;
   regenerateSessionId?: boolean;
 }
