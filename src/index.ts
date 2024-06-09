@@ -25,6 +25,7 @@ export type {
   SystemHttpRequestType,
   SystemHttpResponseType,
   SystemSessionDataType,
+  SessionStoreDataType,
   UserSessionOptions
 } from './types.js';
 export { SessionHandlerError } from './errors/SessionHandlerError.js';
