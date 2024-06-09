@@ -1,7 +1,7 @@
 import {
   SessionStoreDataType,
   SystemHttpRequestType,
-  SystemHttpResponse,
+  SystemHttpResponseType,
   SystemSessionDataType,
   UserSessionOptions
 } from "./types.js";
@@ -27,11 +27,11 @@ import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
 export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
   ((_req: SystemHttpRequestType<SystemSessionDataType>,
-    _response: SystemHttpResponse<SessionStoreDataType>,
+    _response: SystemHttpResponseType<SessionStoreDataType>,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
   ((_err: Error,
     _req: SystemHttpRequestType<SystemSessionDataType>,
-    _response: SystemHttpResponse<SessionStoreDataType>,
+    _response: SystemHttpResponseType<SessionStoreDataType>,
     _handleSessionWithNewlyGeneratedId: express.NextFunction) => void)
 )[] => {
   const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };

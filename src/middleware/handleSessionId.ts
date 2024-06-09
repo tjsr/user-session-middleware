@@ -1,4 +1,9 @@
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
+import {
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponseType,
+  SystemSessionDataType
+} from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
 import {
@@ -13,7 +18,7 @@ import {
 
 export const handleSessionIdRequired = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponse<SessionStoreDataType>
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     request: RequestType,
     response: ResponseType,
@@ -31,7 +36,7 @@ export const handleSessionIdRequired = <
 
 export const handleSessionWithNewlyGeneratedId = <
 RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponse<SessionStoreDataType>
+ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     request: RequestType,
     response: ResponseType,

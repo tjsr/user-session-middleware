@@ -6,11 +6,12 @@ export type uuid = string;
 export type uuid5 = uuid;
 export type uuid4 = uuid;
 export type SnowflakeType = bigint | string;
-export type UserId = uuid5;
 export type EmailAddress = string;
-export type SessionId = uuid5;
 export type HandlerName = string;
 export type IdNamespace = uuid5;
+export type IPAddress = string;
+export type UserId = uuid5;
+export type SessionId = uuid5;
 
 export interface SessionStoreDataType extends SessionDataFields {}
 
@@ -40,14 +41,16 @@ RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestH
   next: express.NextFunction
 }
 
-export interface SystemHttpRequestType<SessionData extends SystemSessionDataType> extends express.Request {
+export interface SystemHttpRequestType<
+  SessionData extends SystemSessionDataType = SystemSessionDataType>
+extends express.Request {
   newSessionIdGenerated?: boolean;
   session: Session & Partial<SessionData>;
   sessionID: SessionId;
   regenerateSessionId?: boolean;
 }
 
-export interface SystemHttpResponse<StoreData extends SessionStoreDataType> extends express.Response {
+export interface SystemHttpResponseType<StoreData extends SessionStoreDataType> extends express.Response {
   locals: {
     calledHandlers: HandlerName[];
     retrievedSessionData?: StoreData;

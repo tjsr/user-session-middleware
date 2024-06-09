@@ -2,7 +2,12 @@ import {
   ERROR_RETRIEVING_SESSION_DATA,
   ERROR_SAVING_SESSION,
 } from "../errors/errorCodes.js";
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "../types.js";
+import {
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponseType,
+  SystemSessionDataType
+} from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from './handlerChainLog.js';
 import { checkNewlyGeneratedId, handleSessionIdRequired } from './handleSessionId.js';
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
@@ -15,7 +20,7 @@ import {
 
 export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSessionDataType>(
   request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponse<SessionStoreDataType>,
+  response: SystemHttpResponseType<SessionStoreDataType>,
   next: express.NextFunction // handleSessionCookie
 ): void => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
@@ -112,7 +117,7 @@ export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSes
 
 export const handleCopySessionStoreDataToSession = <ApplicationDataType extends SystemSessionDataType>(
   req: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponse<SessionStoreDataType>,
+  response: SystemHttpResponseType<SessionStoreDataType>,
   next: express.NextFunction // handleAssignUserIdToRequestSessionWhenNoExistingSessionData
 ): void => {
   try {
