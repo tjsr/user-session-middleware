@@ -11,9 +11,9 @@ import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 export {
   createRandomId,
   createRandomUserId,
-  getIp,
   getUserIdFromRequest,
   getUserIdFromSession,
+  getIp,
   getUserId,
   mysqlSessionStore,
   setUserIdNamespace,
