@@ -2,7 +2,7 @@ import {
   SessionId,
   SessionStoreDataType,
   SystemHttpRequestType,
-  SystemHttpResponse,
+  SystemHttpResponseType,
   SystemSessionDataType
 } from "../types.js";
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
@@ -18,7 +18,7 @@ import { saveSessionPromise } from "../sessionUser.js";
 
 export const handleNewSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
   request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponse<SessionStoreDataType>,
+  response: SystemHttpResponseType<SessionStoreDataType>,
   next: express.NextFunction // handleSessionsWithRequiredData
 ): void => {
   addCalledHandler(response, handleNewSessionWithNoSessionData.name);
@@ -54,7 +54,7 @@ export const handleNewSessionWithNoSessionData = <ApplicationDataType extends Sy
 
 export const handleExistingSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
   request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponse<SessionStoreDataType>,
+  response: SystemHttpResponseType<SessionStoreDataType>,
   next: express.NextFunction // handleSessionsWithRequiredData
 ): void => {
   addCalledHandler(response, handleExistingSessionWithNoSessionData.name);
