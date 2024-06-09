@@ -3,6 +3,7 @@ import { getUserIdFromRequest, getUserIdFromSession } from './auth/user.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
 import { getIp } from './utils/getIp.js';
+import { getUserId } from './auth/user.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { setUserIdNamespace } from './auth/userNamespace.js';
 import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
@@ -13,6 +14,7 @@ export {
   getIp,
   getUserIdFromRequest,
   getUserIdFromSession,
+  getUserId,
   mysqlSessionStore,
   setUserIdNamespace,
   userSessionMiddleware

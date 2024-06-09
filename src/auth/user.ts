@@ -1,4 +1,10 @@
-import { EmailAddress, SystemHttpRequestType, SystemSessionDataType, UserId, uuid5 } from '../types.js';
+import {
+  EmailAddress,
+  SystemHttpRequestType,
+  SystemSessionDataType,
+  UserId,
+  uuid5
+} from '../types.js';
 
 import { Session } from 'express-session';
 import { createRandomId } from '../utils/createRandomId.js';
