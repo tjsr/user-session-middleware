@@ -10,8 +10,6 @@ import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 export {
   createRandomId,
   createRandomUserId,
-  getUserIdFromRequest,
-  getUserIdFromSession,
   getIp,
   getUserIdFromRequest,
   getUserIdFromSession,
