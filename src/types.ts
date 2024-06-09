@@ -35,17 +35,9 @@ export interface UserSessionResponseLocals<StoreData extends SessionStoreDataTyp
   retrievedSessionData?: StoreData;
   skipHandlerDependencyChecks: boolean;
 }
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SystemHttpRequestType<
   SessionDataType extends SystemSessionDataType = SystemSessionDataType,
-  StoreData extends SessionStoreDataType = SessionStoreDataType,
-  P = ParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = QueryString.ParsedQs,
-  Locals extends Record<string, any> = Record<string, any>
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  StoreData extends SessionStoreDataType = SessionStoreDataType
 > extends express.Request<P, ResBody, ReqBody, ReqQuery, Locals & UserSessionResponseLocals<StoreData>> {
   newSessionIdGenerated?: boolean;
   session: Session & SessionDataType;
