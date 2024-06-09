@@ -2,22 +2,23 @@ import {
   EmailAddress,
   SystemHttpRequestType,
   SystemSessionDataType,
-  UserId,
-  uuid5
+  UserId
 } from '../types.js';
+import { createRandomUserId, saveSessionPromise } from '../sessionUser.js';
 
 import { Session } from 'express-session';
-import { createRandomId } from '../utils/createRandomId.js';
 import { getUserIdNamespace } from './userNamespace.js';
-import { saveSessionPromise } from '../sessionUser.js';
 import { v5 as uuidv5 } from 'uuid';
 
-export const createUserIdFromEmail = (email: EmailAddress): uuid5 => {
-  return uuidv5(email, getUserIdNamespace());
+export type AuthenticationRestResult = {
+  email: EmailAddress | undefined;
+  isLoggedIn: boolean;
+  message?: string;
+  sessionId?: string;
 };
 
-export const createRandomUserId = (): UserId => {
-  return createRandomId(getUserIdNamespace());
+export const createUserIdFromEmail = (email: EmailAddress): UserId => {
+  return uuidv5(email, getUserIdNamespace());
 };
 
 export const getUserIdFromRequest = async <SessionData extends SystemSessionDataType>(

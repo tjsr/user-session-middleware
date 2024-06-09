@@ -3,10 +3,12 @@ import { createUserIdFromEmail, getUserIdFromRequest, getUserIdFromSession } fro
 import { HttpStatusCode } from './httpStatusCodes.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
+import { createUserIdFromEmail } from './auth/user.js';
 import { endWithJsonMessage } from './utils/apiMiddlewareUtils.js';
 import { getIp } from './utils/getIp.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { setUserIdNamespace } from './auth/userNamespace.js';
+import { userSessionEndpoints } from './api/endpoints.js';
 import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 
 export {
@@ -17,10 +19,12 @@ export {
   getIp,
   getUserIdFromRequest,
   getUserIdFromSession,
+  createUserIdFromEmail,
   HttpStatusCode,
   mysqlSessionStore,
   setUserIdNamespace,
-  userSessionMiddleware
+  userSessionMiddleware,
+  userSessionEndpoints
 };
 
 export type {
@@ -34,6 +38,7 @@ export type {
   SystemHttpResponseType,
   SystemSessionDataType,
   SessionStoreDataType,
+  UserModel,
   UserSessionOptions
 } from './types.js';
 export type { 

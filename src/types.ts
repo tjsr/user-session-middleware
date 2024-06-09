@@ -16,8 +16,8 @@ export type SessionId = uuid5;
 export interface SessionStoreDataType extends SessionDataFields {}
 
 interface SessionDataFields {
-  userId: UserId;
-  email: EmailAddress;
+  userId: UserId | undefined;
+  email: EmailAddress | undefined;
   newId: boolean | undefined;
 }
 
@@ -26,18 +26,24 @@ export interface SystemSessionDataType extends SessionData, SessionDataFields {
 
 export interface SessionMiddlewareErrorHandler<
 SessionData extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestHandler {
+RequestType extends SystemHttpRequestType<SessionData>,
+StoreData extends SessionStoreDataType,
+ResponseType extends SystemHttpResponseType<StoreData>
+> extends express.RequestHandler {
   err: Error,
-  req: RequestType,
-  res: express.Response,
+  request: RequestType,
+  response: ResponseType,
   next: express.NextFunction
 }
 
 export interface SessionMiddlewareHandler<
 SessionData extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionData>> extends express.RequestHandler {
-  req: RequestType,
-  res: express.Response,
+RequestType extends SystemHttpRequestType<SessionData>,
+StoreData extends SessionStoreDataType,
+ResponseType extends SystemHttpResponseType<StoreData>
+> extends express.RequestHandler {
+  request: RequestType,
+  response: ResponseType,
   next: express.NextFunction
 }
 
@@ -72,3 +78,8 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
   // Look for the session id in the X-Session-Id header
   useForwardedSessions?: boolean | undefined;
 }
+
+export type UserModel = {
+  userId: uuid4;
+  email: EmailAddress;
+};

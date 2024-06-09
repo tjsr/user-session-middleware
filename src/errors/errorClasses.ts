@@ -18,6 +18,7 @@ import { HandlerName, SessionId } from "../types.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionMiddlewareError } from "./SessionMiddlewareError.js";
 
 export class SaveSessionError extends SessionHandlerError {
   constructor (message = 'Error writing session data to store.', cause?: unknown) {
@@ -121,5 +122,11 @@ export class SessionNotGeneratedError extends SessionHandlerError {
   constructor() {
     super(ERROR_REQUEST_SESSION_NOT_INITIALIZED, HttpStatusCode.INTERNAL_SERVER_ERROR,
       'Expected session to exist but was undefined on request.');
+  }
+}
+
+export class UUIDNamespaceNotDefinedError extends SessionMiddlewareError {
+  constructor() {
+    super('USER_UUID_NAMESPACE not set in environment or from application default.');
   }
 }
