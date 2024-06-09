@@ -1,4 +1,4 @@
-import { SystemHttpRequestType, SystemSessionDataType, UserId } from '../types.js';
+import { SessionStoreDataType, SystemHttpRequestType, SystemSessionDataType, UserId } from '../types.js';
 import express, { NextFunction } from 'express';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
@@ -31,8 +31,9 @@ export const endWithJsonMessage = async <ResponseType extends express.Response<J
 };
 
 export const validateHasUserId = async <
-  DataType extends SystemSessionDataType,
-  RequestType extends SystemHttpRequestType<DataType>,
+  SessionDataType extends SystemSessionDataType,
+  StoreDataType extends SessionStoreDataType,
+  RequestType extends SystemHttpRequestType<SessionDataType, StoreDataType>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ResponseType extends express.Response<JSON, any>,
 >(
