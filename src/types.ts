@@ -75,7 +75,7 @@ export interface SystemHttpResponseType<
   StoreDataType extends SessionStoreDataType = SessionStoreDataType,
   ResBody = any,
   Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
-  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>
+    CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>
 > extends express.Response<ResBody, Locals> {
   locals: Locals;
 }

@@ -23,25 +23,26 @@ import {
 } from '../errors/sessionErrorChecks.js';
 
 export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler = 
-<
-  ApplicationSessionType extends SystemSessionDataType,
-  StoreDataType extends SessionStoreDataType,
-  P extends core.ParamsDictionary = core.ParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery extends core.Query = core.Query,
-  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
-  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
-  RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
-    SystemHttpResponseType<StoreDataType, ResBody, Locals>
->(
-    request: RequestType,
-    response: ResponseType,
-    handleSessionWithNewlyGeneratedId: NextFunction
-  ): void => {
+// <
+//   ApplicationSessionType extends SystemSessionDataType,
+//   StoreDataType extends SessionStoreDataType,
+//   P extends core.ParamsDictionary = core.ParamsDictionary,
+//   ResBody = any,
+//   ReqBody = any,
+//   ReqQuery extends core.Query = core.Query,
+//   Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
+//   CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
+//   RequestType extends
+//     SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
+//     SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
+//   ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
+//     SystemHttpResponseType<StoreDataType, ResBody, Locals>
+// >(
+(
+  request: SystemHttpRequestType,
+  response: SystemHttpResponseType,
+  handleSessionWithNewlyGeneratedId: NextFunction
+): void => {
   addCalledHandler(response, handleSessionIdRequired.name);
   try {
     requireSessionIdGenerated(request.sessionID);
@@ -54,8 +55,8 @@ export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler =
 
 export const handleSessionWithNewlyGeneratedId: UserSessionMiddlewareRequestHandler =
 <
-RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponseType<SessionStoreDataType>
+RequestType extends SystemHttpRequestType,
+ResponseType extends SystemHttpResponseType
 >(
     request: RequestType,
     response: ResponseType,

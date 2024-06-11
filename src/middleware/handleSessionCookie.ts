@@ -3,6 +3,7 @@ import * as core from 'express-serve-static-core';
 
 import {
   CustomLocalsOrRecord,
+  UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
 } from "../types/middlewareHandlerTypes.js";
 import {
@@ -58,7 +59,7 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
 };
 
 // TODO: Fix type param compatibility.
-export const handleSessionCookieOnError = // : UserSessionMiddlewareErrorHandler =
+export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
 <
   ApplicationSessionType extends SystemSessionDataType,
   ApplicationStoreType extends SessionStoreDataType,
@@ -77,8 +78,8 @@ export const handleSessionCookieOnError = // : UserSessionMiddlewareErrorHandler
     SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
 >(
     error: Error,
-    request: RequestType,
-    response: ResponseType,
+    request: SystemHttpRequestType | RequestType,
+    response: SystemHttpResponseType | ResponseType,
     nextErrorHandler: express.NextFunction
   ):void => {
   addCalledHandler(response, handleSessionCookieOnError.name);

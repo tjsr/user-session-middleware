@@ -1,8 +1,4 @@
-import { ErrorRequestHandler, RequestHandler } from "express";
-import {
-  UserSessionMiddlewareErrorHandler,
-  UserSessionMiddlewareRequestHandler,
-} from './types/middlewareHandlerTypes.js';
+import express, { ErrorRequestHandler, RequestHandler } from "express";
 import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval,
@@ -33,24 +29,24 @@ export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOption
   //   _req: SystemHttpRequestType,
   //   _response: SystemHttpResponseType | express.Response,
   //   _handleSessionWithNewlyGeneratedId: express.NextFunction) => void) |
-    UserSessionMiddlewareRequestHandler | UserSessionMiddlewareErrorHandler |
+    // UserSessionMiddlewareRequestHandler | UserSessionMiddlewareErrorHandler |
     RequestHandler | ErrorRequestHandler
 )[] => {
   const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
 
   return [
     expressSessionHandlerMiddleware(expressSessionOptions),
-    handleSessionIdRequired,
-    handleSessionWithNewlyGeneratedId,
-    handleSessionDataRetrieval,
-    handleNewSessionWithNoSessionData,
-    handleExistingSessionWithNoSessionData,
-    handleSessionCookie,
+    handleSessionIdRequired as express.RequestHandler,
+    handleSessionWithNewlyGeneratedId as express.RequestHandler,
+    handleSessionDataRetrieval as express.RequestHandler,
+    handleNewSessionWithNoSessionData as express.RequestHandler,
+    handleExistingSessionWithNoSessionData as express.RequestHandler,
+    handleSessionCookie as express.RequestHandler,
     // TODO: Fix correct type.
     handleSessionCookieOnError as ErrorRequestHandler,
-    handleCopySessionStoreDataToSession,
-    handleSessionIdAfterDataRetrieval,
-    handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+    handleCopySessionStoreDataToSession as express.RequestHandler,
+    handleSessionIdAfterDataRetrieval as express.RequestHandler,
+    handleAssignUserIdToRequestSessionWhenNoExistingSessionData as express.RequestHandler,
     // TODO: Fix correct type.
     sessionErrorHandler as ErrorRequestHandler,
   ];

@@ -27,7 +27,7 @@ const handlerAssertionsEnabled = (): boolean => {
   return !isTestMode() && process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : HANDLER_ASSERTIONS_ENABLED;
 };
 
-export const addCalledHandler = <ResponseType extends SystemHttpResponseType<SessionStoreDataType>>(
+export const addCalledHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName,
   silentCallHandlers = false
@@ -41,7 +41,7 @@ export const addCalledHandler = <ResponseType extends SystemHttpResponseType<Ses
   response.locals.calledHandlers.push(handlerName);
 };
 
-export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpResponseType<SessionStoreDataType>>(
+export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName
 ): void => {

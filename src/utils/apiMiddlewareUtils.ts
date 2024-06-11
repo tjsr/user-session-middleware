@@ -1,18 +1,9 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as QueryString from 'qs';
-import * as core from 'express-serve-static-core';
-
 import {
-  CustomLocalsOrRecord,
-  SystemRequestOrExpressRequest,
-  SystemResponseOrExpressResponse,
-  UserSessionMiddlewareRequestHandler
-} from '../types/middlewareHandlerTypes.js';
-import {
-  SessionStoreDataType,
-  SystemResponseLocals,
+  SystemHttpRequestType,
+  SystemHttpResponseType,
   SystemSessionDataType,
   UserId,
 } from '../types.js';
@@ -20,6 +11,9 @@ import express, { NextFunction } from 'express';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
 import { Session } from 'express-session';
+import {
+  UserSessionMiddlewareRequestHandler
+} from '../types/middlewareHandlerTypes.js';
 import { getUserIdFromSession } from '../auth/user.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,24 +42,28 @@ export const endWithJsonMessage = async <ResponseType extends express.Response<J
   });
 };
 
-export const validateHasUserId: UserSessionMiddlewareRequestHandler = <
-  SessionDataType extends SystemSessionDataType,
-  StoreDataType extends SessionStoreDataType,
-  P extends core.ParamsDictionary = core.ParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery extends QueryString.ParsedQs = QueryString.ParsedQs,
-  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> = 
-    CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
-  RequestType extends SystemRequestOrExpressRequest<SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery> =
-    SystemRequestOrExpressRequest<SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery>,
-  ResponseType extends SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals> =
-    SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals>
->(
-    request: RequestType,
-    response: ResponseType,
-    next: NextFunction
-  ): void => {
+export const validateHasUserId: UserSessionMiddlewareRequestHandler = (
+// <
+//   SessionDataType extends SystemSessionDataType,
+//   ProvidedRequestType = SystemHttpRequestType<SessionDataType>,
+//   StoreDataType extends SessionStoreDataType,
+//   P extends core.ParamsDictionary = core.ParamsDictionary,
+//   ResBody = any,
+//   ReqBody = any,
+//   ReqQuery extends QueryString.ParsedQs = QueryString.ParsedQs,
+//   Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> = 
+//     CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
+//   RequestType extends SystemRequestOrExpressRequest<ProvidedRequestType> = // <SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery> =
+//     SystemRequestOrExpressRequest<any, StoreDataType, Locals, P, ResBody, ReqBody, ReqQuery>,
+//   ResponseType extends SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals> =
+//     SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals>
+// >(
+//     request: RequestType,
+//     response: ResponseType,
+  request: SystemHttpRequestType,
+  response: SystemHttpResponseType,
+  next: NextFunction
+): void => {
   try {
     // TODO: Fix casting here.
     getUserIdFromSession(request.session as (Session & SystemSessionDataType)).then((userId: UserId|undefined) => {
