@@ -22,21 +22,21 @@ export const saveSessionDataToSession = async <ApplicationDataType extends Sessi
   return saveSessionPromise(session);
 };
 
-export const retrieveSessionDataFromStore = <ApplicationDataType extends SystemSessionDataType>(
+export const retrieveSessionDataFromStore = <ApplicationSessionType extends SystemSessionDataType>(
   sessionStore: session.Store,
   sessionID: string
-): Promise<ApplicationDataType | null | undefined> => {
+): Promise<ApplicationSessionType | null | undefined> => {
   if (sessionID === undefined) {
     return Promise.reject(new Error('No session ID received'));
   }
-  return new Promise<ApplicationDataType>((resolve, reject) => {
+  return new Promise<ApplicationSessionType>((resolve, reject) => {
     sessionStore.get(
       sessionID,
       async (err: Error, genericSessionData: SessionData | null | undefined) => {
         if (err) {
           reject(err);
         }
-        resolve(genericSessionData as ApplicationDataType);
+        resolve(genericSessionData as ApplicationSessionType);
       });
   });
 };

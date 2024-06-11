@@ -1,19 +1,25 @@
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as QueryString from 'qs';
 import * as core from 'express-serve-static-core';
 
 import {
+  CustomLocalsOrRecord,
+  SystemRequestOrExpressRequest,
+  SystemResponseOrExpressResponse,
+  UserSessionMiddlewareRequestHandler
+} from '../types/middlewareHandlerTypes.js';
+import {
   SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
+  SystemResponseLocals,
   SystemSessionDataType,
   UserId,
 } from '../types.js';
 import express, { NextFunction } from 'express';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
+import { Session } from 'express-session';
 import { getUserIdFromSession } from '../auth/user.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,26 +51,24 @@ export const endWithJsonMessage = async <ResponseType extends express.Response<J
 export const validateHasUserId: UserSessionMiddlewareRequestHandler = <
   SessionDataType extends SystemSessionDataType,
   StoreDataType extends SessionStoreDataType,
-  P = core.ParamsDictionary,
+  P extends core.ParamsDictionary = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
-  ReqQuery = QueryString.ParsedQs,
-  Locals extends Record<string, any> = Record<string, any>,
-  // | SystemResponseLocals<StoreDataType> = Record<string, any> | SystemResponseLocals<StoreDataType> =
-  // Record<string, any> | SystemResponseLocals<StoreDataType>
-  RequestType extends SystemHttpRequestType<SessionDataType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<SessionDataType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
-    SystemHttpResponseType<StoreDataType, ResBody, Locals>,
-  // // extends express.Response,// <JSON, any>,
+  ReqQuery extends QueryString.ParsedQs = QueryString.ParsedQs,
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> = 
+    CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
+  RequestType extends SystemRequestOrExpressRequest<SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery> =
+    SystemRequestOrExpressRequest<SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery>,
+  ResponseType extends SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals> =
+    SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,
     next: NextFunction
   ): void => {
   try {
-    getUserIdFromSession(request.session).then((userId: UserId|undefined) => {
+    // TODO: Fix casting here.
+    getUserIdFromSession(request.session as (Session & SystemSessionDataType)).then((userId: UserId|undefined) => {
       if (userId === undefined) {
         return endWithJsonMessage(response, HttpStatusCode.UNAUTHORIZED, 'Invalid user', next);
       }

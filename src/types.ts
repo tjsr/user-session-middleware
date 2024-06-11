@@ -5,6 +5,7 @@ import * as core from "express-serve-static-core";
 
 import expressSession, { Session, SessionData } from "express-session";
 
+import { CustomLocalsOrRecord } from "./types/middlewareHandlerTypes.js";
 import { ParamsDictionary } from "express-serve-static-core";
 import express from "express";
 
@@ -29,6 +30,11 @@ interface SessionDataFields {
   newId: boolean | undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// type UserSessionData<DataFieldsType extends SessionDataFields> = SessionData & DataFieldsType;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// type UserStoreData<DataFieldsType extends SessionDataFields> = SessionStoreDataType & DataFieldsType;
+
 export interface SystemSessionDataType extends SessionData, SessionDataFields {
 }
 
@@ -40,8 +46,8 @@ export interface SystemHttpRequestType<
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends Record<string, any> | SystemResponseLocals<StoreDataType> =
-    SystemResponseLocals<StoreDataType>
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
+    CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>
   >
 extends express.Request<
   P,
@@ -68,8 +74,8 @@ export interface SystemResponseLocals<StoreData extends SessionStoreDataType> ex
 export interface SystemHttpResponseType<
   StoreDataType extends SessionStoreDataType = SessionStoreDataType,
   ResBody = any,
-  Locals extends Record<string, any> | SystemResponseLocals<StoreDataType> =
-    Record<string, any> | SystemResponseLocals<StoreDataType>
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
+  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>
 > extends express.Response<ResBody, Locals> {
   locals: Locals;
 }

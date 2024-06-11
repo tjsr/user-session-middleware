@@ -18,6 +18,7 @@ import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTy
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
 
+// TODO: This works??
 // This comes after setting data from the session store.
 export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSessionMiddlewareRequestHandler =
 async <

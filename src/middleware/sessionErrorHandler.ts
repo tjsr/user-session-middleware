@@ -3,9 +3,12 @@
 import * as core from 'express-serve-static-core';
 
 import {
+  CustomLocalsOrRecord,
+  SystemRequestOrExpressRequest,
+  SystemResponseOrExpressResponse,
+} from '../types/middlewareHandlerTypes.js';
+import {
   SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
   SystemResponseLocals,
   SystemSessionDataType,
 } from "../types.js";
@@ -16,22 +19,21 @@ import express from "express";
 import { handleSessionCookieOnError } from "./handleSessionCookie.js";
 
 // TODO: Fix type param compatibility.
-export const sessionErrorHandler = <// : UserSessionMiddlewareErrorHandler = <
-ApplicationSessionType extends SystemSessionDataType = SystemSessionDataType,
-ApplicationStoreType extends SessionStoreDataType = SessionStoreDataType,
-P = core.ParamsDictionary,
+export const sessionErrorHandler = //: UserSessionMiddlewareErrorHandler =
+<
+SessionDataType extends SystemSessionDataType = SystemSessionDataType,
+StoreDataType extends SessionStoreDataType = SessionStoreDataType,
+P extends core.ParamsDictionary= core.ParamsDictionary,
 ResBody = any,
 ReqBody = any,
-ReqQuery = core.Query,
-Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
-  Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
-RequestType extends
-// TODO: SHRT | express.Response doesn't mean extends either of these, it means extends a type which is (X|Y)
-  SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> |
-    express.Request<P, ResBody, ReqBody, ReqQuery, Locals> =
-  SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> | express.Response<ResBody, Locals> =
-  SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+ReqQuery extends core.Query = core.Query,
+Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
+  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
+RequestType extends SystemRequestOrExpressRequest<
+  SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery> =
+  SystemRequestOrExpressRequest<SessionDataType, StoreDataType, any, Locals, P, ResBody, ReqBody, ReqQuery>,
+ResponseType extends SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals> =
+  SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals>
 >(
     error: Error | SessionHandlerError,
     _request: RequestType,

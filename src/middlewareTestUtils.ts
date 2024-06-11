@@ -1,14 +1,16 @@
 import { Assertion, expect, vi } from "vitest";
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponse, SystemSessionDataType } from "./types";
+import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponseType, SystemSessionDataType } from "./types";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { SessionHandlerError } from "./errors/SessionHandlerError";
+import { UserSessionMiddlewareRequestHandler } from "./types/middlewareHandlerTypes.ts";
 import express from "express";
 import { getMockReqResp } from "./testUtils";
 
-export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
-  _req: RequestType, _res: express.Response, _next: express.NextFunction
-) => void;
+// export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
+//   _req: RequestType, _res: express.Response, _next: express.NextFunction
+// ) => void;
+export type HandlerFunction = UserSessionMiddlewareRequestHandler;
 
 type ParamsWrapper = {
   params?: unknown;
@@ -29,7 +31,7 @@ export type HandlerErrorResult = {
 
 const expectVerifyHandlerFunction = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponse<SessionStoreDataType>
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType>
   >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,
@@ -65,7 +67,7 @@ const expectVerifyHandlerFunction = <
 export const verifyHandlerFunctionCallsNextWithError = 
 <
 RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponse<SessionStoreDataType>
+ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,
@@ -81,10 +83,10 @@ ResponseType extends SystemHttpResponse<SessionStoreDataType>
   return { error, next, response };
 };
 
-export const verifyHandlerFunctionCallsNext = 
+export const verifyHandlerFunctionCallsNext =
 <
 RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-ResponseType extends SystemHttpResponse<SessionStoreDataType>
+ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,

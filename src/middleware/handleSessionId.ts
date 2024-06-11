@@ -2,6 +2,7 @@
 
 import * as core from 'express-serve-static-core';
 
+import { CustomLocalsOrRecord, UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import {
   SessionStoreDataType,
   SystemHttpRequestType,
@@ -21,23 +22,21 @@ import {
   requireSessionInitialized,
 } from '../errors/sessionErrorChecks.js';
 
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-
 export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler = 
 <
   ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
-  P = core.ParamsDictionary,
+  StoreDataType extends SessionStoreDataType,
+  P extends core.ParamsDictionary = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
-  ReqQuery = core.Query,
-  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
-    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  ReqQuery extends core.Query = core.Query,
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
+  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
   RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
+    SystemHttpResponseType<StoreDataType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,
@@ -111,8 +110,8 @@ export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHand
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
-    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>> =
+    CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>>,
   RequestType extends
     SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
     SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,

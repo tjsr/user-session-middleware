@@ -44,7 +44,9 @@ export type {
 } from './types/model.js';
 export type {
   UserSessionMiddlewareErrorHandler,
-  UserSessionMiddlewareRequestHandler
+  UserSessionMiddlewareRequestHandler,
+  SystemRequestOrExpressRequest,
+  SystemResponseOrExpressResponse
 } from './types/middlewareHandlerTypes.js';
 export { SessionHandlerError } from './errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';

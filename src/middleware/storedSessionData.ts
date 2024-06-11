@@ -2,6 +2,7 @@
 
 import * as core from 'express-serve-static-core';
 
+import { CustomLocalsOrRecord, UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import {
   ERROR_RETRIEVING_SESSION_DATA,
   ERROR_SAVING_SESSION,
@@ -18,7 +19,6 @@ import { checkNewlyGeneratedId, handleSessionIdRequired } from './handleSessionI
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
 
 import { SessionHandlerError } from '../errors/SessionHandlerError.js';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import express from "express";
 import {
   requireSessionStoreConfigured,
@@ -27,18 +27,18 @@ import {
 export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
 <
   ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
+  StoreDataType extends SessionStoreDataType,
   P = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
-    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> = 
+  CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
   RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
+    SystemHttpResponseType<StoreDataType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,
@@ -64,7 +64,8 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
     request.sessionStore, request.sessionID!).then((genericSessionData) => {
     if (genericSessionData) {
       console.log(handleSessionDataRetrieval, `Successfully retrieved session ${request.sessionID} data from store.`);
-      response.locals.retrievedSessionData = genericSessionData as ApplicationSessionType;
+      // TODO: Fix typings here, Cookie gets returned from store retrieval .get() method.
+      response.locals.retrievedSessionData = genericSessionData as unknown as any;
     }
     next();
   }).catch((err) => {
@@ -139,18 +140,18 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
 export const handleCopySessionStoreDataToSession: UserSessionMiddlewareRequestHandler =
 <
   ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
+  StoreDataType extends SessionStoreDataType,
   P = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
-    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> = 
+    CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
   RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
+    SystemHttpResponseType<StoreDataType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,

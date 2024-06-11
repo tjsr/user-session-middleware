@@ -46,10 +46,12 @@ export const userSessionMiddleware = (sessionOptions?: Partial<UserSessionOption
     handleNewSessionWithNoSessionData,
     handleExistingSessionWithNoSessionData,
     handleSessionCookie,
-    handleSessionCookieOnError,
+    // TODO: Fix correct type.
+    handleSessionCookieOnError as ErrorRequestHandler,
     handleCopySessionStoreDataToSession,
     handleSessionIdAfterDataRetrieval,
     handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
-    sessionErrorHandler,
+    // TODO: Fix correct type.
+    sessionErrorHandler as ErrorRequestHandler,
   ];
 };
