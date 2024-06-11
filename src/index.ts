@@ -1,9 +1,9 @@
 import { createUserIdFromEmail, getUserIdFromRequest, getUserIdFromSession } from './auth/user.js';
+import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.js';
 
 import { HttpStatusCode } from './httpStatusCodes.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
-import { endWithJsonMessage } from './utils/apiMiddlewareUtils.js';
 import { getIp } from './utils/getIp.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { setUserIdNamespace } from './auth/userNamespace.js';
@@ -20,7 +20,8 @@ export {
   HttpStatusCode,
   mysqlSessionStore,
   setUserIdNamespace,
-  userSessionMiddleware
+  userSessionMiddleware,
+  validateHasUserId
 };
 
 export type {
@@ -28,10 +29,12 @@ export type {
   uuid4,
   uuid5,
   EmailAddress,
+  HandlerName,
   IPAddress,
   UserId,
   SystemHttpRequestType,
   SystemHttpResponseType,
+  SystemResponseLocals,
   SystemSessionDataType,
   SessionStoreDataType,
   UserSessionOptions
@@ -40,8 +43,8 @@ export type {
   UserModel
 } from './types/model.js';
 export type {
-  SessionMiddlewareErrorHandler,
-  SessionMiddlewareHandler
-} from './types.js';
+  UserSessionMiddlewareErrorHandler,
+  UserSessionMiddlewareRequestHandler
+} from './types/middlewareHandlerTypes.js';
 export { SessionHandlerError } from './errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';

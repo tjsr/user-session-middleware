@@ -40,7 +40,7 @@ export const getUserIdFromSession = async <SessionData extends SystemSessionData
   }
 };
 
-const createRandomIdAndSave = (session: Session & SystemSessionDataType): Promise<UserId|undefined> => {
+const createRandomIdAndSave = (session: Session & Partial<SystemSessionDataType>): Promise<UserId|undefined> => {
   session.userId = createRandomUserId();
   return new Promise<UserId|undefined>((resolve, reject) => {
     saveSessionPromise(session).then(() => {

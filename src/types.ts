@@ -1,4 +1,7 @@
-import * as QueryString from 'qs';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import * as core from "express-serve-static-core";
 
 import expressSession, { Session, SessionData } from "express-session";
 
@@ -16,6 +19,8 @@ export type IPAddress = string;
 export type UserId = uuid5;
 export type SessionId = uuid5;
 
+export type SessionStoreDataTypeVariant<DataFieldsType extends SessionDataFields> = DataFieldsType;
+
 export interface SessionStoreDataType extends SessionDataFields {}
 
 interface SessionDataFields {
@@ -27,23 +32,6 @@ interface SessionDataFields {
 export interface SystemSessionDataType extends SessionData, SessionDataFields {
 }
 
-export interface SessionMiddlewareErrorHandler<
-SessionDataType extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionDataType>> extends express.RequestHandler {
-  err: Error,
-  req: RequestType,
-  res: express.Response,
-  next: express.NextFunction
-}
-
-export interface SessionMiddlewareHandler<
-SessionDataType extends SystemSessionDataType,
-RequestType extends SystemHttpRequestType<SessionDataType>> extends express.RequestHandler {
-  req: RequestType,
-  res: express.Response,
-  next: express.NextFunction
-}
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SystemHttpRequestType<
   SessionDataType extends SystemSessionDataType = SystemSessionDataType,
@@ -51,9 +39,9 @@ export interface SystemHttpRequestType<
   P = ParamsDictionary,
   ResBody = any,
   ReqBody = any,
-  ReqQuery = QueryString.ParsedQs,
+  ReqQuery = core.Query,
   Locals extends Record<string, any> | SystemResponseLocals<StoreDataType> =
-    Record<string, any> | SystemResponseLocals<StoreDataType>
+    SystemResponseLocals<StoreDataType>
   >
 extends express.Request<
   P,
@@ -72,13 +60,13 @@ extends express.Request<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface SystemResponseLocals<StoreData extends SessionStoreDataType> extends Record<string, any> {
   calledHandlers: HandlerName[];
-  retrievedSessionData?: StoreData;
+  retrievedSessionData: StoreData | undefined;
   skipHandlerDependencyChecks: boolean;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SystemHttpResponseType<
-  StoreDataType extends SessionStoreDataType,
+  StoreDataType extends SessionStoreDataType = SessionStoreDataType,
   ResBody = any,
   Locals extends Record<string, any> | SystemResponseLocals<StoreDataType> =
     Record<string, any> | SystemResponseLocals<StoreDataType>
@@ -86,14 +74,6 @@ export interface SystemHttpResponseType<
   locals: Locals;
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
-
-
-// {
-//   calledHandlers: HandlerName[];
-//   retrievedSessionData?: StoreData;
-//   skipHandlerDependencyChecks: boolean;
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// } | Record<string, any>
 
 export interface UserSessionOptions extends expressSession.SessionOptions {
   // Return a 401 if the session id is not recognized in store

@@ -1,8 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import * as core from 'express-serve-static-core';
+
 import {
   SessionStoreDataType,
   SystemHttpRequestType,
   SystemHttpResponseType,
-  SystemSessionDataType
+  SystemResponseLocals,
+  SystemSessionDataType,
 } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
@@ -16,9 +21,23 @@ import {
   requireSessionInitialized,
 } from '../errors/sessionErrorChecks.js';
 
-export const handleSessionIdRequired = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponseType<SessionStoreDataType>
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
+
+export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler = 
+<
+  ApplicationSessionType extends SystemSessionDataType,
+  ApplicationStoreType extends SessionStoreDataType,
+  P = core.ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = core.Query,
+  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
+    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  RequestType extends
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
+    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,
@@ -34,7 +53,8 @@ export const handleSessionIdRequired = <
   handleSessionWithNewlyGeneratedId();
 };
 
-export const handleSessionWithNewlyGeneratedId = <
+export const handleSessionWithNewlyGeneratedId: UserSessionMiddlewareRequestHandler =
+<
 RequestType extends SystemHttpRequestType<SystemSessionDataType>,
 ResponseType extends SystemHttpResponseType<SessionStoreDataType>
 >(
@@ -66,8 +86,8 @@ ResponseType extends SystemHttpResponseType<SessionStoreDataType>
   }
 };
 
-export const checkNewlyGeneratedId = <ApplicationDataType extends SystemSessionDataType>(
-  request: SystemHttpRequestType<ApplicationDataType>,
+export const checkNewlyGeneratedId = (
+  request: SystemHttpRequestType,
   next: express.NextFunction // handleRetrievedSessionDataOrErrorHandler
 ): boolean => {
   try {
@@ -83,11 +103,26 @@ export const checkNewlyGeneratedId = <ApplicationDataType extends SystemSessionD
   return false;
 };
 
-export const handleSessionIdAfterDataRetrieval = <ApplicationDataType extends SystemSessionDataType>(
-  request: SystemHttpRequestType<ApplicationDataType>,
-  response: express.Response,
-  next: express.NextFunction // handleCopySessionStoreDataToSession
-): void => {
+export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHandler =
+<
+  ApplicationSessionType extends SystemSessionDataType,
+  ApplicationStoreType extends SessionStoreDataType,
+  P = core.ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = core.Query,
+  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
+    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  RequestType extends
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
+    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+>(
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction
+  ) => {
   addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
   verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
   verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);

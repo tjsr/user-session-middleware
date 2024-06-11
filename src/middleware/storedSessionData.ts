@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import * as core from 'express-serve-static-core';
+
 import {
   ERROR_RETRIEVING_SESSION_DATA,
   ERROR_SAVING_SESSION,
@@ -6,23 +10,40 @@ import {
   SessionStoreDataType,
   SystemHttpRequestType,
   SystemHttpResponseType,
-  SystemSessionDataType
+  SystemResponseLocals,
+  SystemSessionDataType,
 } from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from './handlerChainLog.js';
 import { checkNewlyGeneratedId, handleSessionIdRequired } from './handleSessionId.js';
 import { retrieveSessionDataFromStore, saveSessionDataToSession } from '../store/loadData.js';
 
 import { SessionHandlerError } from '../errors/SessionHandlerError.js';
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import express from "express";
 import {
   requireSessionStoreConfigured,
 } from '../errors/sessionErrorChecks.js';
 
-export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSessionDataType>(
-  request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponseType<SessionStoreDataType>,
-  next: express.NextFunction // handleSessionCookie
-): void => {
+export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
+<
+  ApplicationSessionType extends SystemSessionDataType,
+  ApplicationStoreType extends SessionStoreDataType,
+  P = core.ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = core.Query,
+  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
+    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  RequestType extends
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
+    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+>(
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction
+  ):void => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
   try {
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers);
@@ -33,17 +54,17 @@ export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSes
 
   verifyPrerequisiteHandler(response, handleSessionIdRequired.name);
   
-  if (checkNewlyGeneratedId(request, next)) {
+  if (checkNewlyGeneratedId(request as SystemHttpRequestType, next)) {
     return;
   }
 
   // let genericSessionData: ApplicationDataType|null|undefined;
   // genericSessionData = await retrieveSessionDataFromStore<ApplicationDataType>(req.sessionStore, req.sessionID!);
-  retrieveSessionDataFromStore<ApplicationDataType>(
+  retrieveSessionDataFromStore<ApplicationSessionType>(
     request.sessionStore, request.sessionID!).then((genericSessionData) => {
     if (genericSessionData) {
       console.log(handleSessionDataRetrieval, `Successfully retrieved session ${request.sessionID} data from store.`);
-      response.locals.retrievedSessionData = genericSessionData as ApplicationDataType;
+      response.locals.retrievedSessionData = genericSessionData as ApplicationSessionType;
     }
     next();
   }).catch((err) => {
@@ -115,11 +136,26 @@ export const handleSessionDataRetrieval = <ApplicationDataType extends SystemSes
 //   }
 // };
 
-export const handleCopySessionStoreDataToSession = <ApplicationDataType extends SystemSessionDataType>(
-  req: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponseType<SessionStoreDataType>,
-  next: express.NextFunction // handleAssignUserIdToRequestSessionWhenNoExistingSessionData
-): void => {
+export const handleCopySessionStoreDataToSession: UserSessionMiddlewareRequestHandler =
+<
+  ApplicationSessionType extends SystemSessionDataType,
+  ApplicationStoreType extends SessionStoreDataType,
+  P = core.ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = core.Query,
+  Locals extends Record<string, any> | SystemResponseLocals<ApplicationStoreType> =
+    Record<string, any> | SystemResponseLocals<ApplicationStoreType>,
+  RequestType extends
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
+    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+>(
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction // handleAssignUserIdToRequestSessionWhenNoExistingSessionData
+  ): void => {
   try {
     addCalledHandler(response, handleCopySessionStoreDataToSession.name);
     verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
@@ -129,7 +165,7 @@ export const handleCopySessionStoreDataToSession = <ApplicationDataType extends 
   }
 
   const sessionData: SessionStoreDataType = response.locals.retrievedSessionData as SessionStoreDataType;
-  saveSessionDataToSession(sessionData, req.session).then(() => {
+  saveSessionDataToSession(sessionData, request.session).then(() => {
     next();
   }).catch((err) => {
     const sessionError: SessionHandlerError = new SessionHandlerError(
