@@ -23,9 +23,9 @@ describe('api.handleSessionIdRequired', () => {
 
   beforeEach(() => {
     ({ app, memoryStore } = appWithMiddleware([
-      handleSessionIdRequired,
-      handleSessionCookie,
-      handleSessionCookieOnError,
+      handleSessionIdRequired as express.RequestHandler,
+      handleSessionCookie as express.RequestHandler,
+      handleSessionCookieOnError as express.ErrorRequestHandler,
     ]));
   });
 

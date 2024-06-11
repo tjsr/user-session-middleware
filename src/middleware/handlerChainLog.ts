@@ -1,6 +1,7 @@
 import { HandlerName, SessionStoreDataType, SystemHttpResponseType } from "../types.js";
 import { MiddlewareCallOrderError, RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
+import assert from "node:assert";
 import { isTestMode } from "@tjsr/simple-env-utils";
 
 const HANDLER_ASSERTIONS_ENABLED = process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : false;
@@ -26,7 +27,7 @@ const handlerAssertionsEnabled = (): boolean => {
   return !isTestMode() && process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : HANDLER_ASSERTIONS_ENABLED;
 };
 
-export const addCalledHandler = <ResponseType extends SystemHttpResponseType<SessionStoreDataType>>(
+export const addCalledHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName,
   silentCallHandlers = false
@@ -40,13 +41,14 @@ export const addCalledHandler = <ResponseType extends SystemHttpResponseType<Ses
   response.locals.calledHandlers.push(handlerName);
 };
 
-export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpResponseType<SessionStoreDataType>>(
+export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName
 ): void => {
   if (handlerAssertionsEnabled() && response.locals.calledHandlers) {
-    if (!response.locals.calledHandlers.includes(handlerName)) {
-      const lastHandler = response.locals.calledHandlers[response.locals.calledHandlers.length - 1];
+    if (!response.locals?.calledHandlers?.includes(handlerName)) {
+      const lastHandler = response.locals?.calledHandlers[response.locals.calledHandlers.length - 1];
+      assert (lastHandler !== undefined, 'calledHandlers stack had no elements!  This should never happen!');
       const err = new RequiredMiddlewareNotCalledError(handlerName, lastHandler);
       console.error(verifyPrerequisiteHandler, err.message);
       throw err;

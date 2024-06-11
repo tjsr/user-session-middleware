@@ -3,17 +3,17 @@ import {
   SessionId,
   SessionStoreDataType,
   SystemHttpRequestType,
-  SystemHttpResponse,
+  SystemHttpResponseType,
   SystemSessionDataType
 } from "./types";
 import { Mock, MockInstance, expect, vi } from "vitest";
 import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
+import express, { ErrorRequestHandler, RequestHandler } from "express";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { addCalledHandler } from "./middleware/handlerChainLog.js";
-import express from "express";
 import expressSession from "express-session";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
@@ -21,7 +21,7 @@ import supertest from "supertest";
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType> = SystemHttpResponseType<SessionStoreDataType>
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -48,7 +48,7 @@ declare module 'vitest' {
 
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponse<SessionStoreDataType> = SystemHttpResponse<SessionStoreDataType>
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType> = SystemHttpResponseType<SessionStoreDataType>
 >(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
@@ -109,9 +109,9 @@ const addHandlersToApp = (
   if (endMiddleware) {
     app.use(endMiddleware);
   }
-  app.use(sessionErrorHandler);
-  app.use(endRequest);
-  app.use(endErrorRequest);
+  app.use(sessionErrorHandler as ErrorRequestHandler);
+  app.use(endRequest as RequestHandler);
+  app.use(endErrorRequest as ErrorRequestHandler);
 };
 
 export const sessionlessAppWithMiddleware = (

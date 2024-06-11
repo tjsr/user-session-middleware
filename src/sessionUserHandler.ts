@@ -1,4 +1,9 @@
-import { SessionStoreDataType, SystemHttpRequestType, SystemHttpResponseType, SystemSessionDataType } from "./types.js";
+import {
+  SessionStoreDataType,
+  SystemHttpRequestType,
+  SystemHttpResponseType,
+  SystemSessionDataType,
+} from "./types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
 import {
   handleCopySessionStoreDataToSession,
@@ -9,11 +14,14 @@ import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
 
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
 
+// TODO: This works??
 // This comes after setting data from the session store.
-export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData = async <
+export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSessionMiddlewareRequestHandler =
+async <
   RequestType extends SystemHttpRequestType<SystemSessionDataType>,
   ResponseType extends SystemHttpResponseType<SessionStoreDataType>,
   >(

@@ -3,7 +3,7 @@ import {
   SessionStoreDataType,
   SystemHttpRequestType,
   SystemHttpResponseType,
-  SystemSessionDataType
+  SystemSessionDataType,
 } from "../types.js";
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
@@ -11,16 +11,23 @@ import { ERROR_SESSION_ID_WITH_NO_DATA } from "../errors/errorCodes.js";
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { NoSessionDataFoundError } from "../errors/errorClasses.js";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import express from "express";
 import { handleSessionDataRetrieval } from "./storedSessionData.js";
 import { regenerateSessionIdIfNoSessionData } from "../sessionChecks.js";
 import { saveSessionPromise } from "../sessionUser.js";
 
-export const handleNewSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
-  request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponseType<SessionStoreDataType>,
-  next: express.NextFunction // handleSessionsWithRequiredData
-): void => {
+export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler =
+<
+ApplicationSessionDataType extends SystemSessionDataType,
+ApplicationSessionStoreType extends SessionStoreDataType,
+RequestType extends SystemHttpRequestType<ApplicationSessionDataType>,
+ResponseType extends SystemHttpResponseType<ApplicationSessionStoreType>,
+>(
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction // handleSessionsWithRequiredData
+  ): void => {
   addCalledHandler(response, handleNewSessionWithNoSessionData.name);
   // This must be called *before* handleExistingSessionWithNoSessionData because it sets newSessionIdGenerated
   verifyCorequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
@@ -52,11 +59,15 @@ export const handleNewSessionWithNoSessionData = <ApplicationDataType extends Sy
   // await saveSessionPromise(request.session);
 };
 
-export const handleExistingSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
-  request: SystemHttpRequestType<ApplicationDataType>,
-  response: SystemHttpResponseType<SessionStoreDataType>,
-  next: express.NextFunction // handleSessionsWithRequiredData
-): void => {
+export const handleExistingSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
+  SessionDataType extends SystemSessionDataType,
+  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
+  ResponseType extends SystemHttpResponseType<SessionStoreDataType>,
+>(
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction
+  ):void => {
   addCalledHandler(response, handleExistingSessionWithNoSessionData.name);
   if (request.newSessionIdGenerated === true) {
     console.debug(handleExistingSessionWithNoSessionData, 'Skipping because new sessionID generated.');
@@ -74,7 +85,7 @@ export const handleExistingSessionWithNoSessionData = <ApplicationDataType exten
   }
   console.debug(handleExistingSessionWithNoSessionData, 'Continuing to regenerateSessionIdIfNoSessionData');
 
-  const sessionData: ApplicationDataType = response.locals?.retrievedSessionData as ApplicationDataType;
+  const sessionData: SessionDataType = response.locals?.retrievedSessionData as SessionDataType;
   try {
     const originalSessionId = request.sessionID;
     regenerateSessionIdIfNoSessionData(sessionData, request).then((newSessionId: SessionId | undefined) => {

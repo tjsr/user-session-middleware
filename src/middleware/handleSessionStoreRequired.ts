@@ -1,16 +1,20 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
+import { SystemHttpRequestType, SystemHttpResponseType } from "../types.js";
 
+import { UserSessionMiddlewareRequestHandler } from "../types/middlewareHandlerTypes.js";
 import { addCalledHandler } from './handlerChainLog.js';
 import express from "express";
 import { requireSessionStoreConfigured } from "../errors/sessionErrorChecks.js";
 
-export const handleSessionStoreRequired = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType>
->(
-    request: RequestType,
-    response: express.Response,
-    next: express.NextFunction
-  ): void => {
+export const handleSessionStoreRequired: UserSessionMiddlewareRequestHandler = 
+// <
+//   RequestType extends SystemHttpRequestType<SystemSessionDataType>,
+//   ResponseType extends SystemHttpResponseType<SystemSessionDataType>
+// >(
+(
+  request: SystemHttpRequestType,
+  response: SystemHttpResponseType,
+  next: express.NextFunction
+): void => {
   addCalledHandler(response, handleSessionStoreRequired.name);
   try {
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers);

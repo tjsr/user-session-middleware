@@ -1,12 +1,10 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "../types.js";
-
 import assert from "assert";
 import express from "express";
 
 export const COOKIE_WITH_HEADER = true;
 
 export const setSessionCookie = (
-  request: SystemHttpRequestType<SystemSessionDataType>,
+  request: express.Request,
   response: express.Response
 ):void => {
   assert(request.sessionID !== undefined);
