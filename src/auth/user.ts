@@ -1,12 +1,12 @@
 import {
   EmailAddress,
-  SystemHttpRequestType,
-  SystemSessionDataType,
   UserId,
   uuid5
 } from '../types.js';
 
 import { Session } from 'express-session';
+import { SystemHttpRequestType } from '../types/request.js';
+import { SystemSessionDataType } from '../types/session.js';
 import { createRandomId } from '../utils/createRandomId.js';
 import { getUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
@@ -27,7 +27,7 @@ export const getUserIdFromRequest = async <SessionData extends SystemSessionData
 };
 
 export const getUserIdFromSession = async <SessionData extends SystemSessionDataType>(
-  session: Session & SessionData
+  session: Session & Partial<SessionData>
 ): Promise<UserId|undefined> => {
   if (session && session.userId) {
     // console.log('Got a session for current call');

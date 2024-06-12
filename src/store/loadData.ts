@@ -1,4 +1,4 @@
-import { SessionStoreDataType, SystemSessionDataType } from '../types.js';
+import { SessionStoreDataType, SystemSessionDataType } from "../types/session.js";
 import session, { Session, SessionData } from "express-session";
 
 import { saveSessionPromise } from '../sessionUser.js';

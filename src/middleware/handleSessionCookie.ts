@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as core from 'express-serve-static-core';
 
 import {
@@ -6,34 +7,30 @@ import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
 } from "../types/middlewareHandlerTypes.js";
-import {
-  SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemResponseLocals,
-  SystemSessionDataType,
-} from "../types.js";
+import { SessionStoreDataType, SystemSessionDataType } from '../types/session.js';
 
 import { SessionIDNotGeneratedError } from '../errors/errorClasses.js';
+import { SystemHttpRequestType } from '../types/request.js';
+import { SystemHttpResponseType } from '../types/response.js';
+import { SystemResponseLocals } from '../types/locals.js';
 import { addCalledHandler } from "./handlerChainLog.js";
 import express from "express";
 import { setSessionCookie } from './setSessionCookie.js';
 
 export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
 <
-  ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
+  SessionType extends SystemSessionDataType,
+  StoreType extends SessionStoreDataType,
   P = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>> = 
-    CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>>,
+  Locals extends SystemResponseLocals<StoreType> = SystemResponseLocals<StoreType>,
   RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+    SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends SystemHttpResponseType<StoreType, ResBody, Locals> =
+    SystemHttpResponseType<StoreType, ResBody, Locals>
 >(
     request: RequestType,
     response: ResponseType,
@@ -61,21 +58,23 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
 // TODO: Fix type param compatibility.
 export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
 <
-  ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
+  SessionType extends SystemSessionDataType,
+  StoreType extends SessionStoreDataType,
   P extends core.ParamsDictionary = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery extends core.Query = core.Query,
-  Locals extends CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>> = 
-    CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>>,
-  RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> |
-    express.Request<P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> |
-    express.Response<ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
+  Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreType>> = 
+    CustomLocalsOrRecord<SystemResponseLocals<StoreType>>,
+  RequestType extends express.Request<P, ResBody, ReqBody, ReqQuery, Locals> =
+    SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+    //  =
+    // SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+  ResponseType extends express.Response<ResBody, Locals> =
+    SystemHttpResponseType<StoreType, ResBody, Locals>,
+  // |
+    //  =
+    // SystemHttpResponseType<StoreType, ResBody, Locals>
 >(
     error: Error,
     request: SystemHttpRequestType | RequestType,

@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-} from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { NextFunction } from "express";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
+import { SystemHttpResponseType } from '../types/response.js';
 import {
   UserSessionMiddlewareErrorHandler,
 } from '../types/middlewareHandlerTypes.js';
@@ -31,13 +28,13 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
 //   SystemResponseOrExpressResponse<StoreDataType, RequestType, ResBody, Locals>
 // >(
 (
-  error: Error,
-  _req: SystemHttpRequestType,
-  response: SystemHttpResponseType,
+  error,
+  _req,
+  response,
   next: NextFunction
 ) => {
-  addCalledHandler(response, sessionErrorHandler.name);
-  verifyPrerequisiteHandler(response, handleSessionCookieOnError.name);
+  addCalledHandler(response as SystemHttpResponseType, sessionErrorHandler.name);
+  verifyPrerequisiteHandler(response as SystemHttpResponseType, handleSessionCookieOnError.name);
 
   if (SessionHandlerError.isType(error)) {
     const sessionError: SessionHandlerError = error as SessionHandlerError;

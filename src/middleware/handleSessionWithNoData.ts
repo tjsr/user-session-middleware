@@ -1,16 +1,15 @@
-import {
-  SessionId,
-  SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemSessionDataType,
-} from "../types.js";
+import { SessionStoreDataType, SystemSessionDataType } from "../types/session.js";
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { ERROR_SESSION_ID_WITH_NO_DATA } from "../errors/errorCodes.js";
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { NoSessionDataFoundError } from "../errors/errorClasses.js";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
+import {
+  SessionId,
+} from "../types.js";
+import { SystemHttpRequestType } from "../types/request.js";
+import { SystemHttpResponseType } from '../types/response.js';
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import express from "express";
 import { handleSessionDataRetrieval } from "./storedSessionData.js";
