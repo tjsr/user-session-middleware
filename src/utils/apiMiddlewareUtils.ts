@@ -4,8 +4,6 @@
 import express, { NextFunction } from 'express';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
-import { Session } from 'express-session';
-import { SystemSessionDataType } from '../types/session.js';
 import {
   UserId,
 } from '../types.js';

@@ -16,10 +16,6 @@ export interface SystemHttpRequestType<
   ReqBody = any,
   ReqQuery = core.Query,
   Locals extends SystemResponseLocals<StoreDataType> = SystemResponseLocals<StoreDataType>,
-  // CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
-  // CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
-  _SessionFields = SessionDataFields,
-  //  SessionStoreDataTypeVariant<SessionFields>
   >
 extends express.Request<
   P,
