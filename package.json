@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.7",
-    "@tjsr/simple-env-utils": "^0.1.1-1",
+    "@tjsr/simple-env-utils": "^0.1.1",
     "express-mysql-session": "^3.0.2",
     "express-session": "^1.18.0",
     "snowflake-uuid": "^1.0.0",
