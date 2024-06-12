@@ -6,11 +6,13 @@ import {
   SessionIdRequiredError,
   SessionIdTypeError
 } from './errors/errorClasses.js';
-import { SystemHttpRequestType, SystemSessionDataType, uuid5 } from './types.js';
 
 import { Session } from 'express-session';
+import { SystemHttpRequestType } from './types/request.js';
+import { SystemSessionDataType } from './types/session.js';
 import { getSnowflake } from './snowflake.js';
 import { getUuidNamespace } from './getGuidNamespace.js';
+import { uuid5 } from './types.js';
 import { v5 as uuidv5 } from 'uuid';
 
 const USERID_UUID_NAMESPACE = getUuidNamespace();

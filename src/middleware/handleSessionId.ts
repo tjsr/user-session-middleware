@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as core from 'express-serve-static-core';
-
-import { CustomLocalsOrRecord, UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import {
-  SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemResponseLocals,
-  SystemSessionDataType,
-} from "../types.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
 import {
@@ -22,9 +12,15 @@ import {
   requireSessionInitialized,
 } from '../errors/sessionErrorChecks.js';
 
+import { SystemHttpRequestType } from '../types/request.js';
+import { SystemHttpResponseType } from '../types/response.js';
+import {
+  UserSessionMiddlewareRequestHandler
+} from '../types/middlewareHandlerTypes.js';
+
 export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler = 
 // <
-//   ApplicationSessionType extends SystemSessionDataType,
+//   SessionType extends SystemSessionDataType,
 //   StoreDataType extends SessionStoreDataType,
 //   P extends core.ParamsDictionary = core.ParamsDictionary,
 //   ResBody = any,
@@ -33,13 +29,13 @@ export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler =
 //   Locals extends CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>> =
 //   CustomLocalsOrRecord<SystemResponseLocals<StoreDataType>>,
 //   RequestType extends
-//     SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
-//     SystemHttpRequestType<ApplicationSessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
+//     SystemHttpRequestType<SessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals> =
+//     SystemHttpRequestType<SessionType, StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,
 //   ResponseType extends SystemHttpResponseType<StoreDataType, ResBody, Locals> =
 //     SystemHttpResponseType<StoreDataType, ResBody, Locals>
 // >(
 (
-  request: SystemHttpRequestType,
+  request,
   response: SystemHttpResponseType,
   handleSessionWithNewlyGeneratedId: NextFunction
 ): void => {
@@ -104,25 +100,24 @@ export const checkNewlyGeneratedId = (
 };
 
 export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHandler =
-<
-  ApplicationSessionType extends SystemSessionDataType,
-  ApplicationStoreType extends SessionStoreDataType,
-  P = core.ParamsDictionary,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = core.Query,
-  Locals extends CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>> =
-    CustomLocalsOrRecord<SystemResponseLocals<ApplicationStoreType>>,
-  RequestType extends
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals> =
-    SystemHttpRequestType<ApplicationSessionType, ApplicationStoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType<ApplicationStoreType, ResBody, Locals> =
-    SystemHttpResponseType<ApplicationStoreType, ResBody, Locals>
->(
-    request: RequestType,
-    response: ResponseType,
-    next: express.NextFunction
-  ) => {
+// <
+//   SessionType extends SystemSessionDataType,
+//   StoreType extends SessionStoreDataType,
+//   P = core.ParamsDictionary,
+//   ResBody = any,
+//   ReqBody = any,
+//   ReqQuery = core.Query,
+//   Locals extends SystemResponseLocals<StoreType> = SystemResponseLocals<StoreType>,
+//   RequestType extends express.Request = 
+//     SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
+//   ResponseType extends SystemHttpResponseType<StoreType, ResBody, Locals> =
+//     SystemHttpResponseType<StoreType, ResBody, Locals>
+// >
+(
+  request,
+  response,
+  next: express.NextFunction
+) => {
   addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
   verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
   verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);

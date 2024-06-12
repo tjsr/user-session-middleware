@@ -1,6 +1,8 @@
-import { HandlerName, SessionStoreDataType, SystemHttpResponseType } from "../types.js";
 import { MiddlewareCallOrderError, RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
+import { HandlerName } from "../types.js";
+import { SessionStoreDataType } from "../types/session.js";
+import { SystemHttpResponseType } from '../types/response.js';
 import assert from "node:assert";
 import { isTestMode } from "@tjsr/simple-env-utils";
 
@@ -27,8 +29,8 @@ const handlerAssertionsEnabled = (): boolean => {
   return !isTestMode() && process.env['HANDLER_ASSERTIONS_ENABLED'] === 'true' ? true : HANDLER_ASSERTIONS_ENABLED;
 };
 
-export const addCalledHandler = <ResponseType extends SystemHttpResponseType>(
-  response: ResponseType,
+export const addCalledHandler = (
+  response: SystemHttpResponseType,
   handlerName: HandlerName,
   silentCallHandlers = false
 ): void => {

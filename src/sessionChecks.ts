@@ -3,10 +3,12 @@ import {
   RegeneratingSessionIdError,
   SessionNotGeneratedError
 } from './errors/errorClasses.js';
-import { SessionId, SystemHttpRequestType, SystemSessionDataType } from './types.js';
 
 import { Barrier } from './asyncUtils.js';
 import { SessionData } from "express-session";
+import { SessionId } from './types.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { SystemSessionDataType } from './types/session.js';
 
 export const regenerateSessionIdIfNoSessionData = async (
   retrievedSessionData: SessionData | null | undefined,

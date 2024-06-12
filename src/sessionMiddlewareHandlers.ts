@@ -16,7 +16,7 @@ import {
 
 import {
   UserSessionOptions
-} from "./types.js";
+} from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';

@@ -1,9 +1,12 @@
 import * as expressSession from 'express-session';
 
-import { SessionId, SystemHttpRequestType, SystemSessionDataType, UserSessionOptions } from './types.js';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 import { IncomingHttpHeaders } from 'http';
+import { SessionId } from './types.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { SystemSessionDataType } from './types/session.js';
+import { UserSessionOptions } from './types/sessionOptions.js';
 import { loadEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
 

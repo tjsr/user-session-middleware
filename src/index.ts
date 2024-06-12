@@ -31,14 +31,24 @@ export type {
   EmailAddress,
   HandlerName,
   IPAddress,
-  UserId,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemResponseLocals,
-  SystemSessionDataType,
-  SessionStoreDataType,
-  UserSessionOptions
+  UserId
 } from './types.js';
+
+export type { SystemResponseLocals } from './types/locals.js';
+export type { SystemSessionDataType, SessionStoreDataType, SessionDataFields } from './types/session.js';
+
+export type { SystemHttpRequestType } from './types/request.js';
+export type { SystemHttpResponseType } from './types/response.js';
+
+export type {
+  UserSessionOptions
+} from './types/sessionOptions.js';
+
+// import {   SystemResponseLocals,
+//   SystemSessionDataType,
+//   SessionStoreDataType,
+//   UserSessionOptions
+//  } from './types.js';
 export type { 
   UserModel
 } from './types/model.js';

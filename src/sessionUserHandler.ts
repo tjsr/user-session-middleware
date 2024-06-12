@@ -1,9 +1,4 @@
-import {
-  SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemSessionDataType,
-} from "./types.js";
+import { SessionStoreDataType, SystemSessionDataType } from "./types/session.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
 import {
   handleCopySessionStoreDataToSession,
@@ -14,6 +9,8 @@ import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
 
+import { SystemHttpRequestType } from "./types/request.js";
+import { SystemHttpResponseType } from './types/response.js';
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
