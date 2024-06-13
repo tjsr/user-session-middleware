@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as core from "express-serve-static-core";
-import * as express from '../types/express.js';
+import * as express from '../express/index.js';
 
 import { SystemHttpRequestType } from "./request.js";
 import { SystemHttpResponseType } from "./response.js";

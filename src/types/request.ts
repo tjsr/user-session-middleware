@@ -1,5 +1,5 @@
 import * as core from 'express-serve-static-core';
-import * as express from "./express.js";
+import * as express from "../express/index.js";
 
 import { SessionId } from "../types.js";
 import { SystemResponseLocals } from './locals.js';

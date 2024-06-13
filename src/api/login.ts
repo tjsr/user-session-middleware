@@ -1,5 +1,5 @@
 import * as EmailValidator from 'email-validator';
-import * as express from '../types/express.js';
+import * as express from '../express/index.js';
 
 import { AuthenticationRestResult, createUserIdFromEmail } from '../auth/user.js';
 

@@ -6,7 +6,7 @@ export interface UserSessionDataFields {
   userId: UserId;
   email: EmailAddress;
   newId: boolean | undefined;
-}
+}  
 
 // export type SessionStoreDataTypeVariant<DataFieldsType extends UserSessionDataFields> = DataFieldsType;
 

@@ -1,31 +1,7 @@
-// import * as express from 'express';
-import * as session from 'express-session';
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EmailAddress, HandlerName, UserId } from "../types.js";
-import { UserSessionData, UserSessionDataFields } from "./session.js";
+import { EmailAddress, UserId } from "../types.js";
 
-import { SystemResponseLocals } from "./locals.js";
-
-declare module "express" {
-  interface Request {
-    session: session.Session & UserSessionData;
-    // session: session.Session & Partial<UserSessionData>;
-    // session: session.Session & Partial<UserSessionData>;
-  }
-
-  interface Response {
-    locals: {
-      calledHandlers: HandlerName[];
-      retrievedSessionData: UserSessionDataFields | undefined;
-      skipHandlerDependencyChecks: boolean;
-    } & Record<string, any> & SystemResponseLocals<UserSessionData>;
-  }
-
-  interface NextFunction {
-
-  }
-}
+import { UserSessionData } from "./session.js";
 
 declare module "express-session" { 
   interface SessionData {
@@ -45,6 +21,5 @@ declare module "express-session" {
   // }
 }
 
-export type { ErrorRequestHandler, Request, RequestHandler, Response, NextFunction  } from 'express';
 export type { Session, SessionData } from 'express-session';
 

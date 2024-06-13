@@ -66,3 +66,5 @@ export type {   SystemRequestOrExpressRequest,
 export { SessionHandlerError } from './errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';
 
+export * as express from './express/index.js';
+export * as session from './types/session.js';

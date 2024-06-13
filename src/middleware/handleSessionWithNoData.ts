@@ -1,4 +1,4 @@
-import * as express from '../types/express.js';
+import * as express from '../express/index.js';
 
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 

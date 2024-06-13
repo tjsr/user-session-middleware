@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as express from '../types/express.js';
+import * as express from '../express/index.js';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
 import {
