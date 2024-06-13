@@ -1,11 +1,11 @@
-import { SessionStoreDataType, SystemSessionDataType } from "../types/session.js";
+import { SessionStoreDataType, UserSessionData } from "../types/session.js";
 import session, { Session, SessionData } from "express-session";
 
 import { saveSessionPromise } from '../sessionUser.js';
 
-export const saveSessionDataToSession = async <ApplicationDataType extends SessionStoreDataType>(
+export const saveSessionDataToSession = async (
   storedSessionData: SessionStoreDataType,
-  session: Session & Partial<ApplicationDataType>
+  session: Session
 ): Promise<void> => {
   session.newId = undefined;
   if (storedSessionData?.userId && session.userId == undefined) {
@@ -22,7 +22,7 @@ export const saveSessionDataToSession = async <ApplicationDataType extends Sessi
   return saveSessionPromise(session);
 };
 
-export const retrieveSessionDataFromStore = <ApplicationSessionType extends SystemSessionDataType>(
+export const retrieveSessionDataFromStore = <ApplicationSessionType extends UserSessionData>(
   sessionStore: session.Store,
   sessionID: string
 ): Promise<ApplicationSessionType | null | undefined> => {

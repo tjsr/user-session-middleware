@@ -1,7 +1,6 @@
 import { MiddlewareCallOrderError, RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
 import { HandlerName } from "../types.js";
-import { SessionStoreDataType } from "../types/session.js";
 import { SystemHttpResponseType } from '../types/response.js';
 import assert from "node:assert";
 import { isTestMode } from "@tjsr/simple-env-utils";
@@ -58,7 +57,7 @@ export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpRespons
   }
 };
 
-export const verifyCorequisiteHandler = <ResponseType extends SystemHttpResponseType<SessionStoreDataType>>(
+export const verifyCorequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName
 ): void => {

@@ -1,12 +1,12 @@
-import { SessionStoreDataType } from "./session.js";
 import { SystemResponseLocals } from "./locals.js";
+import { UserSessionData } from "./session.js";
 import express from "express";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SystemHttpResponseType<
-  StoreDataType extends SessionStoreDataType = SessionStoreDataType,
+  SD extends UserSessionData = UserSessionData,
   ResBody = any,
-  Locals extends SystemResponseLocals<StoreDataType> = SystemResponseLocals<StoreDataType>
+  Locals extends SystemResponseLocals = SystemResponseLocals<SD>
 > extends express.Response<ResBody, Locals> {
   locals: Locals;
 }
