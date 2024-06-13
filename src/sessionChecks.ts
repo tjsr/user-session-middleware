@@ -8,11 +8,11 @@ import { Barrier } from './asyncUtils.js';
 import { SessionData } from "express-session";
 import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
-import { SystemSessionDataType } from './types/session.js';
+import { UserSessionData } from './types/session.js';
 
 export const regenerateSessionIdIfNoSessionData = async (
   retrievedSessionData: SessionData | null | undefined,
-  request: SystemHttpRequestType<SystemSessionDataType>
+  request: SystemHttpRequestType<UserSessionData>
 ): Promise<SessionId | undefined> => {
   const currentSessionId = request.sessionID;
 

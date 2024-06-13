@@ -5,7 +5,7 @@ import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 import { IncomingHttpHeaders } from 'http';
 import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
-import { SystemSessionDataType } from './types/session.js';
+import { UserSessionData } from './types/session.js';
 import { UserSessionOptions } from './types/sessionOptions.js';
 import { loadEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
@@ -19,7 +19,7 @@ const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
 export const SESSION_ID_HEADER_KEY = 'x-session-id';
 const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
 
-const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<SystemSessionDataType>): string | undefined => {
+const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
   const headers: IncomingHttpHeaders = req.headers;
   const sessionIdHeader: SessionId | string | string[] | undefined =
     headers[SESSION_ID_HEADER_KEY];
@@ -30,7 +30,7 @@ const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<SystemSessionD
   return undefined;
 };
 
-const getSessionIdFromCookie = (req: SystemHttpRequestType<SystemSessionDataType>): SessionId | string | undefined => {
+const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): SessionId | string | undefined => {
   const cookies = req.cookies;
   const cookieValue = cookies?.sessionId === 'undefined' ? undefined : cookies?.sessionId;
   return cookieValue;
@@ -42,7 +42,7 @@ export const generateNewSessionId = (sessionSecret = SESSION_SECRET): SessionId 
 
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
-  DataType extends SystemSessionDataType
+  DataType extends UserSessionData = UserSessionData
 >(req: RequestType): string => {
   if (req.regenerateSessionId) {
     const generatedId = uuidv4();

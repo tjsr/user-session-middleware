@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import express, { NextFunction } from 'express';
+import * as express from '../types/express.js';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
 import {
@@ -12,12 +12,14 @@ import {
 } from '../types/middlewareHandlerTypes.js';
 import { getUserIdFromSession } from '../auth/user.js';
 
+// import express as origExpressfrom 'express';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const endWithJsonMessage = async <ResponseType extends express.Response<JSON|any, any>>(
   res: ResponseType,
   status: number | HttpStatusCode,
   message: string,
-  next?: NextFunction,
+  next?: express.NextFunction,
   additionalMessageFields: object = {}
 ): Promise<void> => {
   res.status(status);
@@ -41,7 +43,7 @@ export const endWithJsonMessage = async <ResponseType extends express.Response<J
 export const validateHasUserId: UserSessionMiddlewareRequestHandler = (
   request,
   response,
-  next: NextFunction
+  next: express.NextFunction
 ): void => {
   try {
     // TODO: Fix casting here.

@@ -1,21 +1,18 @@
 import * as core from 'express-serve-static-core';
+import * as express from "./express.js";
 
-import { SessionDataFields, SessionStoreDataType, SystemSessionDataType } from "./session.js";
-
-import { Session } from "express-session";
 import { SessionId } from "../types.js";
 import { SystemResponseLocals } from './locals.js';
-import express from "express";
+import { UserSessionData } from "./session.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface SystemHttpRequestType<
-  SessionDataType extends SystemSessionDataType = SystemSessionDataType,
-  StoreDataType extends SessionDataFields = SessionStoreDataType,
+  SD extends UserSessionData = UserSessionData,
   P = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery = core.Query,
-  Locals extends SystemResponseLocals<StoreDataType> = SystemResponseLocals<StoreDataType>,
+  Locals extends SystemResponseLocals = SystemResponseLocals<SD>,
   >
 extends express.Request<
   P,
@@ -25,7 +22,7 @@ extends express.Request<
   Locals
 > {
   newSessionIdGenerated?: boolean;
-  session: Session & SessionDataType;
+  // session: express.Session & Partial<SessionDataType>;
   sessionID: SessionId;
   regenerateSessionId?: boolean;
 }

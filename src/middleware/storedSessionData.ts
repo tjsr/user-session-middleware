@@ -63,7 +63,7 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
 };
 
 
-// export const handleSessionWithNoSessionData = <ApplicationDataType extends SystemSessionDataType>(
+// export const handleSessionWithNoSessionData = <ApplicationDataType extends UserSessionData>(
 //   request: SystemHttpRequestType<ApplicationDataType>,
 //   response: SystemHttpResponse<SessionStoreDataType>,
 //   next: express.NextFunction // handleSessionsWithRequiredData
@@ -92,7 +92,7 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
 // };
 
 // // Throw an exception if a session that expects the retrievedSessionData was populated from the store.
-// export const handleSessionsWhichRequiredData = <ApplicationDataType extends SystemSessionDataType>(
+// export const handleSessionsWhichRequiredData = <ApplicationDataType extends UserSessionData>(
 //   request: SystemHttpRequestType<ApplicationDataType>,
 //   response: SystemHttpResponse<SessionStoreDataType>,
 //   next: express.NextFunction // handleSessionIdAfterDataRetrieval

@@ -1,4 +1,5 @@
-import { SessionStoreDataType, SystemSessionDataType } from "../types/session.js";
+import * as express from '../types/express.js';
+
 import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { ERROR_SESSION_ID_WITH_NO_DATA } from "../errors/errorCodes.js";
@@ -10,22 +11,19 @@ import {
 } from "../types.js";
 import { SystemHttpRequestType } from "../types/request.js";
 import { SystemHttpResponseType } from '../types/response.js';
+import { UserSessionData } from "../types/session.js";
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import express from "express";
 import { handleSessionDataRetrieval } from "./storedSessionData.js";
 import { regenerateSessionIdIfNoSessionData } from "../sessionChecks.js";
 import { saveSessionPromise } from "../sessionUser.js";
 
-export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler =
-<
-ApplicationSessionDataType extends SystemSessionDataType,
-ApplicationSessionStoreType extends SessionStoreDataType,
-RequestType extends SystemHttpRequestType<ApplicationSessionDataType>,
-ResponseType extends SystemHttpResponseType<ApplicationSessionStoreType>,
->(
+export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
+  RequestType extends SystemHttpRequestType,
+  ResponseType extends SystemHttpResponseType,
+  >(
     request: RequestType,
     response: ResponseType,
-    next: express.NextFunction // handleSessionsWithRequiredData
+    next: express.NextFunction
   ): void => {
   addCalledHandler(response, handleNewSessionWithNoSessionData.name);
   // This must be called *before* handleExistingSessionWithNoSessionData because it sets newSessionIdGenerated
@@ -59,9 +57,9 @@ ResponseType extends SystemHttpResponseType<ApplicationSessionStoreType>,
 };
 
 export const handleExistingSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
-  SessionDataType extends SystemSessionDataType,
-  RequestType extends SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponseType<SessionStoreDataType>,
+  SessionDataType extends UserSessionData,
+  RequestType extends SystemHttpRequestType,
+  ResponseType extends SystemHttpResponseType,
 >(
     request: RequestType,
     response: ResponseType,

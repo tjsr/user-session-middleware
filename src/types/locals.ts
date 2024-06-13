@@ -1,9 +1,10 @@
 import { HandlerName } from "../types.js";
-import { SessionStoreDataType } from "./session.js";
+import { UserSessionData } from "./session.js";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface SystemResponseLocals<StoreData extends SessionStoreDataType> extends Record<string, any> {
+export interface SystemResponseLocals<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  SD extends UserSessionData = UserSessionData> extends Record<string, any> {
   calledHandlers: HandlerName[];
-  retrievedSessionData: StoreData | undefined;
+  retrievedSessionData: SD | undefined;
   skipHandlerDependencyChecks: boolean;
 }

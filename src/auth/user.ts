@@ -4,13 +4,20 @@ import {
   uuid5
 } from '../types.js';
 
-import { Session } from 'express-session';
+import { Session } from '../types/express.js';
 import { SystemHttpRequestType } from '../types/request.js';
-import { SystemSessionDataType } from '../types/session.js';
+import { UserSessionData } from '../types/session.js';
 import { createRandomId } from '../utils/createRandomId.js';
 import { getUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
 import { v5 as uuidv5 } from 'uuid';
+
+export type AuthenticationRestResult = {
+  email: EmailAddress | undefined;
+  isLoggedIn: boolean;
+  message?: string;
+  sessionId?: string;
+};
 
 export const createUserIdFromEmail = (email: EmailAddress): uuid5 => {
   return uuidv5(email, getUserIdNamespace());
@@ -20,14 +27,14 @@ export const createRandomUserId = (): UserId => {
   return createRandomId(getUserIdNamespace());
 };
 
-export const getUserIdFromRequest = async <SessionData extends SystemSessionDataType>(
-  request: SystemHttpRequestType<SessionData>
+export const getUserIdFromRequest = async <SD extends UserSessionData = UserSessionData>(
+  request: SystemHttpRequestType<SD>
 ): Promise<UserId|undefined> => {
   return getUserIdFromSession(request.session);
 };
 
-export const getUserIdFromSession = async <SessionData extends SystemSessionDataType>(
-  session: Session & Partial<SessionData>
+export const getUserIdFromSession = async <SD extends UserSessionData = UserSessionData>(
+  session: Session & SD
 ): Promise<UserId|undefined> => {
   if (session && session.userId) {
     // console.log('Got a session for current call');
@@ -40,7 +47,7 @@ export const getUserIdFromSession = async <SessionData extends SystemSessionData
   }
 };
 
-const createRandomIdAndSave = (session: Session & Partial<SystemSessionDataType>): Promise<UserId|undefined> => {
+const createRandomIdAndSave = (session: Session & UserSessionData): Promise<UserId|undefined> => {
   session.userId = createRandomUserId();
   return new Promise<UserId|undefined>((resolve, reject) => {
     saveSessionPromise(session).then(() => {

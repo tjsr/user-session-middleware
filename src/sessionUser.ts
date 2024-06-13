@@ -9,7 +9,7 @@ import {
 
 import { Session } from 'express-session';
 import { SystemHttpRequestType } from './types/request.js';
-import { SystemSessionDataType } from './types/session.js';
+import { UserSessionData } from './types/session.js';
 import { getSnowflake } from './snowflake.js';
 import { getUuidNamespace } from './getGuidNamespace.js';
 import { uuid5 } from './types.js';
@@ -34,7 +34,7 @@ export const saveSessionPromise = async (session: Session): Promise<void> => {
   });
 };
 
-export const assignUserIdToSession = async <ApplicationDataType extends SystemSessionDataType>(
+export const assignUserIdToSession = async <ApplicationDataType extends UserSessionData>(
   session: Session & Partial<ApplicationDataType>
 ): Promise<void> => {
   requireSessionInitialized(session);
@@ -87,7 +87,7 @@ const requireSessionIDValuesMatch = (
   }
 };
 
-export const assignUserIdToRequestSession = async <ApplicationDataType extends SystemSessionDataType>(
+export const assignUserIdToRequestSession = async <ApplicationDataType extends UserSessionData>(
   request: SystemHttpRequestType<ApplicationDataType>
 ): Promise<void> => {
   try {

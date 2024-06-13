@@ -1,16 +1,18 @@
+import * as express from '../types/express.js';
+
 import { EmailAddress, UserId } from "../types.js";
 
-import { SessionData } from "express-session";
-
-export type SessionStoreDataTypeVariant<DataFieldsType extends SessionDataFields> = DataFieldsType;
-
-export interface SessionStoreDataType extends SessionDataFields {}
-
-export interface SessionDataFields {
+export interface UserSessionDataFields {
   userId: UserId;
   email: EmailAddress;
   newId: boolean | undefined;
 }
 
-export interface SystemSessionDataType extends SessionData, SessionDataFields {
-}
+// export type SessionStoreDataTypeVariant<DataFieldsType extends UserSessionDataFields> = DataFieldsType;
+
+export interface SessionStoreDataType extends UserSessionDataFields {}
+
+// export interface UserSessionData extends SessionData, SessionDataFields {
+// }
+
+export type UserSessionData = express.SessionData & UserSessionDataFields;

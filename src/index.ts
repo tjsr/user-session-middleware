@@ -24,6 +24,8 @@ export {
   validateHasUserId
 };
 
+export { userSessionEndpoints } from './api/endpoints.js';
+
 export type {
   uuid,
   uuid4,
@@ -35,7 +37,9 @@ export type {
 } from './types.js';
 
 export type { SystemResponseLocals } from './types/locals.js';
-export type { SystemSessionDataType, SessionStoreDataType, SessionDataFields } from './types/session.js';
+export type { UserSessionData,
+  SessionStoreDataType,
+  UserSessionDataFields } from './types/session.js';
 
 export type { SystemHttpRequestType } from './types/request.js';
 export type { SystemHttpResponseType } from './types/response.js';
@@ -45,7 +49,7 @@ export type {
 } from './types/sessionOptions.js';
 
 // import {   SystemResponseLocals,
-//   SystemSessionDataType,
+//   UserSessionData,
 //   SessionStoreDataType,
 //   UserSessionOptions
 //  } from './types.js';
@@ -54,9 +58,11 @@ export type {
 } from './types/model.js';
 export type {
   UserSessionMiddlewareErrorHandler,
-  UserSessionMiddlewareRequestHandler,
-  SystemRequestOrExpressRequest,
-  SystemResponseOrExpressResponse
+  UserSessionMiddlewareRequestHandler
 } from './types/middlewareHandlerTypes.js';
+export type {   SystemRequestOrExpressRequest,
+  SystemResponseOrExpressResponse
+} from './types/optionalReqRes.js';
 export { SessionHandlerError } from './errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';
+
