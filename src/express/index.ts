@@ -2,8 +2,10 @@ import { UserSessionData, UserSessionDataFields } from "../types/session.js";
 
 import { HandlerName } from "../types.js";
 import { SystemResponseLocals } from "../types/locals.js";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import session from 'express-session';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 export type { ErrorRequestHandler, Request, RequestHandler, Response, NextFunction  } from 'express';
 

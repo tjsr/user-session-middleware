@@ -1,13 +1,14 @@
-import { SessionStoreDataType, SystemHttpResponseType } from '../types.js';
 import { describe, expect, test } from 'vitest';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
+import { SystemHttpResponseType } from '../types/response.js';
+import { UserSessionData } from '../types/session.js';
 import { endWithJsonMessage } from './apiMiddlewareUtils.js';
 import { getMockRes } from 'vitest-mock-express';
 
 describe('endWithJsonMessage', () => {
   test('should call next and not reject or end chain when next parameter is passed.', async () => {
-    const { res, next } = getMockRes<SystemHttpResponseType<SessionStoreDataType>>();
+    const { res, next } = getMockRes<SystemHttpResponseType<UserSessionData>>();
 
     await expect(endWithJsonMessage(res, 401, 'Unauthorized', next)).resolves.not.toThrow();
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.UNAUTHORIZED);
@@ -18,7 +19,7 @@ describe('endWithJsonMessage', () => {
   });
 
   test('should end chain when no next parameter is passed.', async () => {
-    const { res, next } = getMockRes<SystemHttpResponseType<SessionStoreDataType>>();
+    const { res, next } = getMockRes<SystemHttpResponseType<UserSessionData>>();
 
     await expect(endWithJsonMessage(res, HttpStatusCode.FORBIDDEN, 'Forbidden')).resolves.not.toThrow();
     // .toEqual(new Error('403/Forbidden'));

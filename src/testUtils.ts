@@ -1,11 +1,7 @@
 import {
   HandlerName,
   SessionId,
-  SessionStoreDataType,
-  SystemHttpRequestType,
-  SystemHttpResponseType,
-  SystemSessionDataType
-} from "./types";
+} from "./types.js";
 import { Mock, MockInstance, expect, vi } from "vitest";
 import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
@@ -13,6 +9,9 @@ import { getMockReq, getMockRes } from "vitest-mock-express";
 import session, { Cookie, Store } from "express-session";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";
+import { SystemHttpRequestType } from "./types/request.js";
+import { SystemHttpResponseType } from "./types/response.js";
+import { UserSessionData } from "./types/session.js";
 import { addCalledHandler } from "./middleware/handlerChainLog.js";
 import expressSession from "express-session";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
@@ -20,8 +19,8 @@ import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
 import supertest from "supertest";
 
 export interface MockReqRespSet<
-  RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponseType<SessionStoreDataType> = SystemHttpResponseType<SessionStoreDataType>
+  RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -35,20 +34,20 @@ export interface MockReqRespSet<
 export interface SessionDataTestContext {
   memoryStore?: Store;
   testRequestData: MockRequest;
-  testSessionStoreData: SystemSessionDataType;
+  testSessionStoreData: UserSessionData;
 }
 
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
     testRequestData: MockRequest;
-    testSessionStoreData: SystemSessionDataType;
+    testSessionStoreData: UserSessionData;
   }
 };
 
 export const getMockReqResp = <
-  RequestType extends SystemHttpRequestType<SystemSessionDataType> = SystemHttpRequestType<SystemSessionDataType>,
-  ResponseType extends SystemHttpResponseType<SessionStoreDataType> = SystemHttpResponseType<SessionStoreDataType>
+RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
+ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
 >(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
@@ -143,7 +142,7 @@ interface SessionTestRunOptions {
   skipCreateSession?: boolean;
   skipAddToStore?: boolean;
   spyOnSave?: boolean;
-  overrideSessionData?: Partial<SystemSessionDataType>;
+  overrideSessionData?: Partial<UserSessionData>;
   markHandlersCalled?: HandlerName[],
   silentCallHandlers?: boolean;
 }
@@ -162,7 +161,7 @@ export const createTestRequestSessionData = (
     ...context.testRequestData,
     ...mockDataOverrides,
   };
-  const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<SystemSessionDataType>>(mockRequestData);
+  const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
   const { request, response } = mocks;
   context.testRequestData.new = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
@@ -201,7 +200,7 @@ export const createTestRequestSessionData = (
 export const createContextForSessionTest = (
   context: SessionDataTestContext,
   requestDataDefaults: MockRequest = {},
-  sessionStoreDefaults: Partial<SystemSessionDataType> = {}
+  sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
   const cookie = new Cookie();
   context.memoryStore = new expressSession.MemoryStore();

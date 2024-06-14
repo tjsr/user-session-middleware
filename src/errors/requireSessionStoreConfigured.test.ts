@@ -5,15 +5,16 @@ import { SessionStoreNotConfiguredError } from "./errorClasses";
 import { requireSessionStoreConfigured } from './sessionErrorChecks.js';
 
 describe('requireSessionStoreConfigured', () => {
+  const handlerChain = ['testHandler'];
   test('Should throw an error if sessionStore is undefined', () => {
     const sessionStore: Store|undefined = undefined;
-    const act = () => requireSessionStoreConfigured(sessionStore);
+    const act = () => requireSessionStoreConfigured(sessionStore, handlerChain);
     expect(act).toThrow(expect.any(SessionStoreNotConfiguredError));
   });
 
   test('Should not throw an error if sessionStore is passed', () => {
     const sessionStore: Store|undefined = new MemoryStore();
-    const act = () => requireSessionStoreConfigured(sessionStore);
+    const act = () => requireSessionStoreConfigured(sessionStore, handlerChain);
     expect(act).not.toThrow();
   });
 });
