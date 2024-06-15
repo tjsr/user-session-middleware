@@ -1,17 +1,20 @@
 import { SESSION_ID_HEADER_KEY, generateNewSessionId } from "../getSession.js";
+import { describe, expect, test } from "vitest";
 import {
-  appWithMiddleware,
   expectDifferentSetCookieSessionId,
   expectResponseResetsSessionIdCookie,
   expectSetCookieSessionId
-} from "../testUtils.js";
-import { describe, expect, test } from "vitest";
+} from '../utils/expectations.js';
 import {
   handleExistingSessionWithNoSessionData,
   handleNewSessionWithNoSessionData
 } from "./handleSessionWithNoData.js";
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 
+import {
+  appWithMiddleware,
+} from "../testUtils.js";
+import express from "../express/index.js";
 import { handleSessionDataRetrieval } from "./storedSessionData.js";
 import { handleSessionIdRequired } from "./handleSessionId.js";
 import supertest from 'supertest';
@@ -22,11 +25,11 @@ describe('spec.handleSessionCookie', () => {
     async () => {
       const testTessionId = generateNewSessionId();
       const { app } = appWithMiddleware([
-        handleSessionIdRequired,
-        handleSessionDataRetrieval,
-        handleNewSessionWithNoSessionData,
-        handleExistingSessionWithNoSessionData,
-        handleSessionCookie,
+        handleSessionIdRequired as express.RequestHandler,
+        handleSessionDataRetrieval as express.RequestHandler,
+        handleNewSessionWithNoSessionData as express.RequestHandler,
+        handleExistingSessionWithNoSessionData as express.RequestHandler,
+        handleSessionCookie as express.RequestHandler,
         handleSessionCookieOnError,
       ]);
       app.use(handleSessionCookieOnError);

@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.publish.json",
   "compilerOptions": {
     "outDir": "./dist/cjs",
     "module": "commonjs",

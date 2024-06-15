@@ -1,22 +1,22 @@
 import {
+  MockSessionRequest,
   SessionDataTestContext,
   createContextForSessionTest,
   createMockPromisePair,
-  createTestRequestSessionData,
+  createTestRequestSessionData
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { MockRequest } from "vitest-mock-express/dist/src/request/index.js";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import { Store } from "express-session";
-import { SystemSessionDataType } from "../types";
-import { handleSessionWithNewlyGeneratedId } from "./handleSessionId";
+import { UserSessionData } from "../types/session.js";
+import { handleSessionWithNewlyGeneratedId } from "./handleSessionId.js";
 
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
-    testRequestData: MockRequest;
-    testSessionStoreData: SystemSessionDataType;
+    testRequestData: MockSessionRequest;
+    testSessionStoreData: UserSessionData;
   }
 };
 
@@ -61,7 +61,7 @@ describe('handler.handleSessionWithNewlyGeneratedId', () => {
       sessionID: 'session-2345',
     }, { skipCreateSession: true });
 
-    context.testRequestData.new = true;
+    context.testRequestData['new'] = true;
     handleSessionWithNewlyGeneratedId(request, response, next);
     expect(next).toHaveBeenCalledWith(expect.any(SessionHandlerError));
     expect(next).not.toHaveBeenCalledWith();

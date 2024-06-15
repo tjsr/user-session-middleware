@@ -6,7 +6,7 @@ import {
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { SessionData } from "express-session";
+import { SessionData } from "../express-session/index.js";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import { handleSessionDataRetrieval } from './storedSessionData.js';
 
@@ -63,7 +63,7 @@ describe('handleSessionDataRetrieval', () => {
     context.memoryStore?.set(testSessionId, context.testSessionStoreData);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    context.memoryStore!.get = vi.fn((sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
+    context.memoryStore!.get = vi.fn((_sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
       callback(undefined, undefined);
     }) as never;
 
@@ -88,7 +88,7 @@ describe('handleSessionDataRetrieval', () => {
 
     const testError: Error = new Error('Generic session storage error occurred.');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    context.memoryStore!.get = vi.fn((sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
+    context.memoryStore!.get = vi.fn((_sid: string, callback: (_err: any, _session?: SessionData | null) => void) => {
       callback(testError, undefined);
     }) as never;
     const [callbackPromiseNext, callbackMockNext]: [Promise<void>, typeof next] = createMockPromisePair(next);

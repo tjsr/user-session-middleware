@@ -4,7 +4,6 @@ import {
   appWithMiddleware,
   createContextForSessionTest,
   createTestRequestSessionData,
-  expectResponseSetsSessionIdCookie,
   sessionlessAppWithMiddleware
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
@@ -13,6 +12,7 @@ import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError
 
 import { MemoryStore } from "express-session";
 import { SessionStoreNotConfiguredError } from "../errors/errorClasses.js";
+import { expectResponseSetsSessionIdCookie } from "../utils/expectations.js";
 import { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
 import supertest from 'supertest';
 

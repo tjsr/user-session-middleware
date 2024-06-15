@@ -14,7 +14,8 @@ import { SystemHttpRequestType } from '../types/request.js';
 import {
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
-import express from "express";
+import express from "../express/index.js";
+import { handleLocalsCreation } from "./handleLocalsCreation.js";
 import {
   requireSessionStoreConfigured,
 } from '../errors/sessionErrorChecks.js';
@@ -27,7 +28,8 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler =
 ):void => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
   try {
-    requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers);
+    verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+    requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers!);
   } catch (err) {
     next(err);
     return;

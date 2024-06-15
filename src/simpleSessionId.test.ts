@@ -1,8 +1,9 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "./types.js";
 import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import expressSession, { Cookie, Session, Store } from 'express-session';
 
+import { SystemHttpRequestType } from "./types/request.js";
+import { UserSessionData } from "./types/session.js";
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import { getMockReq } from "vitest-mock-express";
 import { saveSessionDataToSession } from './store/loadData.js';
@@ -111,15 +112,15 @@ describe('handleSessionFromStore', () => {
 
 describe('saveSessionDataToSession', () => {
   let memoryStore: Store;
-  let testSessionData: SystemSessionDataType;
-  let req: SystemHttpRequestType<SystemSessionDataType>;
+  let testSessionData: UserSessionData;
+  let req: SystemHttpRequestType<UserSessionData>;
 
-  const withTestSession = (
-    partailStoreData: Partial<SystemSessionDataType>,
-    existingSessionDataOverrides: Partial<SystemSessionDataType>,
+  const withTestSession = <SD extends UserSessionData>(
+    partailStoreData: Partial<SD>,
+    existingSessionDataOverrides: Partial<SD>,
     noSave = false
-  ): Session & Partial<SystemSessionDataType> => {
-    const storedSessionData: Partial<SystemSessionDataType> = {
+  ): Session => {
+    const storedSessionData: Partial<SD> = {
       ...partailStoreData,
       cookie: new Cookie(),
     };
@@ -128,12 +129,12 @@ describe('saveSessionDataToSession', () => {
       ...existingSessionDataOverrides,
     };
 
-    const session: Session & Partial<SystemSessionDataType> = memoryStore.createSession(req, testSessionData);
+    const session: Session = memoryStore.createSession(req, testSessionData);
     if (!noSave) {
       session.save = vi.fn();
     }
     // TODO: Fix this
-    saveSessionDataToSession(storedSessionData as SystemSessionDataType, session);
+    saveSessionDataToSession(storedSessionData as UserSessionData, session);
     expect(session.save).toBeCalled();
     return session;
   };
@@ -149,9 +150,9 @@ describe('saveSessionDataToSession', () => {
     memoryStore = new expressSession.MemoryStore();
     memoryStore.set('some-session-id', {
       cookie: new Cookie(),
-    });
+    } as UserSessionData);
 
-    req = getMockReq<SystemHttpRequestType<SystemSessionDataType>>({
+    req = getMockReq<SystemHttpRequestType<UserSessionData>>({
       newSessionIdGenerated: false,
       sessionID: 'fake-session-id',
       sessionStore: memoryStore,
@@ -159,7 +160,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take session data userId if no userId is already on session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
       {
         email: 'test-user-email',
         userId: 'test-user-id',
@@ -170,7 +171,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take existing session data userId if userId is already on session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
       {
         email: 'test-user-email',
         userId: 'test-user-id',
@@ -181,7 +182,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take session data email if email is already on session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
       { email: 'test-user-email' },
       { email: undefined }
     );
@@ -189,7 +190,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take existing session data email if no email is already on session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session = withTestSession(
       { email: 'test-user-emnail' },
       { email: 'existing-user-email' }
     );
@@ -197,7 +198,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take newId flag if not already on session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session = withTestSession(
       { newId: true },
       { newId: undefined }
     );
@@ -205,7 +206,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should not override newId flag if explicitly set to false session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session = withTestSession(
       { newId: true },
       { newId: false }
     );
@@ -213,7 +214,7 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should not override newId=true flag if explicitly set to false session', () => {
-    const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+    const sessionToVerify: Session = withTestSession(
       { newId: false },
       { newId: true }
     );
@@ -222,7 +223,7 @@ describe('saveSessionDataToSession', () => {
 
   test('Should take newId value from existing session', () => {
     [true, false].forEach((storedNewId) => {
-      const sessionToVerify: Session & Partial<SystemSessionDataType> = withTestSession(
+      const sessionToVerify: Session = withTestSession(
         { newId: storedNewId },
         { newId: undefined }
       );

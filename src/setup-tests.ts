@@ -6,7 +6,8 @@ let ignored: (string|RegExp)[] = ['You are running Vue in development mode.', 'F
 
 let ignoredSourceMethods: string[] = [];
 
-const filterIgnored = (callback, ...args) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const filterIgnored = (callback:Function, ...args:any[]) => {
   const firstArg = args?.[0];
   let msg;
   if (typeof firstArg === 'function') {
@@ -39,17 +40,17 @@ console.warn = (...args) => filterIgnored(warn, ...args);
 console.error = (...args) => filterIgnored(error, ...args);
 console.debug = (...args) => filterIgnored(error, ...args);
 
-export const addIgnoredLog = (msg: string|RegExp) => {
+export const addIgnoredLog = (msg: string|RegExp): void => {
   ignored.push(msg);
 };
 
-export const addIgnoredLogsFromFunction = (...fns: Function[]) => {
+export const addIgnoredLogsFromFunction = (...fns: Function[]): void => {
   fns.forEach((fn) => {
     ignoredSourceMethods.push(fn.name);
   });
 };
 
-export const removeIgnoredLogsFromFunction = (fn: Function) => {
+export const removeIgnoredLogsFromFunction = (fn: Function): void => {
   ignoredSourceMethods = ignoredSourceMethods.filter((ignoredFn) => ignoredFn !== fn.name);
 };
 

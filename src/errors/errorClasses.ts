@@ -3,6 +3,7 @@ import {
   ERROR_SAVING_SESSION,
   ERROR_SESSION_ID_NOT_GENERATED,
   ERROR_SESSION_NOT_INITIALIZED,
+  LOGOUT_FAILED_ERROR,
   NEW_SESSION_ID_DATA_EXISTS,
   NO_SESSION_DATA_FROM_STORE,
   NO_SESSION_ID_IN_REQUEST,
@@ -68,6 +69,12 @@ export class MiddlewareCallOrderError extends SessionHandlerError {
   }
 }
 
+export class MiddlewareConfigurationError extends SessionHandlerError {
+  constructor (message = 'Middleware prerequisite not met.', cause?: unknown) {
+    super(REQUIRED_MIDDLEWARE_CALLED_INCORRECTLY, HttpStatusCode.BAD_GATEWAY, message, cause);
+  }
+}
+
 export class SessionStoreNotConfiguredError extends SessionHandlerError {
   constructor(handlerChain: HandlerName[]) {
     super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');
@@ -121,5 +128,19 @@ export class SessionNotGeneratedError extends SessionHandlerError {
   constructor() {
     super(ERROR_REQUEST_SESSION_NOT_INITIALIZED, HttpStatusCode.INTERNAL_SERVER_ERROR,
       'Expected session to exist but was undefined on request.');
+  }
+}
+
+export class SessionSaveError extends SessionHandlerError {
+  constructor(cause: Error) {
+    super(ERROR_SAVING_SESSION, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Error saving session.', cause);
+  }
+}
+
+export class LogoutFailedError extends SessionHandlerError {
+  constructor(message: string|undefined, cause: unknown) {
+    super(LOGOUT_FAILED_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      message ?? 'Error logging out.', cause);
   }
 }

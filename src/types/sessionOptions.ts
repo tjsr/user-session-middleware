@@ -12,4 +12,10 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
 
   // Look for the session id in the X-Session-Id header
   useForwardedSessions?: boolean | undefined;
+
+  // Don't permit a session ID to be renewed by calling /session
+  disableSessionRefresh?: boolean | undefined;
+
+  // Don't bind the /login and /logout endpoints
+  disableLoginEndpoints?: boolean | undefined;
 }

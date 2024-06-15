@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
-import { clearIgnoredFunctions } from "./setup-tests";
+import { clearIgnoredFunctions } from "./setup-tests.js";
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));

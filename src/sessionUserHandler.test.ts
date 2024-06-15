@@ -1,4 +1,3 @@
-import { SystemHttpRequestType, SystemSessionDataType } from "./types";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { disableHandlerAssertions, forceHandlerAssertions } from "./middleware/handlerChainLog.js";
 import express, { NextFunction } from "express";
@@ -8,9 +7,11 @@ import {
 } from './middleware/storedSessionData.js';
 
 import { Cookie } from "express-session";
-import { SESSION_ID_HEADER_KEY } from "./getSession";
-import { addIgnoredLog } from "./setup-tests";
-import { appWithMiddleware } from "./testUtils";
+import { SESSION_ID_HEADER_KEY } from "./getSession.js";
+import { SystemHttpRequestType } from "./types/request.js";
+import { UserSessionData } from "./types/session.js";
+import { addIgnoredLog } from "./setup-tests.js";
+import { appWithMiddleware } from "./testUtils.js";
 import {
   handleExistingSessionWithNoSessionData,
 } from "./middleware/handleSessionWithNoData.js";
@@ -33,7 +34,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
     'Should set/save userId on req.session when userId is not yet set and no existing session data in store.',
     async () => {
       const endValidator = (
-        req: SystemHttpRequestType<SystemSessionDataType>,
+        req: SystemHttpRequestType,
         _res: express.Response,
         next: NextFunction
       ) => {
@@ -59,7 +60,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
 
   test('Should set and save the userId on the request session when data in store has no userId.', async () => {
     const endValidator = (
-      req: SystemHttpRequestType<SystemSessionDataType>,
+      req: SystemHttpRequestType,
       _res: express.Response,
       next: NextFunction
     ) => {
@@ -71,7 +72,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
       handleCopySessionStoreDataToSession,
     ],
     [endValidator]);
-    const testSessionData: SystemSessionDataType = {
+    const testSessionData: UserSessionData = {
       // TODO: Stored data doesn't need to store cookie.
       cookie: new Cookie(),
       email: 'test-email',
@@ -94,7 +95,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
     'Should set and save the userId on the session when no userId set but data in store has a userId.',
     async () => {
       const endValidator = (
-        req: SystemHttpRequestType<SystemSessionDataType>,
+        req: SystemHttpRequestType,
         _response: express.Response,
         next: NextFunction
       ) => {
@@ -113,7 +114,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
       ], [endValidator]);
-      const testSessionData: SystemSessionDataType = {
+      const testSessionData: UserSessionData = {
         // TODO: Stored data doesn't need to store cookie.
         cookie: new Cookie(),
         email: 'test-email',

@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import * as expressSession from 'express-session';
+
 import { EmailAddress, UserId } from "../types.js";
 
-import { UserSessionData } from "./session.js";
+import { UserSessionData } from "../types/session.js";
 
 declare module "express-session" { 
   interface SessionData {
@@ -21,5 +24,8 @@ declare module "express-session" {
   // }
 }
 
+export const session = expressSession;
+
+export { Cookie, MemoryStore, Store } from 'express-session';
 export type { Session, SessionData } from 'express-session';
 
