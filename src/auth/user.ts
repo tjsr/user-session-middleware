@@ -4,7 +4,7 @@ import {
   uuid5
 } from '../types.js';
 
-import { Session } from '../types/express.js';
+import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';

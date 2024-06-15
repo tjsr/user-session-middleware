@@ -1,7 +1,7 @@
-import { MemoryStore, Store } from "express-session";
+import { MemoryStore, Store } from "../express-session/index.js";
 import { describe, expect, test } from "vitest";
 
-import { SessionStoreNotConfiguredError } from "./errorClasses";
+import { SessionStoreNotConfiguredError } from "./errorClasses.js";
 import { requireSessionStoreConfigured } from './sessionErrorChecks.js';
 
 describe('requireSessionStoreConfigured', () => {

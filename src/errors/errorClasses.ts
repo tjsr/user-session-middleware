@@ -69,6 +69,12 @@ export class MiddlewareCallOrderError extends SessionHandlerError {
   }
 }
 
+export class MiddlewareConfigurationError extends SessionHandlerError {
+  constructor (message = 'Middleware prerequisite not met.', cause?: unknown) {
+    super(REQUIRED_MIDDLEWARE_CALLED_INCORRECTLY, HttpStatusCode.BAD_GATEWAY, message, cause);
+  }
+}
+
 export class SessionStoreNotConfiguredError extends SessionHandlerError {
   constructor(handlerChain: HandlerName[]) {
     super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');

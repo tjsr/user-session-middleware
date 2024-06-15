@@ -48,11 +48,6 @@ export type {
   UserSessionOptions
 } from './src/types/sessionOptions.js';
 
-// import {   SystemResponseLocals,
-//   UserSessionData,
-//   SessionStoreDataType,
-//   UserSessionOptions
-//  } from './types.js';
 export type { 
   UserModel
 } from './src/types/model.js';
@@ -67,4 +62,4 @@ export { SessionHandlerError } from './src/errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './src/errors/SessionMiddlewareError.js';
 
 export * as express from './src/express/index.js';
-export * as session from './src/types/session.js';
+export * as session from './src/express-session/index.js';

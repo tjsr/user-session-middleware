@@ -1,4 +1,4 @@
-import * as express from '../types/express.js';
+import * as express from '../express-session/index.js';
 
 import { EmailAddress, UserId } from "../types.js";
 

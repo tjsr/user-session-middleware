@@ -1,13 +1,14 @@
-import { SystemHttpRequestType, SystemHttpResponseType } from "../types.ts";
 import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
-} from "../types/middlewareHandlerTypes.ts";
-import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.ts";
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.ts";
+} from "../types/middlewareHandlerTypes.js";
+import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 
-import { HttpStatusCode } from "../httpStatusCodes.ts";
+import { HttpStatusCode } from "../httpStatusCodes.js";
 import { NextFunction } from "express";
+import { SystemHttpRequestType } from "../types/request.js";
+import { SystemHttpResponseType } from "../types/response.js";
 
 export const endRequest: UserSessionMiddlewareRequestHandler = (
   _req: SystemHttpRequestType,

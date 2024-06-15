@@ -17,9 +17,9 @@ export interface UserSessionMiddlewareRequestHandler<
   ReqBody = any,
   ReqQuery extends core.Query = core.Query,
   Locals extends SystemResponseLocals = SystemResponseLocals<SD>,
-  RequestType extends SystemHttpRequestType = SystemHttpRequestType<
+  RequestType extends express.Request = SystemHttpRequestType<
     SD, P, ResBody, ReqBody, ReqQuery, Locals>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<SD, ResBody, Locals>
+  ResponseType extends express.Response = SystemHttpResponseType<SD, ResBody, Locals>
 > extends express.RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals> {
   (
     request: RequestType,
@@ -29,16 +29,21 @@ export interface UserSessionMiddlewareRequestHandler<
 }
 
 export interface UserSessionMiddlewareErrorHandler<
-  StoreDataType extends UserSessionData = UserSessionData, 
+  SD extends UserSessionData = UserSessionData, 
   P extends core.ParamsDictionary = core.ParamsDictionary,
   ResBody = any,
   ReqBody = any,
   ReqQuery extends core.Query = core.Query,
-  Locals extends SystemResponseLocals<StoreDataType> = SystemResponseLocals<StoreDataType>,
+  Locals extends SystemResponseLocals = SystemResponseLocals<SD>,
   RequestType extends express.Request = SystemHttpRequestType<
-    StoreDataType, P, ResBody, ReqBody, ReqQuery, Locals>,  
-  ResponseType extends express.Response = SystemHttpResponseType<StoreDataType, ResBody, Locals>
-> extends express.ErrorRequestHandler {
+    SD, P, ResBody, ReqBody, ReqQuery, Locals>,  
+  ResponseType extends express.Response = SystemHttpResponseType<SD, ResBody, Locals>
+> extends express.ErrorRequestHandler<
+    P,
+    ResBody,
+    ReqBody,
+    ReqQuery,
+    Locals>{
   (
     error: Error,
     request: RequestType,

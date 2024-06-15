@@ -8,10 +8,10 @@ import {
   SessionDataTestContext,
   createContextForSessionTest,
   createTestRequestSessionData,
-} from "./testUtils";
-import { addIgnoredLog, clearIgnoredFunctions } from "./setup-tests";
+} from "./testUtils.js";
+import { addIgnoredLog, clearIgnoredFunctions } from "./setup-tests.js";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser";
+import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser.js";
 
 describe('assignUserIdToSession', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
@@ -188,7 +188,9 @@ describe('assignUserIdToRequestSession', () => {
   });
 
   test('Requires a session id on the session to be a string.', async (context) => {
-    const { request } = createTestRequestSessionData(context, { sessionID: 12345 }, {});
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const forcedNumericSessionID: string = 12345 as any as string;
+    const { request } = createTestRequestSessionData(context, { sessionID: forcedNumericSessionID }, {});
 
     expect(request.session).toBeDefined();
 

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as core from "express-serve-static-core";
 
-import { SessionData } from "./express.js";
+import { SessionData } from "../express-session/index.js";
 import { SystemHttpRequestType } from "./request.js";
 import { SystemHttpResponseType } from "./response.js";
 import { SystemResponseLocals } from "./locals.js";

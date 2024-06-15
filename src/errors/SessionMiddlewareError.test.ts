@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { SessionMiddlewareError } from './SessionMiddlewareError.ts';
+import { SessionMiddlewareError } from './SessionMiddlewareError.js';
 
 describe('SessionMiddlewareError', () => {
   const testSessionError = new SessionMiddlewareError('Test message');

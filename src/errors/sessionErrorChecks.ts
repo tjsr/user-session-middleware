@@ -5,13 +5,16 @@ import {
   SESSION_ID_NOT_GENERATED,
 } from "./errorCodes.js";
 import { HandlerName, SessionId } from "../types.js";
-import { Session, SessionData, Store } from "express-session";
 import {
+  MiddlewareConfigurationError,
   SessionDataNotExpectedError,
   SessionStoreNotConfiguredError
 } from "./errorClasses.js";
+import { Session, SessionData, Store } from "express-session";
 
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SystemResponseLocals } from "../types/locals.js";
+import assert from "node:assert";
 
 export const requireSessionIdGenerated = (
   sessionID: string|undefined
@@ -69,10 +72,22 @@ export const requireSessionInitialized = (
   }
 };
 
+export const requireHandlerChainCreated = (
+  locals: SystemResponseLocals
+): void => {
+  if (!locals) {
+    throw new MiddlewareConfigurationError('Middleware prerequisite not met: Handler locals not created');
+  }
+  if (!locals.calledHandlers) {
+    throw new MiddlewareConfigurationError('Middleware prerequisite not met: Call handler chain not created');
+  }
+};
+
 export const requireSessionStoreConfigured = (
   sessionStore: Store | undefined,
   handlerChain: HandlerName[]
 ): void => {
+  assert(handlerChain !== undefined && handlerChain !== null);
   if (!sessionStore) {
     throw new SessionStoreNotConfiguredError(handlerChain);
   }

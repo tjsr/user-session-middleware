@@ -1,22 +1,20 @@
-import {
-  HandlerName,
-  SessionId,
-} from "./types.js";
+import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
 import { Mock, MockInstance, expect, vi } from "vitest";
 import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
-import express, { ErrorRequestHandler, RequestHandler } from "express";
+import express, { ErrorRequestHandler, Express, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from "vitest-mock-express";
-import session, { Cookie, Store } from "express-session";
 
+import {
+  HandlerName,
+} from "./types.js";
+import { HttpStatusCode } from "./httpStatusCodes.js";
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from "./types/response.js";
 import { UserSessionData } from "./types/session.js";
-import { addCalledHandler } from "./middleware/handlerChainLog.js";
-import expressSession from "express-session";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
+import { markHandlersCalled } from "./utils/testing/markHandlers.js";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
-import supertest from "supertest";
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
@@ -25,7 +23,7 @@ export interface MockReqRespSet<
   clearMockReq: () => void;
   clearMockRes: () => void;
   mockClear: () => void;
-  next: express.NextFunction;
+  next: NextFunction;
   request: RequestType;
   response: ResponseType;
   spies?: Map<Function, MockInstance>;
@@ -33,14 +31,14 @@ export interface MockReqRespSet<
 
 export interface SessionDataTestContext {
   memoryStore?: Store;
-  testRequestData: MockRequest;
+  testRequestData: MockSessionRequest;
   testSessionStoreData: UserSessionData;
 }
 
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
-    testRequestData: MockRequest;
+    testRequestData: MockSessionRequest;
     testSessionStoreData: UserSessionData;
   }
 };
@@ -91,18 +89,20 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
   return [ promise, mock ];
 };
 
-const addExpressSessionHandler = (app: express.Express, memoryStore: session.MemoryStore): void => {
+const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
   app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
 };
 
+type MiddlewareTypes = (RequestHandler | ErrorRequestHandler)[];
+
 const addHandlersToApp = (
-  app: express.Express,
-  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
-  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
+  app: Express,
+  middleware: (RequestHandler|ErrorRequestHandler)[],
+  endMiddleware?: (RequestHandler|ErrorRequestHandler)[]
 ): void => {
   app.use(middleware);
-  app.get('/', (req, res, next) => {
-    res.status(200);
+  app.get('/', (_req, res, next) => {
+    res.status(HttpStatusCode.OK);
     next();
   });
   if (endMiddleware) {
@@ -114,23 +114,23 @@ const addHandlersToApp = (
 };
 
 export const sessionlessAppWithMiddleware = (
-  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
-  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
-): { app: express.Express, memoryStore: session.MemoryStore } => {
+  middleware: MiddlewareTypes,
+  endMiddleware?: MiddlewareTypes
+): { app: Express, memoryStore: MemoryStore } => {
 
-  const app: express.Express = express();
+  const app: Express = express();
   addHandlersToApp(app, middleware, endMiddleware);
 
   return { app, memoryStore: undefined! };
 };
 
 export const appWithMiddleware = (
-  middleware: (express.RequestHandler|express.ErrorRequestHandler)[],
-  endMiddleware?: (express.RequestHandler|express.ErrorRequestHandler)[]
-): { app: express.Express, memoryStore: session.MemoryStore } => {
-  const memoryStore: session.MemoryStore = new session.MemoryStore();
+  middleware: MiddlewareTypes,
+  endMiddleware?: MiddlewareTypes
+): { app: Express, memoryStore: MemoryStore } => {
+  const memoryStore: MemoryStore = new MemoryStore();
 
-  const app: express.Express = express();
+  const app: Express = express();
   addExpressSessionHandler(app, memoryStore);
   addHandlersToApp(app, middleware, endMiddleware);
 
@@ -149,7 +149,7 @@ interface SessionTestRunOptions {
 
 export const createTestRequestSessionData = (
   context: SessionDataTestContext, 
-  mockDataOverrides: MockRequest = {},
+  mockDataOverrides: MockSessionRequest = {},
   testRunOptions: SessionTestRunOptions = {
     silentCallHandlers: true,
   }
@@ -157,13 +157,13 @@ export const createTestRequestSessionData = (
   if (context.testRequestData === undefined) {
     createContextForSessionTest(context);
   }
-  const mockRequestData: MockRequest = {
+  const mockRequestData: MockSessionRequest = {
     ...context.testRequestData,
     ...mockDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
   const { request, response } = mocks;
-  context.testRequestData.new = true;
+  context.testRequestData['newSessionIdGenerated'] = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
     context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
   }
@@ -181,32 +181,31 @@ export const createTestRequestSessionData = (
 
     expect(request.session).toBeDefined();
 
-    if (testRunOptions.overrideSessionData !== undefined) {
-      Object.keys(testRunOptions?.overrideSessionData as object).forEach((key) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (request.session as any)[key] = testRunOptions.overrideSessionData![key];
-      });
-    }
+    Object.assign(request.session, testRunOptions.overrideSessionData);
   }
   if (testRunOptions.markHandlersCalled) {
-    testRunOptions.markHandlersCalled.forEach((handlerName) => {
-      addCalledHandler(response, handlerName, testRunOptions.silentCallHandlers);
-    });
+    markHandlersCalled(response, testRunOptions.markHandlersCalled, testRunOptions.silentCallHandlers);
   }
 
   return mocks;
 };
 
+export interface MockSessionRequest extends MockRequest {
+  sessionID?: string | undefined;
+  newSessionIdGenerated?: boolean | undefined;
+  sessionStore?: Store | undefined;
+}
+
 export const createContextForSessionTest = (
   context: SessionDataTestContext,
-  requestDataDefaults: MockRequest = {},
+  requestDataDefaults: MockSessionRequest = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
   const cookie = new Cookie();
-  context.memoryStore = new expressSession.MemoryStore();
-  context.memoryStore.set('some-session-id', {
+  context.memoryStore = new MemoryStore();
+  context.memoryStore?.set('some-session-id', {
     cookie,
-  });
+  } as SessionData);
 
   context.testRequestData = {
     newSessionIdGenerated: requestDataDefaults.newSessionIdGenerated !== undefined
@@ -223,30 +222,8 @@ export const createContextForSessionTest = (
   };
 };
 
-export const expectResponseSetsSessionIdCookie = (
-  response: supertest.Response, expectedSessionId: SessionId
-): void => {
-  const cookieValue = response.get('Set-Cookie')![0];
-  expect(cookieValue).toMatch(new RegExp(`sessionId=${expectedSessionId}`));
-};
-
-export const expectDifferentSetCookieSessionId = (sessionId: SessionId, cookieValue: string): void => {
-  expect(cookieValue).not.toMatch(new RegExp(`sessionId=${sessionId}`));
-  expect(cookieValue).toMatch(new RegExp(`sessionId=(?!${sessionId}).*; Path=/; HttpOnly; SameSite=Strict`));
-};
-
-export const expectSetCookieSessionId = (sessionId: SessionId, cookieValue: string): void => {
-  expect(cookieValue).toEqual(`sessionId=${sessionId}; Path=/; HttpOnly; SameSite=Strict`);
-};
-
-export const expectResponseResetsSessionIdCookie = (
-  response: supertest.Response, originalSessionId: SessionId
-) => {
-  const cookieValue = response.get('Set-Cookie')![0];
-  expectDifferentSetCookieSessionId(originalSessionId, cookieValue);
-};
-
-export const checkForDefault = <OptionsType extends object>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const checkForDefault = <OptionsType extends Record<string, any>>(
   defaultOptions: OptionsType,
   contextOptions: Partial<OptionsType>,
   key: string,
@@ -258,7 +235,8 @@ export const checkForDefault = <OptionsType extends object>(
   expect(updatedOptions[key]).toEqual(defaultOptions[key]);
 };
 
-export const checkForOverride = <OptionsType extends object>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const checkForOverride = <OptionsType extends Record<string, any>>(
   defaultOptions: OptionsType,
   contextOptions: Partial<OptionsType>,
   key: string,

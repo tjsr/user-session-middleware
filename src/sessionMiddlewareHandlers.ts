@@ -19,6 +19,7 @@ import {
 } from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
+import { handleLocalsCreation } from "./middleware/handleLocalsCreation.js";
 import { login } from "./api/login.js";
 import { logout } from "./api/logout.js";
 import { session } from './api/session.js';
@@ -32,6 +33,7 @@ export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessi
   return [
     // handle /session to generate a new sessionId before anything else.
     expressSessionHandlerMiddleware(expressSessionOptions),
+    handleLocalsCreation,
     handleSessionIdRequired as express.RequestHandler,
     handleSessionWithNewlyGeneratedId as express.RequestHandler,
     handleSessionDataRetrieval as express.RequestHandler,
