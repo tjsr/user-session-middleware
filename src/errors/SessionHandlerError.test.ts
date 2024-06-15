@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { NO_SESSION_DATA_FROM_STORE } from './errorCodes';
-import { SessionHandlerError } from './SessionHandlerError';
+import { NO_SESSION_DATA_FROM_STORE } from './errorCodes.js';
+import { SessionHandlerError } from './SessionHandlerError.js';
 
 describe('SessionHandlerError', () => {
   const testSessionError = new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, undefined, 'Test message');

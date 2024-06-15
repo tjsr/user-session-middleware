@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import express from 'express';
+import express from './express/index.js';
 import { getMockRes } from 'vitest-mock-express';
 import { randomUUID } from 'crypto';
-import { setUserCookies } from './setUserCookies';
+import { setUserCookies } from './setUserCookies.js';
 
 describe('setUserCookies', () => {
   test('Should set cookkies fo basic user data.', () => {

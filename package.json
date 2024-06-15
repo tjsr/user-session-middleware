@@ -13,15 +13,16 @@
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsc && tsc -p tsconfig.cjs.json",
+    "build": "rimraf dist && tsc",
+    "build:dist": "rimraf dist && tsc -p tsconfig.publish.json && tsc -p tsconfig.cjs.json",
     "check": "npx npm-check",
     "clean": "rimraf build dist coverage",
     "clean:all": "rimraf build dist coverage node_modules",
     "link": "npm link @tjsr/eslint-config @tjsr/simple-env-utils @tjsr/mysql-pool-utils",
     "lint": "eslint --config eslint.config.mjs src/*.ts",
     "lint:fix": "eslint --fix src/*.ts",
-    "prepack": "npm test && npm run build",
-    "prepublishOnly": "npm run clean && npm test && npm run build",
+    "prepack": "npm test && npm run build:dist",
+    "prepublishOnly": "npm run clean",
     "disabled:postinstall": "npm run link",
     "test": "vitest --run && npm run lint",
     "test:coverage": "vitest run --coverage"
@@ -33,7 +34,7 @@
     ],
     "ext": "ts",
     "ignore": "dist",
-    "exec": "tsc && tsc -p tsconfig.cjs.json",
+    "exec": "tsc",
     "delay": 200
   },
   "test": "foobar",

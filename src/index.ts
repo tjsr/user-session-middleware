@@ -7,7 +7,6 @@ import { createRandomUserId } from './sessionUser.js';
 import { getIp } from './utils/getIp.js';
 import { mysqlSessionStore } from './sessionStore.js';
 import { setUserIdNamespace } from './auth/userNamespace.js';
-import { userSessionMiddleware } from './sessionMiddlewareHandlers.js';
 
 export {
   createRandomId,
@@ -20,11 +19,10 @@ export {
   HttpStatusCode,
   mysqlSessionStore,
   setUserIdNamespace,
-  userSessionMiddleware,
   validateHasUserId
 };
 
-export { userSessionEndpoints } from './api/endpoints.js';
+export { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
 
 export type {
   uuid,
@@ -48,11 +46,6 @@ export type {
   UserSessionOptions
 } from './types/sessionOptions.js';
 
-// import {   SystemResponseLocals,
-//   UserSessionData,
-//   SessionStoreDataType,
-//   UserSessionOptions
-//  } from './types.js';
 export type { 
   UserModel
 } from './types/model.js';
@@ -67,4 +60,4 @@ export { SessionHandlerError } from './errors/SessionHandlerError.js';
 export { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';
 
 export * as express from './express/index.js';
-export * as session from './types/session.js';
+export * as session from './express-session/index.js';

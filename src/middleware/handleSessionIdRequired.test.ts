@@ -1,12 +1,12 @@
+import { Cookie, MemoryStore, Session } from "../express-session/index.js";
 import { beforeEach, describe, expect, test } from "vitest";
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.ts";
-import session, { Cookie } from "express-session";
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
-import { SESSION_ID_HEADER_KEY } from "../getSession";
-import { appWithMiddleware } from "../testUtils";
-import express from "express";
-import { handleSessionIdRequired } from "./handleSessionId";
+import { Express } from "../express/index.js";
+import { SESSION_ID_HEADER_KEY } from "../getSession.js";
+import { appWithMiddleware } from "../testUtils.js";
+import { handleSessionIdRequired } from "./handleSessionId.js";
 import supertest from 'supertest';
 
 describe('handler.handleSessionIdRequired', () => {
@@ -18,21 +18,21 @@ describe('handler.handleSessionIdRequired', () => {
 });
 
 describe('api.handleSessionIdRequired', () => {
-  let app: express.Express;
-  let memoryStore: session.MemoryStore;
+  let app: Express;
+  let memoryStore: MemoryStore;
 
   beforeEach(() => {
     ({ app, memoryStore } = appWithMiddleware([
-      handleSessionIdRequired as express.RequestHandler,
-      handleSessionCookie as express.RequestHandler,
-      handleSessionCookieOnError as express.ErrorRequestHandler,
+      handleSessionIdRequired,
+      handleSessionCookie,
+      handleSessionCookieOnError,
     ]));
   });
 
   test('Should accept a request with a valid sessionId.', async () => {
     memoryStore.set('abcd-1234', {
       cookie: new Cookie(),
-    });
+    } as Session);
 
     const response = await supertest(app)
       .get('/')

@@ -1,7 +1,7 @@
 import { COOKIE_WITH_HEADER, setSessionCookie } from "./setSessionCookie.js";
 import { describe, expect, test } from "vitest";
 
-import { createTestRequestSessionData } from "../testUtils";
+import { createTestRequestSessionData } from "../testUtils.js";
 import express from "express";
 import { generateNewSessionId } from "../getSession.js";
 
