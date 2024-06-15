@@ -37,12 +37,3 @@ describe('login', () => {
 
   });
 });
-
-describe('getDbUserByEmail', () => {
-  test.todo('Should call retrieveUserData if it is set', () => {
-
-  });
-
-  test.todo('Should return a default user object if retrieveUserData is not set', () => {
-  });
-});

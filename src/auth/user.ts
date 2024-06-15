@@ -13,7 +13,7 @@ import { getUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
 import { v5 as uuidv5 } from 'uuid';
 
-let retrieveUserData: ((_email: EmailAddress) => UserModel) | undefined = undefined;
+export let retrieveUserData: ((_email: EmailAddress) => UserModel) | undefined = undefined;
 
 export const setRetrieveUserDataFunction = (fn: (_email: EmailAddress) => UserModel) => {
   retrieveUserData = fn;
@@ -60,12 +60,4 @@ const createRandomIdAndSave = (session: Session & UserSessionData): Promise<User
   });
 };
 
-export const getDbUserByEmail = async (email: EmailAddress): Promise<UserModel> => {
-  if (retrieveUserData) {
-    return retrieveUserData(email);
-  }
-  return Promise.resolve({
-    email: email,
-    userId: createUserIdFromEmail(email),
-  });
-};
+

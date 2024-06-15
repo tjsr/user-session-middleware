@@ -14,7 +14,7 @@ import { Session } from '../express-session/index.js';
 import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import { getDbUserByEmail } from '../auth/user.js';
+import { getDbUserByEmail } from '../auth/getDbUser.js';
 
 const handleAuthenticationFailure = (session: Session, next: express.NextFunction): void => {
   session.userId = undefined!;
