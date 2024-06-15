@@ -24,8 +24,6 @@ export {
 
 export { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
 
-export { userSessionEndpoints } from './api/endpoints.js';
-
 export type {
   uuid,
   uuid4,
