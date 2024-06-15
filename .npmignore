@@ -3,3 +3,10 @@ build/**/*
 .github
 vitest.config.ts.timestamp-*
 .vscode/**/*
+**/vitest.config.*
+**/*.test.*
+eslint.config.mjs
+.prettierrc.json
+.npmrc
+src/**
+.npmcheckrc
