@@ -6,18 +6,11 @@ import {
 
 import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
-import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';
 import { createRandomId } from '../utils/createRandomId.js';
 import { getUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
 import { v5 as uuidv5 } from 'uuid';
-
-export let retrieveUserData: ((_email: EmailAddress) => UserModel) | undefined = undefined;
-
-export const setRetrieveUserDataFunction = (fn: (_email: EmailAddress) => UserModel) => {
-  retrieveUserData = fn;
-};
 
 export const createUserIdFromEmail = (email: EmailAddress): uuid5 => {
   return uuidv5(email, getUserIdNamespace());
