@@ -3,6 +3,7 @@ import {
   ERROR_SAVING_SESSION,
   ERROR_SESSION_ID_NOT_GENERATED,
   ERROR_SESSION_NOT_INITIALIZED,
+  ERROR_SESSION_VALUES_MISSING,
   LOGOUT_FAILED_ERROR,
   NEW_SESSION_ID_DATA_EXISTS,
   NO_SESSION_DATA_FROM_STORE,
@@ -142,5 +143,12 @@ export class LogoutFailedError extends SessionHandlerError {
   constructor(message: string|undefined, cause: unknown) {
     super(LOGOUT_FAILED_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
       message ?? 'Error logging out.', cause);
+  }
+}
+
+export class SessionUserInfoError extends SessionHandlerError {
+  constructor(message: string) {
+    super(ERROR_SESSION_VALUES_MISSING, HttpStatusCode.UNAUTHORIZED,
+      message);
   }
 }

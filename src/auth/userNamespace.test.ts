@@ -1,7 +1,7 @@
+import { NamespaceUUIDFormatError, UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.js';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { getUserIdNamespace, setUserIdNamespace } from './userNamespace.js';
 
-import { UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.js';
 import { v5 } from 'uuid';
 
 const nilUuid = '00000000-0000-0000-0000-000000000000';
@@ -40,10 +40,21 @@ describe('getUserIdNamespace', () => {
     const testNamespace = getUserIdNamespace();
     expect(testNamespace).toBe(alternateEnvNamespace);
   });
+});
 
-  test('Should throw an error if no namespace is set.', () => {
-    delete process.env['USERID_UUID_NAMESPACE'];
-    setUserIdNamespace(undefined!);
-    expect(() => getUserIdNamespace()).toThrowError(expect.any(UUIDNamespaceNotDefinedError));
+describe('setUserIdNamespace', () => {
+  test('Should reject a namespace parameter which is not a valid UUID.', () => {
+    const invalidNamespace = 'not-a-valid-uuid';
+    expect(() => setUserIdNamespace(invalidNamespace)).toThrowError(expect.any(NamespaceUUIDFormatError));
+  });
+
+  test('Should reject a namespace on the environment which is not a valid UUID.', () => {
+    process.env['USERID_UUID_NAMESPACE'] = 'not-a-valid-uuid';
+    expect(() => setUserIdNamespace(undefined!)).toThrowError(expect.any(NamespaceUUIDFormatError));
+  });
+
+  test('Should throw an error if trying to set an undefined namespace.', () => {
+    process.env['USERID_UUID_NAMESPACE'] = undefined;
+    expect(() => setUserIdNamespace(undefined!)).toThrowError(expect.any(UUIDNamespaceNotDefinedError));
   });
 });
