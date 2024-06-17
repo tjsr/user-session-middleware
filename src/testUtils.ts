@@ -1,20 +1,16 @@
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
+import { ErrorRequestHandler, NextFunction, RequestHandler } from './express/index.js';
 import { Mock, MockInstance, TaskContext, expect, vi } from "vitest";
-import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
-import express, { ErrorRequestHandler, Express, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from "vitest-mock-express";
 
 import {
   HandlerName,
 } from "./types.js";
-import { HttpStatusCode } from "./httpStatusCodes.js";
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from "./types/response.js";
 import { UserSessionData } from "./types/session.js";
-import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { markHandlersCalled } from "./utils/testing/markHandlers.js";
-import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -100,53 +96,7 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
   return [ promise, mock ];
 };
 
-const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
-  app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
-};
-
-type MiddlewareTypes = (RequestHandler | ErrorRequestHandler)[];
-
-const addHandlersToApp = (
-  app: Express,
-  middleware: (RequestHandler|ErrorRequestHandler)[],
-  endMiddleware?: (RequestHandler|ErrorRequestHandler)[]
-): void => {
-  app.use(middleware);
-  app.get('/', (_req, res, next) => {
-    res.status(HttpStatusCode.OK);
-    next();
-  });
-  if (endMiddleware) {
-    app.use(endMiddleware);
-  }
-  app.use(sessionErrorHandler as ErrorRequestHandler);
-  app.use(endRequest as RequestHandler);
-  app.use(endErrorRequest as ErrorRequestHandler);
-};
-
-export const sessionlessAppWithMiddleware = (
-  middleware: MiddlewareTypes,
-  endMiddleware?: MiddlewareTypes
-): { app: Express, memoryStore: MemoryStore } => {
-
-  const app: Express = express();
-  addHandlersToApp(app, middleware, endMiddleware);
-
-  return { app, memoryStore: undefined! };
-};
-
-export const appWithMiddleware = (
-  middleware: MiddlewareTypes,
-  endMiddleware?: MiddlewareTypes
-): { app: Express, memoryStore: MemoryStore } => {
-  const memoryStore: MemoryStore = new MemoryStore();
-
-  const app: Express = express();
-  addExpressSessionHandler(app, memoryStore);
-  addHandlersToApp(app, middleware, endMiddleware);
-
-  return { app, memoryStore };
-};
+export type MiddlewareTypes = (RequestHandler | ErrorRequestHandler)[];
 
 interface SessionTestRunOptions {
   noMockSave?: boolean;

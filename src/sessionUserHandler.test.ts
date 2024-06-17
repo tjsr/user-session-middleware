@@ -11,7 +11,7 @@ import { SESSION_ID_HEADER_KEY } from "./getSession.js";
 import { SystemHttpRequestType } from "./types/request.js";
 import { UserSessionData } from "./types/session.js";
 import { addIgnoredLog } from "./setup-tests.js";
-import { appWithMiddleware } from "./testUtils.js";
+import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import {
   handleExistingSessionWithNoSessionData,
 } from "./middleware/handleSessionWithNoData.js";

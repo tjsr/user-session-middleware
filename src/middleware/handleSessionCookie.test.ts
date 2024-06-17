@@ -11,9 +11,7 @@ import {
 } from "./handleSessionWithNoData.js";
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 
-import {
-  appWithMiddleware,
-} from "../testUtils.js";
+import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import express from "../express/index.js";
 import { handleSessionDataRetrieval } from "./storedSessionData.js";
 import { handleSessionIdRequired } from "./handleSessionId.js";
