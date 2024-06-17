@@ -13,6 +13,8 @@ import { addIgnoredLog, clearIgnoredFunctions } from "./setup-tests.js";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser.js";
 
+import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
+
 describe('assignUserIdToSession', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
@@ -28,6 +30,7 @@ describe('assignUserIdToSession', () => {
         },
         spyOnSave: true,
       });
+      setUserIdNamespaceForTest(context);
 
       expect(request.session).toBeDefined();
       const saveMock = spies?.get(request.session.save);
@@ -102,6 +105,7 @@ describe('assignUserIdToRequestSession', () => {
       spyOnSave: true,
     });
 
+    setUserIdNamespaceForTest(context);
     const saveMock = spies?.get(request.session.save);
 
     await expect((async () => await assignUserIdToRequestSession(request))()).resolves.not.toThrowError();

@@ -3,6 +3,7 @@ import {
   UserId,
   uuid5
 } from '../types.js';
+import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
 
 import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
@@ -29,28 +30,26 @@ export const getUserIdFromRequest = async <SD extends UserSessionData = UserSess
 export const getUserIdFromSession = async <SD extends UserSessionData = UserSessionData>(
   session: Session & SD,
   noCreate = false
-): Promise<UserId|undefined> => {
+): Promise<UserId> => {
   if (session && session.userId) {
-    // console.log('Got a session for current call');
     return Promise.resolve(session.userId);
   } else if (!session) {
     // TODO return a UserSessionError
-    return Promise.reject(new Error('No session'));
+    return Promise.reject(new SessionNotGeneratedError());
   } else if (!noCreate) {
     return createRandomIdAndSave(session);
   } else {
-    return Promise.resolve(undefined);
+    return Promise.reject(new SessionUserInfoError('User session had no credentials.'));
   }
 };
 
-const createRandomIdAndSave = (session: Session & UserSessionData): Promise<UserId|undefined> => {
+export const createRandomIdAndSave = (session: Session & UserSessionData): Promise<UserId> => {
   session.userId = createRandomUserId();
-  return new Promise<UserId|undefined>((resolve, reject) => {
+  return new Promise<UserId>((resolve, reject) => {
     saveSessionPromise(session).then(() => {
       console.trace(createRandomIdAndSave, 'Returning user id', session.userId);
-      return resolve(session?.userId);
+      return resolve(session.userId);
     }).catch(reject);
   });
 };
-
 

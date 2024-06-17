@@ -1,5 +1,5 @@
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
-import { Mock, MockInstance, expect, vi } from "vitest";
+import { Mock, MockInstance, TaskContext, expect, vi } from "vitest";
 import { endErrorRequest, endRequest } from "./middleware/handleTestEndEvents.js";
 import express, { ErrorRequestHandler, Express, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from "vitest-mock-express";
@@ -16,6 +16,8 @@ import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { markHandlersCalled } from "./utils/testing/markHandlers.js";
 import { sessionErrorHandler } from "./middleware/sessionErrorHandler.js";
 
+export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
+
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
@@ -29,27 +31,31 @@ export interface MockReqRespSet<
   spies?: Map<Function, MockInstance>;
 };
 
-export interface SessionDataTestContext {
+export interface SessionDataTestContext extends TaskContext {
   memoryStore?: Store;
-  testRequestData: MockSessionRequest;
+  testRequestData: MockRequestWithSession;
   testSessionStoreData: UserSessionData;
 }
 
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
-    testRequestData: MockSessionRequest;
+    testRequestData: MockRequestWithSession;
     testSessionStoreData: UserSessionData;
   }
 };
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @deprecated This method should not be called directly. Use XYZ instead.
+ */
 export const getMockReqResp = <
 RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
 ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
->(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
+>(requestProps?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
-  const request: RequestType = getMockReq(values);
+  const request: RequestType = getMockReq(requestProps);
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
@@ -63,8 +69,13 @@ ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSession
   return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
-export const getMockRequestResponse = getMockReqResp;
-
+/**
+ * @deprecated This method should not be called directly. Use XYZ instead.
+ */
+export const getMockRequestResponse: <
+ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
+// eslint-disable-next-line no-unused-vars
+>(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>) => MockReqRespSet = getMockReqResp;
 export const getMockRequest = getMockReq;
 export const getMockResponse = getMockRes;
 
@@ -149,7 +160,7 @@ interface SessionTestRunOptions {
 
 export const createTestRequestSessionData = (
   context: SessionDataTestContext, 
-  mockDataOverrides: MockSessionRequest = {},
+  requestDataOverrides: MockRequestWithSession = {},
   testRunOptions: SessionTestRunOptions = {
     silentCallHandlers: true,
   }
@@ -157,9 +168,9 @@ export const createTestRequestSessionData = (
   if (context.testRequestData === undefined) {
     createContextForSessionTest(context);
   }
-  const mockRequestData: MockSessionRequest = {
+  const mockRequestData: MockRequestWithSession = {
     ...context.testRequestData,
-    ...mockDataOverrides,
+    ...requestDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
   const { request, response } = mocks;
@@ -190,7 +201,7 @@ export const createTestRequestSessionData = (
   return mocks;
 };
 
-export interface MockSessionRequest extends MockRequest {
+export interface MockRequestWithSession extends MockRequest {
   sessionID?: string | undefined;
   newSessionIdGenerated?: boolean | undefined;
   sessionStore?: Store | undefined;
@@ -198,7 +209,7 @@ export interface MockSessionRequest extends MockRequest {
 
 export const createContextForSessionTest = (
   context: SessionDataTestContext,
-  requestDataDefaults: MockSessionRequest = {},
+  requestDataDefaults: MockRequestWithSession = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
   const cookie = new Cookie();

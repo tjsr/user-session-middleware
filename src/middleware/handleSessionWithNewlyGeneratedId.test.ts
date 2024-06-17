@@ -1,5 +1,5 @@
 import {
-  MockSessionRequest,
+  MockRequestWithSession,
   SessionDataTestContext,
   createContextForSessionTest,
   createMockPromisePair,
@@ -15,7 +15,7 @@ import { handleSessionWithNewlyGeneratedId } from "./handleSessionId.js";
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
-    testRequestData: MockSessionRequest;
+    testRequestData: MockRequestWithSession;
     testSessionStoreData: UserSessionData;
   }
 };

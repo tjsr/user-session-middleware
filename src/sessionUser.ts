@@ -11,14 +11,12 @@ import { Session } from 'express-session';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
 import { getSnowflake } from './snowflake.js';
-import { getUuidNamespace } from './getGuidNamespace.js';
+import { getUserIdNamespace } from './auth/userNamespace.js';
 import { uuid5 } from './types.js';
 import { v5 as uuidv5 } from 'uuid';
 
-const USERID_UUID_NAMESPACE = getUuidNamespace();
-
 export const createRandomUserId = (): uuid5 => {
-  return uuidv5(getSnowflake().toString(), USERID_UUID_NAMESPACE);
+  return uuidv5(getSnowflake().toString(), getUserIdNamespace());
 };
 
 export const saveSessionPromise = async (session: Session): Promise<void> => {

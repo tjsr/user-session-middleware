@@ -23,20 +23,25 @@ export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> =
       request.session.userId = undefined!;
       request.session.email = undefined!;
       // Save immediately when logging out.
-      request.session.save((err: Error) => {
-        if (err) {
-          const logoutErr = new LogoutFailedError('Error logging out while saving session.', err);
-          console.error('Failed saving session', logoutErr, err);
-          next(logoutErr);
-        } else {
-          res.status(HttpStatusCode.OK);
-          res.send(result);
-          next();
-        }
+      return new Promise((resolve, reject) => {
+        request.session.save((err: Error) => {
+          if (err) {
+            const logoutErr = new LogoutFailedError('Error logging out while saving session.', err);
+            console.error('Failed saving session', logoutErr, err);
+            next(logoutErr);
+            reject(logoutErr);
+          } else {
+            res.status(HttpStatusCode.OK);
+            res.send(result);
+            next();
+            resolve();
+          }
+        });
       });
     } catch (e) {
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
       const errLogout = new LogoutFailedError('Error logging out.', e);
       next(errLogout);
+      return Promise.reject(errLogout);
     }
   };
