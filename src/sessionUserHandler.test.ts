@@ -1,6 +1,7 @@
 import { TaskContext, afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { disableHandlerAssertions, forceHandlerAssertions } from "./middleware/handlerChainLog.js";
 import express, { NextFunction } from "express";
+import { generateSessionIdForTest, generateUserIdForTest } from "./utils/testIdUtils.js";
 import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval
@@ -10,7 +11,6 @@ import { SESSION_ID_HEADER_KEY } from "./getSession.js";
 import { SystemHttpRequestType } from "./types/request.js";
 import { UserSessionData } from "./types/session.js";
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
-import { generateSessionIdForTest } from "./utils/testIdUtils.js";
 import {
   handleExistingSessionWithNoSessionData,
 } from "./middleware/handleSessionWithNoData.js";
@@ -92,13 +92,16 @@ describe('assignUserIdToRequestSessionHandler', () => {
   test(
     'Should set and save the userId on the session when no userId set but data in store has a userId.',
     async (context: TaskContext) => {
+      const testSessionData: UserSessionData = mockSession();
+      const testUserId = testSessionData.userId;
       const endValidator = (
         req: SystemHttpRequestType,
-        _response: express.Response,
+        response: express.Response,
         next: NextFunction
       ) => {
-        if (req.session.userId !== 'test-user-id') {
-          next(new Error(`userId not set correctly: ${req.session.userId} != 'test-user-id'`));
+        if (req.session.userId !== testUserId) {
+          response.status(500);
+          next(new Error(`userId not set correctly: ${req.session.userId} != '${testUserId}'`));
         } else {
           next();
         }
@@ -111,7 +114,6 @@ describe('assignUserIdToRequestSessionHandler', () => {
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
       ], [endValidator]);
-      const testSessionData: UserSessionData = mockSession();
       memoryStore.set(testSessionId, testSessionData);
 
       return supertest(app)
