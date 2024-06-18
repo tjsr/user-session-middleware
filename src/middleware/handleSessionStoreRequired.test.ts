@@ -1,19 +1,20 @@
-import { SESSION_ID_HEADER_KEY, generateNewSessionId } from "../getSession.js";
 import {
   SessionDataTestContext,
-  appWithMiddleware,
   createContextForSessionTest,
-  createTestRequestSessionData,
-  sessionlessAppWithMiddleware
+  createTestRequestSessionData
 } from "../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
 import { MemoryStore } from "express-session";
+import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { SessionStoreNotConfiguredError } from "../errors/errorClasses.js";
+import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import { expectResponseSetsSessionIdCookie } from "../utils/expectations.js";
+import { generateNewSessionId } from '../session/sessionId.js';
 import { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
+import { sessionlessAppWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import supertest from 'supertest';
 
 describe('next.handleSessionStoreRequired', () => {

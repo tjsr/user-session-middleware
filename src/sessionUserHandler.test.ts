@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { TaskContext, afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { disableHandlerAssertions, forceHandlerAssertions } from "./middleware/handlerChainLog.js";
 import express, { NextFunction } from "express";
 import {
@@ -6,15 +6,16 @@ import {
   handleSessionDataRetrieval
 } from './middleware/storedSessionData.js';
 
-import { Cookie } from "express-session";
 import { SESSION_ID_HEADER_KEY } from "./getSession.js";
 import { SystemHttpRequestType } from "./types/request.js";
 import { UserSessionData } from "./types/session.js";
-import { addIgnoredLog } from "./setup-tests.js";
-import { appWithMiddleware } from "./testUtils.js";
+import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
+import { generateSessionIdForTest } from "./utils/testIdUtils.js";
 import {
   handleExistingSessionWithNoSessionData,
 } from "./middleware/handleSessionWithNoData.js";
+import { mockSession } from "./utils/testing/mocks.js";
+import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
 import supertest from 'supertest';
 
 describe('assignUserIdToRequestSessionHandler', () => {
@@ -22,6 +23,10 @@ describe('assignUserIdToRequestSessionHandler', () => {
     forceHandlerAssertions(false);
     disableHandlerAssertions(true);
     return Promise.resolve();
+  });
+
+  beforeEach(async (context: TaskContext) => {
+    setUserIdNamespaceForTest(context);
   });
 
   afterAll(async () => {
@@ -32,7 +37,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
 
   test(
     'Should set/save userId on req.session when userId is not yet set and no existing session data in store.',
-    async () => {
+    async (context: TaskContext) => {
       const endValidator = (
         req: SystemHttpRequestType,
         _res: express.Response,
@@ -45,8 +50,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
         handleCopySessionStoreDataToSession,
         handleExistingSessionWithNoSessionData,
       ], [endValidator]);
-      const testSessionId = 'test-session-4321';
-      addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
+      const testSessionId = generateSessionIdForTest(context);
 
       // return new Promise<void>((done) => {
       const response = await supertest(app)
@@ -58,55 +62,51 @@ describe('assignUserIdToRequestSessionHandler', () => {
       expect(response.statusCode).toEqual(401);
     });
 
-  test('Should set and save the userId on the request session when data in store has no userId.', async () => {
-    const endValidator = (
-      req: SystemHttpRequestType,
-      _res: express.Response,
-      next: NextFunction
-    ) => {
-      expect(req.session.userId).not.toBeUndefined();
-      next();
-    };
-    const { app, memoryStore } = appWithMiddleware([
-      handleSessionDataRetrieval,
-      handleCopySessionStoreDataToSession,
-    ],
-    [endValidator]);
-    const testSessionData: UserSessionData = {
-      // TODO: Stored data doesn't need to store cookie.
-      cookie: new Cookie(),
-      email: 'test-email',
-      newId: false,
-      userId: 'some-user-id'!,
-    };
-    const testSessionId = 'test-session-4321';
-    addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
-    memoryStore.set(testSessionId, testSessionData);
+  test('Should set and save the userId on the request session when data in store has no userId.',
+    async (context: TaskContext) => {
+      const endValidator = (
+        req: SystemHttpRequestType,
+        _res: express.Response,
+        next: NextFunction
+      ) => {
+        expect(req.session.userId).not.toBeUndefined();
+        next();
+      };
+      const { app, memoryStore } = appWithMiddleware([
+        handleSessionDataRetrieval,
+        handleCopySessionStoreDataToSession,
+      ],
+      [endValidator]);
+      const testSessionData: UserSessionData = mockSession();
+      const testSessionId = generateSessionIdForTest(context);
+      memoryStore.set(testSessionId, testSessionData);
 
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(200);
-    expect(response.statusCode).toEqual(200);
-  });
+      const response = await supertest(app)
+        .get('/')
+        .set(SESSION_ID_HEADER_KEY, testSessionId)
+        .set('Content-Type', 'application/json')
+        .expect(200);
+      expect(response.statusCode).toEqual(200);
+    });
 
   test(
     'Should set and save the userId on the session when no userId set but data in store has a userId.',
-    async () => {
+    async (context: TaskContext) => {
+      const testSessionData: UserSessionData = mockSession();
+      const testUserId = testSessionData.userId;
       const endValidator = (
         req: SystemHttpRequestType,
-        _response: express.Response,
+        response: express.Response,
         next: NextFunction
       ) => {
-        if (req.session.userId !== 'test-user-id') {
-          next(new Error(`userId not set correctly: ${req.session.userId} != 'test-user-id'`));
+        if (req.session.userId !== testUserId) {
+          response.status(500);
+          next(new Error(`userId not set correctly: ${req.session.userId} != '${testUserId}'`));
         } else {
           next();
         }
       };
-      const testSessionId = 'test-session-4321';
-      addIgnoredLog(/^Assigned a new userId (.*) to session test-session-4321$/);
+      const testSessionId = generateSessionIdForTest(context);
 
       // handleCopySessionStoreDataToSession must be called first and is responsible for assigment
       // of the data from the store to session
@@ -114,13 +114,6 @@ describe('assignUserIdToRequestSessionHandler', () => {
         handleSessionDataRetrieval,
         handleCopySessionStoreDataToSession,
       ], [endValidator]);
-      const testSessionData: UserSessionData = {
-        // TODO: Stored data doesn't need to store cookie.
-        cookie: new Cookie(),
-        email: 'test-email',
-        newId: false,
-        userId: 'test-user-id',
-      };
       memoryStore.set(testSessionId, testSessionData);
 
       return supertest(app)

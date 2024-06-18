@@ -7,4 +7,5 @@ export interface SystemResponseLocals<
   calledHandlers?: HandlerName[];
   retrievedSessionData?: SD | undefined;
   skipHandlerDependencyChecks?: boolean;
+  sendAuthenticationResult?: boolean;
 }

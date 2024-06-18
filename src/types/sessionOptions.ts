@@ -1,5 +1,7 @@
+import { IdNamespace } from "../types.js";
 import expressSession from "express-session";
 
+type Path = string;
 export interface UserSessionOptions extends expressSession.SessionOptions {
   // Return a 401 if the session id is not recognized in store
   rejectUnrecognizedSessionId?: boolean | undefined;
@@ -18,4 +20,10 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
 
   // Don't bind the /login and /logout endpoints
   disableLoginEndpoints?: boolean | undefined;
+
+  userIdNamespace?: IdNamespace | undefined;
+
+  logoutPath?: Path;
+  loginPath?: Path;
+  sessionPath?: Path;
 }

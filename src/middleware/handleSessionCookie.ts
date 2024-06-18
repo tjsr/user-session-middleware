@@ -5,18 +5,17 @@ import {
   UserSessionMiddlewareRequestHandler
 } from "../types/middlewareHandlerTypes.js";
 
+import { NextFunction } from "../express/index.js";
 import { SessionIDNotGeneratedError } from '../errors/errorClasses.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { SystemHttpResponseType } from "../types/response.js";
+import { SystemHttpRequestType } from "../types/request.js";
 import { addCalledHandler } from "./handlerChainLog.js";
-import express from "express";
 import { setSessionCookie } from './setSessionCookie.js';
 
 export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
 (
-  request,
+  request: SystemHttpRequestType,
   response,
-  next: express.NextFunction
+  next: NextFunction
 ) => {
   addCalledHandler(response, handleSessionCookie.name);
   if (request.sessionID === undefined) {
@@ -25,7 +24,7 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
     next(err);
     return;
   }
-  setSessionCookie(request as SystemHttpRequestType, response);
+  setSessionCookie(request, response);
   request.session.save((err) => {
     if (err) {
       console.error(handleSessionCookie, 'Error saving session in handleSessionCookie', err);
@@ -37,22 +36,19 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
   });
 };
 
-// TODO: Fix type param compatibility.
 export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
 (
   error: Error,
   request,
   response,
-  nextErrorHandler: express.NextFunction
+  nextErrorHandler: NextFunction
 ):void => {
-  // TODO: Fix forced type here
-  addCalledHandler(response as SystemHttpResponseType, handleSessionCookieOnError.name);
+  addCalledHandler(response, handleSessionCookieOnError.name);
   if (request.sessionID === undefined) {
     console.error(handleSessionCookieOnError,
       'No sessionID on request when setting cookie in cookie error handler.  Something is wrong here.');
   } else {
-    // TODO: Remove need to cast here.
-    setSessionCookie(request as express.Request, response as express.Response);
+    setSessionCookie(request, response);
   }
   request.session.save((saveErr) => {
     if (saveErr) {
@@ -60,7 +56,7 @@ export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
       nextErrorHandler(saveErr);
       return;
     }
-    console.log(handleSessionCookieOnError, `Saved session ${request.sessionID} set in error handler.`);
+    console.error(handleSessionCookieOnError, `Saved session ${request.sessionID} set in error handler.`, error);
     nextErrorHandler(error);
   });
 };

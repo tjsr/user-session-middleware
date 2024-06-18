@@ -1,7 +1,5 @@
 import * as expressSession from 'express-session';
 
-import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
-
 import { IncomingHttpHeaders } from 'http';
 import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
@@ -9,6 +7,7 @@ import { UserSessionData } from './types/session.js';
 import { UserSessionOptions } from './types/sessionOptions.js';
 import { loadEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
+import { v4 as uuidv4 } from 'uuid';
 
 const memoryStore = new session.MemoryStore();
 
@@ -17,7 +16,7 @@ const IN_PROD = process.env['NODE_ENV'] === 'production';
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
 export const SESSION_ID_HEADER_KEY = 'x-session-id';
-const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
+export const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
 
 const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
   const headers: IncomingHttpHeaders = req.headers;
@@ -34,10 +33,6 @@ const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): Se
   const cookies = req.cookies;
   const cookieValue = cookies?.sessionId === 'undefined' ? undefined : cookies?.sessionId;
   return cookieValue;
-};
-
-export const generateNewSessionId = (sessionSecret = SESSION_SECRET): SessionId => {
-  return uuidv5(uuidv4(), sessionSecret);
 };
 
 export const sessionIdFromRequest = <

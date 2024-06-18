@@ -22,9 +22,10 @@ export const createRandomUserId = (): UserId => {
 };
 
 export const getUserIdFromRequest = async <SD extends UserSessionData = UserSessionData>(
-  request: SystemHttpRequestType<SD>
+  request: SystemHttpRequestType<SD>,
+  noCreate = false
 ): Promise<UserId|undefined> => {
-  return getUserIdFromSession(request.session);
+  return getUserIdFromSession(request.session, noCreate);
 };
 
 export const getUserIdFromSession = async <SD extends UserSessionData = UserSessionData>(

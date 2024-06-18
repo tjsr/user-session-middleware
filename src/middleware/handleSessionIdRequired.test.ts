@@ -5,7 +5,7 @@ import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError
 
 import { Express } from "../express/index.js";
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
-import { appWithMiddleware } from "../testUtils.js";
+import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import { handleSessionIdRequired } from "./handleSessionId.js";
 import supertest from 'supertest';
 
