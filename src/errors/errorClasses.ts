@@ -140,15 +140,27 @@ export class SessionSaveError extends SessionHandlerError {
 }
 
 export class LogoutFailedError extends SessionHandlerError {
-  constructor(message: string|undefined, cause: unknown) {
-    super(LOGOUT_FAILED_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
-      message ?? 'Error logging out.', cause);
+  constructor(code: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR,
+    message: string = 'Error logging out.', cause?: unknown) {
+    super(LOGOUT_FAILED_ERROR, code, message, cause);
   }
 }
 
 export class SessionUserInfoError extends SessionHandlerError {
-  constructor(message: string) {
-    super(ERROR_SESSION_VALUES_MISSING, HttpStatusCode.UNAUTHORIZED,
+  constructor(message: string, code: HttpStatusCode = HttpStatusCode.UNAUTHORIZED) {
+    super(ERROR_SESSION_VALUES_MISSING, code,
       message);
+  }
+}
+
+export class NotLoggedInError extends LogoutFailedError {
+  constructor(code: HttpStatusCode = HttpStatusCode.UNAUTHORIZED, message = 'Not logged in.') {
+    super(code, message);
+  }
+}
+
+export class AlreadyLoggedOutError extends NotLoggedInError {
+  constructor(message = 'Already logged out.') {
+    super(HttpStatusCode.UNAUTHORIZED, message);
   }
 }

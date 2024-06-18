@@ -8,8 +8,8 @@ import session from 'express-session';
 declare module "express" {
   interface Request {
     session: session.Session & UserSessionData;
-    // session: session.Session & Partial<UserSessionData>;
-    // session: session.Session & Partial<UserSessionData>;
+    newSessionIdGenerated?: boolean;
+    regenerateSessionId?: boolean;
   }
   
   interface Response {

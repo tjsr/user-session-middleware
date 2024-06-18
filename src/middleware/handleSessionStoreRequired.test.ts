@@ -1,4 +1,3 @@
-import { SESSION_ID_HEADER_KEY, generateNewSessionId } from "../getSession.js";
 import {
   SessionDataTestContext,
   createContextForSessionTest,
@@ -9,9 +8,11 @@ import { handleSessionCookie, handleSessionCookieOnError } from "./handleSession
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
 import { MemoryStore } from "express-session";
+import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { SessionStoreNotConfiguredError } from "../errors/errorClasses.js";
 import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import { expectResponseSetsSessionIdCookie } from "../utils/expectations.js";
+import { generateNewSessionId } from '../session/sessionId.js';
 import { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
 import { sessionlessAppWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
 import supertest from 'supertest';

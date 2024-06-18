@@ -126,6 +126,16 @@ export const createTestRequestSessionData = (
   const { request, response } = mocks;
   context.testRequestData['newSessionIdGenerated'] = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
+    context.memoryStore?.get(mockRequestData.sessionID, (err, data) => {
+      if (err) {
+        console.error(err);
+      }
+      if (data) {
+        console.warn(createTestRequestSessionData,
+          'createTestRequestSessionData overwrote existing sessionID data in memory store.',
+          mockRequestData.sessionID);
+      }
+    });
     context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
   }
   if (!testRunOptions.skipCreateSession) {
@@ -163,7 +173,9 @@ export const createContextForSessionTest = (
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
   const cookie = new Cookie();
-  context.memoryStore = new MemoryStore();
+  if (!context.memoryStore) {
+    context.memoryStore = new MemoryStore();
+  }
   context.memoryStore?.set('some-session-id', {
     cookie,
   } as SessionData);
@@ -177,9 +189,10 @@ export const createContextForSessionTest = (
 
   context.testSessionStoreData = {
     cookie,
-    email: sessionStoreDefaults.email !== undefined ? sessionStoreDefaults.email : "test-email",
+    email: sessionStoreDefaults.email ?? "test-email",
+    hasLoggedOut: sessionStoreDefaults.hasLoggedOut ?? false,
     newId: undefined,
-    userId: sessionStoreDefaults.userId !== undefined ? sessionStoreDefaults.userId : 'test-user-id',
+    userId: sessionStoreDefaults.userId ?? 'test-user-id',
   };
 };
 

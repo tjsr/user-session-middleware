@@ -1,25 +1,50 @@
+import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/errorClasses.js';
 import {
-  NIL_UUID,
   SessionDataTestContext,
   createContextForSessionTest,
+  createMockPromisePair,
   createTestRequestSessionData,
 } from '../testUtils.js';
 import { beforeEach, describe, expect, test } from 'vitest';
+import { checkLogout, logout } from './logout.js';
 
-import { createUserIdFromEmail } from '../auth/user.js';
-import { logout } from './logout.js';
-import { setUserIdNamespace } from '../auth/userNamespace.js';
-import { v5 } from 'uuid';
+import { generateSessionIdForTest } from '../utils/testIdUtils.js';
+import { setUserIdNamespaceForTest } from '../utils/testNamespaceUtils.js';
 
 describe('logout', () => {
-  const TEST_USER_EMAIL = 'test@example.com';
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
-  test.todo('Should return a 403 when a user is not currently logged in.', async (context: SessionDataTestContext) => {
-    const TEST_UUID_NAMESPACE = v5('logout.200ok', NIL_UUID);
-    setUserIdNamespace(TEST_UUID_NAMESPACE);
-    const { next, request, response, spies } = createTestRequestSessionData(context, {
-      sessionID: 'test-session-id',
+  test('Should call session.save with a HTTP 200 result if we currently have a user.',
+    async (context: SessionDataTestContext) => {
+      setUserIdNamespaceForTest(context);
+      const sessionId = generateSessionIdForTest(context);
+      const { next, request, response } = createTestRequestSessionData(context, {
+        sessionID: sessionId,
+      }, {
+        spyOnSave: true,
+      });
+
+      expect(request.session).toBeDefined();
+      
+      const [nextPromise, nextMock] = createMockPromisePair(next);
+      logout(request, response, nextMock);
+      await nextPromise;
+  
+      expect(request.session.save).toHaveBeenCalled();
+      expect(response.status).not.toHaveBeenCalled();
+      expect(nextMock).toHaveBeenCalledWith(); 
+    });
+}); 
+
+describe('checkLogout', () => {
+  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
+
+  test('Should return a 401 when a user is not currently logged in.', async (context: SessionDataTestContext) => {
+    setUserIdNamespaceForTest(context);
+    const sessionId = generateSessionIdForTest(context);
+
+    const { next, request, response } = createTestRequestSessionData(context, {
+      sessionID: sessionId,
     }, {
       overrideSessionData: {
         email: undefined,
@@ -29,36 +54,35 @@ describe('logout', () => {
     });
 
     expect(request.session).toBeDefined();
-    const saveMock = spies?.get(request.session.save);
-    
-    await logout(request, response, next);
-    expect(saveMock).not.toHaveBeenCalled();
-    expect(response.status).not.toHaveBeenCalledWith(200);
-    expect(next).toHaveBeenCalledWith();
 
+    const [nextPromise, nextMock] = createMockPromisePair(next);
+    checkLogout(request, response, nextMock);
+    await nextPromise;
+
+    expect(nextMock).toHaveBeenCalledWith(expect.any(NotLoggedInError));
+    expect(response.status).not.toHaveBeenCalled();
+    expect(request.session.save).not.toHaveBeenCalled();
   });
 
-  test('Should call session.save with a HTTP 200 result if we currently have a user.',
+  test('Should refuse to log out again and return 401 if the session is already written with hasLoggedOut=true',
     async (context: SessionDataTestContext) => {
-      const TEST_UUID_NAMESPACE = v5('logout.200ok', NIL_UUID);
-      setUserIdNamespace(TEST_UUID_NAMESPACE);
-      const { next, request, response, spies } = createTestRequestSessionData(context, {
-        sessionID: 'test-session-id',
+      setUserIdNamespaceForTest(context);
+      const sessionId = generateSessionIdForTest(context);
+      
+      context.testSessionStoreData.hasLoggedOut = true;
+
+      const { next, request, response } = createTestRequestSessionData(context, {
+        sessionID: sessionId,
       }, {
-        overrideSessionData: {
-          email: TEST_USER_EMAIL,
-          userId: createUserIdFromEmail(TEST_USER_EMAIL),
-        },
-        spyOnSave: true,
+        silentCallHandlers: false,
+        skipAddToStore: true,
       });
 
-      expect(request.session).toBeDefined();
-      const saveMock = spies?.get(request.session.save);
-      
-      await logout(request, response, next);
-      expect(saveMock).toHaveBeenCalled();
-      expect(response.status).toHaveBeenCalledWith(200);
-      expect(next).toHaveBeenCalledWith();
-    });
-}); 
+      const [nextPromise, nextMock] = createMockPromisePair(next);
+      checkLogout(request, response, nextMock);
+      await nextPromise;
 
+      expect(response.status).not.toHaveBeenCalled();
+      expect(nextMock).toHaveBeenCalledWith(expect.any(AlreadyLoggedOutError));
+    });
+});

@@ -11,6 +11,7 @@ declare module "express-session" {
     userId: UserId;
     email: EmailAddress;
     newId: boolean | undefined;
+    hasLoggedOut: boolean;
   }
   
   // interface Session extends Partial<SessionData> {}

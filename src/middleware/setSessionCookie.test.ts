@@ -1,18 +1,9 @@
-import { COOKIE_WITH_HEADER, setSessionCookie } from "./setSessionCookie.js";
 import { describe, expect, test } from "vitest";
 
 import { createTestRequestSessionData } from "../testUtils.js";
-import express from "express";
-import { generateNewSessionId } from "../getSession.js";
-
-export const expectSetSessionCookie = (response: express.Response, sessionID: string) => {
-  if (COOKIE_WITH_HEADER) {
-    // expect(response.get('Set-Cookie')).toEqual(`sessionId=${sessionID}`);
-    expect(response.set).toBeCalledWith('Set-Cookie', `sessionId=${sessionID}; Path=/; HttpOnly; SameSite=Strict`);
-  } else {
-    expect(response.cookie).toBeCalledWith('sessionId', sessionID, { httpOnly: true, path: '/', strict: true });
-  }
-};
+import { expectSetSessionCookieOnResponseMock } from "../utils/testing/cookieTestUtils.js";
+import { generateNewSessionId } from '../session/sessionId.js';
+import { setSessionCookie } from "./setSessionCookie.js";
 
 describe('setSessionCookie', () => {
   test('Should set the session cookie to the session ID.', (context) => {
@@ -24,7 +15,7 @@ describe('setSessionCookie', () => {
 
     setSessionCookie(request, response);
 
-    expectSetSessionCookie(response, expectedSessionId);
+    expectSetSessionCookieOnResponseMock(response, expectedSessionId);
   });
   
   test('Should throw an error if the session has not been created', (context) => {

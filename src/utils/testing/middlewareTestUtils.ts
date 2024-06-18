@@ -4,8 +4,10 @@ import express, { ErrorRequestHandler, Express, RequestHandler } from "../../exp
 import { HttpStatusCode } from '../../httpStatusCodes.js';
 import { MemoryStore } from "../../express-session/index.js";
 import { MiddlewareTypes } from '../../testUtils.js';
+import { UserSessionOptions } from '../../types/sessionOptions.js';
 import { expressSessionHandlerMiddleware } from '../../getSession.js';
 import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
+import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
 
 export const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
   app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
@@ -51,4 +53,12 @@ export const appWithMiddleware = (
   addHandlersToApp(app, middleware, endMiddleware);
 
   return { app, memoryStore };
+};
+
+export const testableApp = (
+  options?: Partial<UserSessionOptions>
+) => {
+  const app: Express = express();
+  useUserSessionMiddleware(app, options);
+  return app;
 };

@@ -1,3 +1,4 @@
+import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import {
   handleCopySessionStoreDataToSession,
@@ -20,8 +21,8 @@ import {
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
 import { handleLocalsCreation } from "./middleware/handleLocalsCreation.js";
+import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
 import { login } from "./api/login.js";
-import { logout } from "./api/logout.js";
 import { session } from './api/session.js';
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
@@ -34,11 +35,12 @@ export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessi
     // handle /session to generate a new sessionId before anything else.
     expressSessionHandlerMiddleware(expressSessionOptions),
     handleLocalsCreation,
-    handleSessionIdRequired as express.RequestHandler,
-    handleSessionWithNewlyGeneratedId as express.RequestHandler,
-    handleSessionDataRetrieval as express.RequestHandler,
-    handleNewSessionWithNoSessionData as express.RequestHandler,
-    handleExistingSessionWithNoSessionData as express.RequestHandler,
+    handleSessionIdRequired,
+    handleSessionWithNewlyGeneratedId,
+    handleSessionDataRetrieval,
+    handleNewSessionWithNoSessionData,
+    handleExistingSessionWithNoSessionData,
+    handleCopySessionStoreDataToSession,
   ];
 };
 
@@ -46,13 +48,15 @@ export const sessionUserRouteHandlers = (app: express.Express,
   sessionOptions?: Partial<UserSessionOptions> | undefined): void => {
   // Handle login, logout before we send back a cookie
   if (!sessionOptions?.disableSessionRefresh) {
-    app.get('/session', session);
+    app.get(sessionOptions?.sessionPath ?? '/session', session);
   }
   if (!sessionOptions?.disableLoginEndpoints) {
-    app.get('/login', login);
-    app.post('/login', login);
-    app.get('/logout', logout);
-    app.post('/logout', logout);
+    app.get(sessionOptions?.loginPath ?? '/login', login);
+    app.post(sessionOptions?.loginPath ?? '/login', login);
+    app.get(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,
+      regenerateAfterLogout, regenerateAfterLogoutError);
+    app.post(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,
+      regenerateAfterLogout, regenerateAfterLogoutError);
   }
 };
 
@@ -60,13 +64,11 @@ export const postLoginUserSessionMiddleware = (): (
   RequestHandler | ErrorRequestHandler
 )[] => {
   return [
-    handleSessionCookie as express.RequestHandler,
-    // TODO: Fix correct type.
-    handleSessionCookieOnError as ErrorRequestHandler,
-    handleCopySessionStoreDataToSession as express.RequestHandler,
-    handleSessionIdAfterDataRetrieval as express.RequestHandler,
-    handleAssignUserIdToRequestSessionWhenNoExistingSessionData as express.RequestHandler,
-    // TODO: Fix correct type.
-    sessionErrorHandler as ErrorRequestHandler,
+    handleSessionCookie,
+    handleSessionCookieOnError,
+    handleSessionIdAfterDataRetrieval,
+    handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+    handleSessionUserBodyResults,
+    sessionErrorHandler,
   ];
 };

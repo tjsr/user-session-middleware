@@ -1,4 +1,4 @@
-import { IdNamespace, UserId } from '../types.js';
+import { IdNamespace, SessionId, UserId } from '../types.js';
 
 import { TaskContext } from 'vitest';
 import { createTestRunNamespace } from './testNamespaceUtils.js';
@@ -31,8 +31,18 @@ export const createTestObjectId = (suite: string): string => {
   return generateTestIdString(suite, 'o', 1000);
 };
 
+/*
+ * @deprecated
+ */
 export const createTestSessionId = (suite: string): string => {
   return generateTestIdString(suite, 'o', 1000);
+};
+
+export const generateSessionIdForTest = (context: TaskContext, sessionPrefix?: string): string => {
+  const taskNamespace: IdNamespace = createTestRunNamespace(context.task.name);
+
+  const sessionIdForTask: SessionId = v5((sessionPrefix ? sessionPrefix + '-' : '') + context.task.name, taskNamespace);
+  return sessionIdForTask;
 };
 
 export const generateUserIdForTest = (context: TaskContext, userPrefix?: string): UserId => {

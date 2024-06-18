@@ -1,12 +1,15 @@
+import { Cookie, MemoryStore, Session, Store } from './express-session/index.js';
 import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
-import expressSession, { Cookie, Session, Store } from 'express-session';
 
+import { SessionDataTestContext } from "./testUtils.js";
 import { SystemHttpRequestType } from "./types/request.js";
 import { UserSessionData } from "./types/session.js";
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import { getMockReq } from "vitest-mock-express";
+import { mockSession } from "./utils/testing/mocks.js";
 import { saveSessionDataToSession } from './store/loadData.js';
+import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {
@@ -139,15 +142,11 @@ describe('saveSessionDataToSession', () => {
     return session;
   };
   
-  beforeEach(() => {
-    testSessionData = {
-      cookie: new Cookie(),
-      email: 'existing-email',
-      newId: undefined,
-      userId: 'existing-user-id',
-    };
+  beforeEach((context: SessionDataTestContext) => {
+    setUserIdNamespaceForTest(context);
+    testSessionData = mockSession();
 
-    memoryStore = new expressSession.MemoryStore();
+    memoryStore = new MemoryStore();
     memoryStore.set('some-session-id', {
       cookie: new Cookie(),
     } as UserSessionData);
