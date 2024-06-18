@@ -11,12 +11,11 @@ import {
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
 import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+import express, { NextFunction } from '../express/index.js';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { UserId } from '../types.js';
 import { UserSessionData } from '../types/session.js';
-import express from 'express';
 import { getUserIdFromRequest } from '../auth/user.js';
 import { handleCopySessionStoreDataToSession } from '../middleware/storedSessionData.js';
 import { handleLocalsCreation } from '../middleware/handleLocalsCreation.js';
@@ -93,33 +92,20 @@ export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> =
     }
   };
 
+
 export const regenerateAfterLogout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   request: SystemHttpRequestType,
   response,
-  next
+  next: NextFunction
 ) => {
-  addCalledHandler(response, regenerateAfterLogout.name);
-  verifyPrerequisiteHandler(response, checkLogout.name);
-  verifyPrerequisiteHandler(response, logout.name);
-
-  request.regenerateSessionId = true;
-  request.session.regenerate((err) => {
-    if (err) {
-      const regenError = new RegeneratingSessionIdError(err);
-      console.error(regenerateAfterLogout, 'Error regenerating session', err);
-      response.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
-      return next(regenError);
-    }
-    console.debug(regenerateAfterLogout, 'Regenerated session');
-    next();
-  });
+  regenerateAfterLogoutError(undefined, request, response, next);
 };
 
 export const regenerateAfterLogoutError: UserSessionMiddlewareErrorHandler<UserSessionData> = (
   error,
   request: SystemHttpRequestType,
   response,
-  nextErrorHandler
+  next: NextFunction
 ): void => {
   addCalledHandler(response, regenerateAfterLogoutError.name);
   verifyPrerequisiteHandler(response, checkLogout.name);
@@ -130,10 +116,13 @@ export const regenerateAfterLogoutError: UserSessionMiddlewareErrorHandler<UserS
     if (err) {
       const regenError = new RegeneratingSessionIdError(err);
       console.error(regenerateAfterLogoutError, 'Error regenerating session', err);
-      response.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
-      return nextErrorHandler(regenError);
+      return next(regenError);
     }
     console.debug(regenerateAfterLogoutError, 'Regenerated session');
-    nextErrorHandler(error);
+    if (error) {
+      next(error);
+    } else {
+      next();
+    }
   });
 };
