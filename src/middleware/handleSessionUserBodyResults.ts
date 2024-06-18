@@ -15,6 +15,8 @@ export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler =
     console.debug(handleSessionUserBodyResults, 'Sending body to client, no further headers allowed.');
     response.send(result);
   }
-  console.log('handleSessionUserBodyResults', request.body);
+  if (request.body) {
+    console.log('handleSessionUserBodyResults', request.body);
+  }
   next();
 };
