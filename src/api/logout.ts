@@ -17,7 +17,7 @@ import { SystemHttpRequestType } from '../types/request.js';
 import { UserId } from '../types.js';
 import { UserSessionData } from '../types/session.js';
 import { getUserIdFromRequest } from '../auth/user.js';
-import { handleCopySessionStoreDataToSession } from '../middleware/storedSessionData.js';
+import { handleCopySessionStoreDataToSession } from '../middleware/handlers/handleCopySessionStoreDataToSession.js';
 import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
 import { saveSessionPromise } from '../sessionUser.js';
 

@@ -7,9 +7,7 @@ import {
 } from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
-import {
-  handleCopySessionStoreDataToSession,
-} from "./middleware/storedSessionData.js";
+import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
 import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
