@@ -3,7 +3,6 @@ import express, { ErrorRequestHandler, RequestHandler } from "express";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
 import {
   handleSessionIdAfterDataRetrieval,
-  handleSessionIdRequired,
   handleSessionWithNewlyGeneratedId
 } from "./middleware/handleSessionId.js";
 
@@ -23,6 +22,7 @@ import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
+import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRequired.js";
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
 import { login } from "./api/login.js";

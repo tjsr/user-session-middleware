@@ -14,7 +14,7 @@ import {
   handleNewSessionWithNoSessionData
 } from "../handleSessionWithNoData.js";
 import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
-import { handleSessionIdRequired } from "../handleSessionId.js";
+import { handleSessionIdRequired } from "./handleSessionIdRequired.js";
 import supertest from 'supertest';
 
 describe('spec.handleSessionCookie', () => {
