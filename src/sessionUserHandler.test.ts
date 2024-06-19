@@ -12,8 +12,8 @@ import { UserSessionData } from "./types/session.js";
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from "./utils/testIdUtils.js";
 import {
-  handleExistingSessionWithNoSessionData,
-} from "./middleware/handleSessionWithNoData.js";
+  handleExistingSessionWithNoSessionData
+} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import { mockSession } from "./utils/testing/mocks.js";
 import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
 import supertest from 'supertest';

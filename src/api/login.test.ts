@@ -21,7 +21,7 @@ describe('login', () => {
 
   test.todo('Should not call session.save with a valid user', () => {
     // This would be done by the end session handler.
-
+    
   });
 
   test.todo('Should not call res.cookie with a valid user', () => {

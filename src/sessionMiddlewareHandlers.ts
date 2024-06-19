@@ -4,10 +4,6 @@ import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval,
 } from "./middleware/storedSessionData.js";
-import {
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData
-} from './middleware/handleSessionWithNoData.js';
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handleSessionCookie.js";
 import {
   handleSessionIdAfterDataRetrieval,
@@ -20,7 +16,13 @@ import {
 } from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
+import {
+  handleExistingSessionWithNoSessionData
+} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import { handleLocalsCreation } from "./middleware/handleLocalsCreation.js";
+import {
+  handleNewSessionWithNoSessionData
+} from './middleware/handleSessionWithNoData.js';
 import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
 import { login } from "./api/login.js";
 import { session } from './api/session.js';

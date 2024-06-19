@@ -3,10 +3,6 @@
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import express, { NextFunction } from "express";
 import {
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData
-} from './handleSessionWithNoData.js';
-import {
   requireSessionIdGenerated,
   requireSessionIdWhenNewSessionIdGenerated,
   requireSessionInitialized,
@@ -17,6 +13,10 @@ import { SystemHttpResponseType } from '../types/response.js';
 import {
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
+import { handleExistingSessionWithNoSessionData } from './handlers/handleExistingSessionWithNoSessionData.js';
+import {
+  handleNewSessionWithNoSessionData
+} from './handleSessionWithNoData.js';
 
 export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler = 
 // <
