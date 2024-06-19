@@ -35,7 +35,7 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler = (
     if (genericSessionData) {
       console.log(handleSessionDataRetrieval, `Successfully retrieved session ${request.sessionID} data from store.`);
       // TODO: Fix typings here, Cookie gets returned from store retrieval .get() method.
-      response.locals.retrievedSessionData = genericSessionData as unknown as any;
+      response.locals.retrievedSessionData = genericSessionData;
     }
     next();
   }).catch((err) => {
