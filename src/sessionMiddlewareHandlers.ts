@@ -23,6 +23,7 @@ import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
+import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
 import { login } from "./api/login.js";
 import { session } from './api/session.js';
@@ -37,6 +38,7 @@ export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessi
     // handle /session to generate a new sessionId before anything else.
     expressSessionHandlerMiddleware(expressSessionOptions),
     handleLocalsCreation,
+    handleSessionStoreRequired,
     handleSessionIdRequired,
     handleSessionWithNewlyGeneratedId,
     handleSessionDataRetrieval,
