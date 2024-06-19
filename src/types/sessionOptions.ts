@@ -21,6 +21,7 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
   // Don't bind the /login and /logout endpoints
   disableLoginEndpoints?: boolean | undefined;
 
+  // The UUID namespace to separate out generated User IDs to ensure unuqieness across systems.
   userIdNamespace?: IdNamespace | undefined;
 
   logoutPath?: Path;
