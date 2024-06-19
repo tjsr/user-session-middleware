@@ -7,9 +7,7 @@ import { SystemHttpRequestType } from "./types/request.js";
 import { UserSessionData } from "./types/session.js";
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from "./utils/testIdUtils.js";
-import {
-  handleCopySessionStoreDataToSession
-} from './middleware/storedSessionData.js';
+import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
 import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';

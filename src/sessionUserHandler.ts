@@ -6,9 +6,7 @@ import { UserSessionData } from "./types/session.js";
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
-import {
-  handleCopySessionStoreDataToSession,
-} from "./middleware/storedSessionData.js";
+import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
 import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
