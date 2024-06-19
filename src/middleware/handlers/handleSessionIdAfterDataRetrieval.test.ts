@@ -3,7 +3,7 @@ import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError
 
 import { RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 import { forceHandlerAssertions } from "./handlerChainLog.js";
-import { handleSessionIdAfterDataRetrieval } from "./handleSessionId.js";
+import { handleSessionIdAfterDataRetrieval } from "./handlers/handleSessionIdAfterDataRetrieval.js";
 
 describe('chain.handleSessionIdAfterDataRetrieval', () => {
   test('Should call to error handler when sessionID is not set.', () => {
