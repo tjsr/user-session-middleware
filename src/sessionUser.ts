@@ -1,17 +1,16 @@
 import {
-  RequestSessionIdRequiredError,
-  SaveSessionError,
-  SessionDataNotFoundError,
-  SessionIDValueMismatch,
-  SessionIdRequiredError,
-  SessionIdTypeError
+  SaveSessionError
 } from './errors/errorClasses.js';
-
 import { Session } from 'express-session';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
 import { getSnowflake } from './snowflake.js';
 import { getUserIdNamespace } from './auth/userNamespace.js';
+import { requireRequestSessionId } from './session/sessionChecks.js';
+import { requireSessionIDValuesMatch } from './session/sessionChecks.js';
+import { requireSessionId } from './session/sessionChecks.js';
+import { requireSessionInitialized } from './session/sessionChecks.js';
+import { requireSessionIsIsString } from './session/sessionChecks.js';
 import { uuid5 } from './types.js';
 import { v5 as uuidv5 } from 'uuid';
 
@@ -48,40 +47,6 @@ export const assignUserIdToSession = async <ApplicationDataType extends UserSess
     } catch (err) {
       throw new SaveSessionError(`Error saving session ${session.id} data to store.`, err);
     }
-  }
-};
-
-const requireSessionIsIsString = (session: Session) => {
-  if (typeof session.id !== 'string') {
-    throw new SessionIdTypeError(
-      `Session ID defined on session is not a uuid (${typeof session.id}) when assigning userId.`);
-  }
-};
-
-const requireSessionId = (session: Session) => {
-  if (!session.id) {
-    throw new SessionIdRequiredError('Session ID is not defined on session when assigning userId to session.');
-  }
-};
-
-const requireRequestSessionId = (sessionID: string|undefined) => {
-  if (!sessionID) {
-    throw new RequestSessionIdRequiredError('Request sessionID is not defined when assigning userId to session.');
-  }
-};
-
-const requireSessionInitialized = (session: Session) => {
-  if (!session) {
-    throw new SessionDataNotFoundError('Session is not defined when assigning userId to session.');
-  }
-};
-
-const requireSessionIDValuesMatch = (
-  sessionID: string,
-  sessionIDFromSession: string
-) => {
-  if (sessionID !== sessionIDFromSession) {
-    throw new SessionIDValueMismatch(sessionID, sessionIDFromSession);
   }
 };
 
