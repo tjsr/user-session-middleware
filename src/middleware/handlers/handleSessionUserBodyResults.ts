@@ -1,7 +1,7 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
+import { addCalledHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
 
-import { AuthenticationRestResult } from "../types/apiResults.js";
-import { UserSessionMiddlewareRequestHandler } from "../types/middlewareHandlerTypes.js";
+import { AuthenticationRestResult } from "../../types/apiResults.js";
+import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
 import { handleLocalsCreation } from "./handleLocalsCreation.js";
 
 export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler = (request, response, next) => {

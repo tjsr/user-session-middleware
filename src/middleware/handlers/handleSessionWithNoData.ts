@@ -1,13 +1,13 @@
-import * as express from '../express/index.js';
+import * as express from '../../express/index.js';
 
-import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
+import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
 
-import { SystemHttpRequestType } from "../types/request.js";
-import { SystemHttpResponseType } from '../types/response.js';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import { handleExistingSessionWithNoSessionData } from './handlers/handleExistingSessionWithNoSessionData.js';
-import { handleSessionDataRetrieval } from "./handlers/handleSessionDataRetrieval.js";
-import { saveSessionPromise } from "../sessionUser.js";
+import { SystemHttpRequestType } from "../../types/request.js";
+import { SystemHttpResponseType } from '../../types/response.js';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
+import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
+import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
+import { saveSessionPromise } from "../../sessionUser.js";
 
 export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
   RequestType extends SystemHttpRequestType,

@@ -3,7 +3,7 @@ import { addCalledHandler, verifyPrerequisiteHandler } from "../handlerChainLog.
 import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
 import express from "express";
 import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
-import { handleNewSessionWithNoSessionData } from '../handleSessionWithNoData.js';
+import { handleNewSessionWithNoSessionData } from './handleSessionWithNoData.js';
 import { requireSessionIdGenerated } from '../../errors/sessionErrorChecks.js';
 
 export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHandler =

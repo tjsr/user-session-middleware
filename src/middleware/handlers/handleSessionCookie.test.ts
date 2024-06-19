@@ -12,7 +12,7 @@ import { generateNewSessionId } from '../../session/sessionId.js';
 import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
 import {
   handleNewSessionWithNoSessionData
-} from "../handleSessionWithNoData.js";
+} from "./handleSessionWithNoData.js";
 import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
 import { handleSessionIdRequired } from "./handleSessionIdRequired.js";
 import supertest from 'supertest';

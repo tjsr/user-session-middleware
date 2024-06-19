@@ -18,7 +18,7 @@ import { UserId } from '../types.js';
 import { UserSessionData } from '../types/session.js';
 import { getUserIdFromRequest } from '../auth/user.js';
 import { handleCopySessionStoreDataToSession } from '../middleware/storedSessionData.js';
-import { handleLocalsCreation } from '../middleware/handleLocalsCreation.js';
+import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
 import { saveSessionPromise } from '../sessionUser.js';
 
 export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> =

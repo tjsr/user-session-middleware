@@ -3,7 +3,7 @@ import { requireHandlerChainCreated, requireSessionStoreConfigured } from "../..
 
 import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
 import express from "express";
-import { handleLocalsCreation } from '../handleLocalsCreation.js';
+import { handleLocalsCreation } from './handleLocalsCreation.js';
 
 export const handleSessionStoreRequired: UserSessionMiddlewareRequestHandler = (
   request,

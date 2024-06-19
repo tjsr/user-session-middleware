@@ -11,7 +11,7 @@ import { SystemHttpRequestType } from "../../types/request.js";
 import { SystemHttpResponseType } from '../../types/response.js';
 import { UserSessionData } from "../../types/session.js";
 import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
-import { handleNewSessionWithNoSessionData } from '../handleSessionWithNoData.js';
+import { handleNewSessionWithNoSessionData } from './handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
 import { regenerateSessionIdIfNoSessionData } from "../../sessionChecks.js";
 import { saveSessionPromise } from "../../sessionUser.js";
