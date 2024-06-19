@@ -1,6 +1,6 @@
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
-import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handleSessionCookie.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
 import {
   handleSessionIdAfterDataRetrieval,
   handleSessionIdRequired,

@@ -3,7 +3,7 @@ import {
   UserSessionMiddlewareRequestHandler
 } from "../types/middlewareHandlerTypes.js";
 import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { NextFunction } from "express";

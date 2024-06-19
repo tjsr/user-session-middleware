@@ -3,13 +3,13 @@
 import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
-} from "../types/middlewareHandlerTypes.js";
+} from "../../types/middlewareHandlerTypes.js";
 
-import { NextFunction } from "../express/index.js";
-import { SessionIDNotGeneratedError } from '../errors/errorClasses.js';
-import { SystemHttpRequestType } from "../types/request.js";
-import { addCalledHandler } from "./handlerChainLog.js";
-import { setSessionCookie } from './setSessionCookie.js';
+import { NextFunction } from "../../express/index.js";
+import { SessionIDNotGeneratedError } from '../../errors/errorClasses.js';
+import { SystemHttpRequestType } from "../../types/request.js";
+import { addCalledHandler } from "../handlerChainLog.js";
+import { setSessionCookie } from '../setSessionCookie.js';
 
 export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
 (

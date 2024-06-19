@@ -5,7 +5,7 @@ import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import {
   UserSessionMiddlewareErrorHandler,
 } from '../types/middlewareHandlerTypes.js';
-import { handleSessionCookieOnError } from "./handleSessionCookie.js";
+import { handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
 
 export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
 (

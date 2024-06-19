@@ -4,7 +4,7 @@ import {
   expectResponseResetsSessionIdCookie,
   expectSetCookieSessionId
 } from '../utils/expectations.js';
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
 
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
