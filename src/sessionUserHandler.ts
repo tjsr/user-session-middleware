@@ -3,10 +3,6 @@ import {
   handleCopySessionStoreDataToSession,
   handleSessionDataRetrieval,
 } from "./middleware/storedSessionData.js";
-import {
-  handleExistingSessionWithNoSessionData,
-  handleNewSessionWithNoSessionData
-} from './middleware/handleSessionWithNoData.js';
 
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from './types/response.js';
@@ -14,6 +10,10 @@ import { UserSessionData } from "./types/session.js";
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
+import { handleExistingSessionWithNoSessionData } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
+import {
+  handleNewSessionWithNoSessionData
+} from './middleware/handleSessionWithNoData.js';
 
 // TODO: This works??
 // This comes after setting data from the session store.
