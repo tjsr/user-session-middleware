@@ -21,10 +21,10 @@ export const handleExistingSessionWithNoSessionData: UserSessionMiddlewareReques
   RequestType extends SystemHttpRequestType,
   ResponseType extends SystemHttpResponseType
 >(
-  request: RequestType,
-  response: ResponseType,
-  next: express.NextFunction
-): void => {
+    request: RequestType,
+    response: ResponseType,
+    next: express.NextFunction
+  ): void => {
   addCalledHandler(response, handleExistingSessionWithNoSessionData.name);
   if (request.newSessionIdGenerated === true) {
     console.debug(handleExistingSessionWithNoSessionData, 'Skipping because new sessionID generated.');

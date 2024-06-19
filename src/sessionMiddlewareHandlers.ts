@@ -16,7 +16,9 @@ import {
 } from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
-import { handleExistingSessionWithNoSessionData } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
+import {
+  handleExistingSessionWithNoSessionData
+} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import { handleLocalsCreation } from "./middleware/handleLocalsCreation.js";
 import {
   handleNewSessionWithNoSessionData

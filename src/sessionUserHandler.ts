@@ -10,7 +10,9 @@ import { UserSessionData } from "./types/session.js";
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
-import { handleExistingSessionWithNoSessionData } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
+import {
+  handleExistingSessionWithNoSessionData
+} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
