@@ -4,7 +4,7 @@ import {
   createTestRequestSessionData
 } from "../../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
-import { handleSessionCookie, handleSessionCookieOnError } from "../handleSessionCookie.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../../middlewareTestUtils.js";
 
 import { MemoryStore } from "express-session";

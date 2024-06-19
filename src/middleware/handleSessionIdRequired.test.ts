@@ -1,6 +1,6 @@
 import { Cookie, MemoryStore, Session } from "../express-session/index.js";
 import { beforeEach, describe, expect, test } from "vitest";
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
+import { handleSessionCookie, handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
 
 import { Express } from "../express/index.js";

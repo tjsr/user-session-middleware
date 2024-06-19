@@ -3,18 +3,18 @@ import {
   expectDifferentSetCookieSessionId,
   expectResponseResetsSessionIdCookie,
   expectSetCookieSessionId
-} from '../utils/expectations.js';
+} from '../../utils/expectations.js';
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 
-import { SESSION_ID_HEADER_KEY } from "../getSession.js";
-import { appWithMiddleware } from '../utils/testing/middlewareTestUtils.js';
-import { generateNewSessionId } from '../session/sessionId.js';
-import { handleExistingSessionWithNoSessionData } from './handlers/handleExistingSessionWithNoSessionData.js';
+import { SESSION_ID_HEADER_KEY } from "../../getSession.js";
+import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
+import { generateNewSessionId } from '../../session/sessionId.js';
+import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
 import {
   handleNewSessionWithNoSessionData
-} from "./handleSessionWithNoData.js";
-import { handleSessionDataRetrieval } from "./handlers/handleSessionDataRetrieval.js";
-import { handleSessionIdRequired } from "./handleSessionId.js";
+} from "../handleSessionWithNoData.js";
+import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
+import { handleSessionIdRequired } from "../handleSessionId.js";
 import supertest from 'supertest';
 
 describe('spec.handleSessionCookie', () => {
