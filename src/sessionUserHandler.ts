@@ -1,8 +1,4 @@
 import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
-import {
-  handleCopySessionStoreDataToSession,
-  handleSessionDataRetrieval,
-} from "./middleware/storedSessionData.js";
 
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from './types/response.js';
@@ -11,11 +7,15 @@ import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTy
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
 import {
+  handleCopySessionStoreDataToSession,
+} from "./middleware/storedSessionData.js";
+import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
+import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
 
 // TODO: This works??
 // This comes after setting data from the session store.
