@@ -22,9 +22,7 @@ import { handleSessionIdAfterDataRetrieval } from "./middleware/handlers/handleS
 import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRequired.js";
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handlers/handleSessionUserBodyResults.js";
-import {
-  handleSessionWithNewlyGeneratedId
-} from "./middleware/handleSessionId.js";
+import { handleSessionWithNewlyGeneratedId } from './middleware/handlers/handleSessionWithNewlyGeneratedId.js';
 import { login } from "./api/login.js";
 import { session } from './api/session.js';
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';

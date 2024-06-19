@@ -4,13 +4,13 @@ import {
   createContextForSessionTest,
   createMockPromisePair,
   createTestRequestSessionData
-} from "../testUtils.js";
+} from "../../testUtils.js";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { SessionHandlerError } from "../errors/SessionHandlerError.js";
-import { Store } from "express-session";
-import { UserSessionData } from "../types/session.js";
-import { handleSessionWithNewlyGeneratedId } from "./handleSessionId.js";
+import { SessionHandlerError } from "../../errors/SessionHandlerError.js";
+import { Store } from "../../express-session/index.js";
+import { UserSessionData } from "../../types/session.js";
+import { handleSessionWithNewlyGeneratedId } from './handleSessionWithNewlyGeneratedId.js';
 
 declare module 'vitest' {
   export interface TestContext {
