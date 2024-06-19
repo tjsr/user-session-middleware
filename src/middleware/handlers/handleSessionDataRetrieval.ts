@@ -6,7 +6,7 @@ import { SystemHttpRequestType } from '../../types/request.js';
 import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
 import { checkNewlyGeneratedId } from '../handleSessionId.js';
 import express from "../../express/index.js";
-import { handleLocalsCreation } from "../handleLocalsCreation.js";
+import { handleLocalsCreation } from "./handleLocalsCreation.js";
 import { handleSessionIdRequired } from "./handleSessionIdRequired.js";
 import { requireSessionStoreConfigured } from '../../errors/sessionErrorChecks.js';
 import { retrieveSessionDataFromStore } from '../../store/loadData.js';

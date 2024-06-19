@@ -14,7 +14,7 @@ import {
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
 import {
   handleNewSessionWithNoSessionData
-} from './middleware/handleSessionWithNoData.js';
+} from './middleware/handlers/handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
 
 // TODO: This works??

@@ -1,5 +1,5 @@
-import { UserSessionMiddlewareRequestHandler } from "../types/middlewareHandlerTypes.js";
-import { addCalledHandler } from "./handlerChainLog.js";
+import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
+import { addCalledHandler } from "../handlerChainLog.js";
 
 export const handleLocalsCreation: UserSessionMiddlewareRequestHandler = (
   _request,

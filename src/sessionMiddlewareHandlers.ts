@@ -13,15 +13,15 @@ import {
 import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
-import { handleLocalsCreation } from "./middleware/handleLocalsCreation.js";
+import { handleLocalsCreation } from "./middleware/handlers/handleLocalsCreation.js";
 import {
   handleNewSessionWithNoSessionData
-} from './middleware/handleSessionWithNoData.js';
+} from './middleware/handlers/handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
 import { handleSessionIdAfterDataRetrieval } from "./middleware/handlers/handleSessionIdAfterDataRetrieval.js";
 import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRequired.js";
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
-import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
+import { handleSessionUserBodyResults } from "./middleware/handlers/handleSessionUserBodyResults.js";
 import {
   handleSessionWithNewlyGeneratedId
 } from "./middleware/handleSessionId.js";
