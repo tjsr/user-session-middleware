@@ -3,12 +3,12 @@ import {
   createContextForSessionTest,
   createMockPromisePair,
   createTestRequestSessionData
-} from "../testUtils.js";
+} from "../../testUtils.js";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { SessionData } from "../express-session/index.js";
-import { SessionHandlerError } from "../errors/SessionHandlerError.js";
-import { handleSessionDataRetrieval } from './storedSessionData.js';
+import { SessionData } from "../../express-session/index.js";
+import { SessionHandlerError } from "../../errors/SessionHandlerError.js";
+import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
 
 describe('handleSessionDataRetrieval', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));

@@ -13,7 +13,7 @@ import { handleExistingSessionWithNoSessionData } from './handlers/handleExistin
 import {
   handleNewSessionWithNoSessionData
 } from "./handleSessionWithNoData.js";
-import { handleSessionDataRetrieval } from "./storedSessionData.js";
+import { handleSessionDataRetrieval } from "./handlers/handleSessionDataRetrieval.js";
 import { handleSessionIdRequired } from "./handleSessionId.js";
 import supertest from 'supertest';
 

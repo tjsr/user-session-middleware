@@ -1,10 +1,6 @@
 import { TaskContext, afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { disableHandlerAssertions, forceHandlerAssertions } from "./middleware/handlerChainLog.js";
 import express, { NextFunction } from "express";
-import {
-  handleCopySessionStoreDataToSession,
-  handleSessionDataRetrieval
-} from './middleware/storedSessionData.js';
 
 import { SESSION_ID_HEADER_KEY } from "./getSession.js";
 import { SystemHttpRequestType } from "./types/request.js";
@@ -12,8 +8,12 @@ import { UserSessionData } from "./types/session.js";
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from "./utils/testIdUtils.js";
 import {
+  handleCopySessionStoreDataToSession
+} from './middleware/storedSessionData.js';
+import {
   handleExistingSessionWithNoSessionData
 } from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
+import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
 import { mockSession } from "./utils/testing/mocks.js";
 import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
 import supertest from 'supertest';

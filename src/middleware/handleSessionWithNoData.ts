@@ -6,7 +6,7 @@ import { SystemHttpRequestType } from "../types/request.js";
 import { SystemHttpResponseType } from '../types/response.js';
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
 import { handleExistingSessionWithNoSessionData } from './handlers/handleExistingSessionWithNoSessionData.js';
-import { handleSessionDataRetrieval } from "./storedSessionData.js";
+import { handleSessionDataRetrieval } from "./handlers/handleSessionDataRetrieval.js";
 import { saveSessionPromise } from "../sessionUser.js";
 
 export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
