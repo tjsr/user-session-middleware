@@ -86,6 +86,7 @@
     "express": "^4.19.2"
   },
   "overrides": {
+    "braces": ">=3.0.3",
     "mysql2": ">=3.10.0",
     "rimraf": "^5.0.7"
   },
