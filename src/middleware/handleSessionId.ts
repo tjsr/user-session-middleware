@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
 import {
-  requireSessionIdGenerated,
   requireSessionIdWhenNewSessionIdGenerated,
   requireSessionInitialized,
 } from '../errors/sessionErrorChecks.js';
@@ -12,11 +10,8 @@ import { SystemHttpResponseType } from '../types/response.js';
 import {
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
+import { addCalledHandler } from "./handlerChainLog.js";
 import express from "express";
-import { handleExistingSessionWithNoSessionData } from './handlers/handleExistingSessionWithNoSessionData.js';
-import {
-  handleNewSessionWithNoSessionData
-} from './handleSessionWithNoData.js';
 
 export const handleSessionWithNewlyGeneratedId: UserSessionMiddlewareRequestHandler =
 <
@@ -68,33 +63,3 @@ export const checkNewlyGeneratedId = (
   return false;
 };
 
-export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHandler =
-// <
-//   SessionType extends SystemSessionDataType,
-//   StoreType extends SessionStoreDataType,
-//   P = core.ParamsDictionary,
-//   ResBody = any,
-//   ReqBody = any,
-//   ReqQuery = core.Query,
-//   Locals extends SystemResponseLocals<StoreType> = SystemResponseLocals<StoreType>,
-//   RequestType extends express.Request = 
-//     SystemHttpRequestType<SessionType, StoreType, P, ResBody, ReqBody, ReqQuery, Locals>,
-//   ResponseType extends SystemHttpResponseType<StoreType, ResBody, Locals> =
-//     SystemHttpResponseType<StoreType, ResBody, Locals>
-// >
-(
-  request,
-  response,
-  next: express.NextFunction
-) => {
-  addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
-  verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
-  verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
-
-  try {
-    requireSessionIdGenerated(request.sessionID);
-    next();
-  } catch (err) {
-    next(err);
-  }
-};

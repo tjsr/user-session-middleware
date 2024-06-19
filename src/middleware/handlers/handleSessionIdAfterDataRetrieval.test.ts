@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../middlewareTestUtils.js";
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../../middlewareTestUtils.js";
 
-import { RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
-import { forceHandlerAssertions } from "./handlerChainLog.js";
-import { handleSessionIdAfterDataRetrieval } from "./handleSessionId.js";
+import { RequiredMiddlewareNotCalledError } from "../../errors/errorClasses.js";
+import { forceHandlerAssertions } from "../handlerChainLog.js";
+import { handleSessionIdAfterDataRetrieval } from "./handleSessionIdAfterDataRetrieval.js";
 
 describe('chain.handleSessionIdAfterDataRetrieval', () => {
   test('Should call to error handler when sessionID is not set.', () => {

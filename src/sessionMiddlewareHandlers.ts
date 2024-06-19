@@ -1,10 +1,6 @@
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
-import {
-  handleSessionIdAfterDataRetrieval,
-  handleSessionWithNewlyGeneratedId
-} from "./middleware/handleSessionId.js";
 
 import {
   UserSessionOptions
@@ -22,9 +18,13 @@ import {
   handleNewSessionWithNoSessionData
 } from './middleware/handleSessionWithNoData.js';
 import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
+import { handleSessionIdAfterDataRetrieval } from "./middleware/handlers/handleSessionIdAfterDataRetrieval.js";
 import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRequired.js";
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handleSessionUserBodyResults.js";
+import {
+  handleSessionWithNewlyGeneratedId
+} from "./middleware/handleSessionId.js";
 import { login } from "./api/login.js";
 import { session } from './api/session.js';
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
