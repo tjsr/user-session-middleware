@@ -43,3 +43,10 @@ export class UnknownAuthenticationError extends SessionHandlerError {
     this.name = 'UnknownAuthenticationError';
   }
 }
+
+export class LoginBodyFormatError extends UserInputValidationError {
+  constructor(message: string) {
+    super(USER_INPUT_VALIDATION_ERROR, HttpStatusCode.BAD_REQUEST, message);
+    this.name = 'LoginBodyFormatError';
+  }
+}

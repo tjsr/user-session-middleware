@@ -1,6 +1,7 @@
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
+import { login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
 
 import {
   UserSessionOptions
@@ -21,7 +22,6 @@ import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRe
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handlers/handleSessionUserBodyResults.js";
 import { handleSessionWithNewlyGeneratedId } from './middleware/handlers/handleSessionWithNewlyGeneratedId.js';
-import { login } from "./api/login.js";
 import { session } from './api/session.js';
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
@@ -51,8 +51,13 @@ export const sessionUserRouteHandlers = (app: express.Express,
     app.get(sessionOptions?.sessionPath ?? '/session', session);
   }
   if (!sessionOptions?.disableLoginEndpoints) {
-    app.get(sessionOptions?.loginPath ?? '/login', login);
-    app.post(sessionOptions?.loginPath ?? '/login', login);
+    // express.json will be required if we are going to use req.body for /login
+    app.use(express.json()),
+    app.get(sessionOptions?.loginPath ?? '/login', login,
+      regenerateAfterLogin, regenerateAfterLoginError);
+    app.post(sessionOptions?.loginPath ?? '/login', login,
+      regenerateAfterLogin, regenerateAfterLoginError
+    );
     app.get(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,
       regenerateAfterLogout, regenerateAfterLogoutError);
     app.post(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,

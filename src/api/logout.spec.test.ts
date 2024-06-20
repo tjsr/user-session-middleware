@@ -1,10 +1,10 @@
 import { Cookie, MemoryStore } from "../express-session/index.js";
 import { IdNamespace, SessionId } from "../types.js";
-import { TaskContext, beforeEach, describe, test } from "vitest";
+import { beforeEach, describe, test } from "vitest";
 
+import { ApiTestContext } from "./utils/testcontext.js";
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
-import { UserSessionOptions } from "../types/sessionOptions.js";
 import { createUserIdFromEmail } from "../auth/user.js";
 import { expectResponseResetsSessionIdCookie } from "../utils/expectations.js";
 import { generateSessionIdForTest } from "../utils/testIdUtils.js";
@@ -12,11 +12,6 @@ import { mockSession } from "../utils/testing/mocks.js";
 import { setUserIdNamespaceForTest } from "../utils/testNamespaceUtils.js";
 import supertest from "supertest";
 import { testableApp } from "../utils/testing/middlewareTestUtils.js";
-
-interface ApiTestContext extends TaskContext {
-  userIdNamespace: IdNamespace;
-  sessionOptions: Partial<UserSessionOptions>;
-}
 
 describe('api.logout', () => {
   const testUserEmail = 'test-user@example.com';

@@ -4,6 +4,7 @@ import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from './types/response.js';
 import { UserSessionData } from "./types/session.js";
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
+import assert from "node:assert";
 import { assignUserIdToRequestSession } from "./sessionUser.js";
 import express from "express";
 import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
@@ -39,14 +40,23 @@ async <
     return;
   }
 
+  if (request.session.userId) {
+    console.debug(handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+      'userId already exists on session; skipping copy from to session.');
+    return next();
+  }
+
   try {
     const existingRequestSessionId = request.sessionID;
     const existingSessionId = request.session.id;
+    assert(request.sessionID === request.session.id, 'sessionID and session.id do not match! This should never happen');
     const existingMutation = `${existingRequestSessionId}/${existingSessionId}`;
     await assignUserIdToRequestSession(request);
     const updatedRequestSessionId = request.sessionID;
     const updatedSessionId = request.session.id;
     const updatedMutation = `${updatedRequestSessionId}/${updatedSessionId}`;
+    assert(request.sessionID === request.session.id,
+      'Updated sessionID and session.id do not match! This should never happen');
     const idMutation = `${existingMutation}=>${updatedMutation}`;
     console.debug(handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
       `Finished assigning userId for session ${idMutation} with missing session data.`);

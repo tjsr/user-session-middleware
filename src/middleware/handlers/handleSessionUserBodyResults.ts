@@ -11,12 +11,15 @@ export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler =
     const result: AuthenticationRestResult = {
       email: request.session.email,
       isLoggedIn: request.session.email !== undefined,
+      sessionId: request.session.id,
     };
-    console.debug(handleSessionUserBodyResults, 'Sending body to client, no further headers allowed.');
+    console.debug(handleSessionUserBodyResults, 'Sending body to client, no further headers allowed.', result);
     response.send(result);
+    response.end();
+    return;
   }
   if (request.body) {
-    console.log('handleSessionUserBodyResults', request.body);
+    console.log(handleSessionUserBodyResults, request.body);
   }
   next();
 };

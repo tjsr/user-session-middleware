@@ -17,3 +17,5 @@ export const getDbUserByEmail = async (email: EmailAddress): Promise<UserModel> 
 export const setRetrieveUserDataFunction = async (fn: (_email: EmailAddress) => Promise<UserModel>) => {
   retrieveUserData = fn;
 };
+
+export const hasRetrieveUserDataFunction = (): boolean => retrieveUserData !== undefined;
