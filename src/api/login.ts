@@ -80,7 +80,7 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
       
       req.session.userId = user.userId;
       req.session.email = email;
-      console.debug(`User ${email} logged in and has userId ${user.userId}`);
+      console.debug(login, `User ${email} logged in and has userId`, user.userId);
 
       res.locals.sendAuthenticationResult = true;
       res.locals.userAuthenticationData = user;
@@ -115,7 +115,6 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
   verifyPrerequisiteHandler(response, checkLogin.name);
   verifyPrerequisiteHandler(response, login.name);
 
-  const originalSession = request.session;
   const originalSessionId = request.session.id;
   request.regenerateSessionId = true;
   request.session.regenerate((err) => {
@@ -128,9 +127,8 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
     if (error) {
       next(error);
     } else {
-      console.log('Regenerated session ID', originalSessionId, '=>', request.session.id);
+      console.debug(regenerateAfterLoginError, 'Regenerated session ID', originalSessionId, '=>', request.session.id);
       Object.assign(request.session, response.locals.userAuthenticationData);
-      console.log('Sessions:', originalSession, request.session);
       next();
     }
   });

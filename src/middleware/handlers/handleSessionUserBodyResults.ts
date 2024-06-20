@@ -13,7 +13,7 @@ export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler =
       isLoggedIn: request.session.email !== undefined,
       sessionId: request.session.id,
     };
-    console.debug(handleSessionUserBodyResults, 'Sending body to client, no further headers allowed.', result);
+    console.debug(handleSessionUserBodyResults, 'Sending body to client, no further headers allowed.');
     response.send(result);
     response.end();
     return;

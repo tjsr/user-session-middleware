@@ -1,4 +1,4 @@
-import { IdNamespace, SessionId } from '../types.js';
+import { EmailAddress, IdNamespace, SessionId } from '../types.js';
 import { assert, beforeEach, describe, expect, test } from 'vitest';
 import { hasRetrieveUserDataFunction, setRetrieveUserDataFunction } from '../auth/getDbUser.js';
 
@@ -36,83 +36,96 @@ describe('api.login', () => {
   test.todo('login call must have implemented a handler.', () => {
   });
 
+  const loginWith = async (context: ApiTestContext, email?: EmailAddress, sessionId?: SessionId) => {
+    if (!context.app) {
+      context.app = testableApp(context.sessionOptions);
+    }
+
+    let st = supertest(context.app).post('/login');
+    
+    if (email) {
+      const loginBody = createLoginBody(email);
+      st = st.send(loginBody);
+    }
+    
+    st.set('Content-Type', 'application/json')
+      .accept('application/json');
+
+    if (sessionId) {
+      st = st.set(SESSION_ID_HEADER_KEY, sessionId);
+    } else if (context.currentSessionId) {
+      st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
+    }
+    const response = await st;
+    context.currentSessionId = getSupertestSessionIdCookie(response);
+
+    return response;
+  };
+
+  const verifySessionId = (response: supertest.Response, context: ApiTestContext): SessionId => {
+    expect(context.currentSessionId).not.toBeUndefined();
+    assert(validate(context.currentSessionId!), 'session ID should be a UUID value');
+    expect(response.body.sessionId).toEqual(context.currentSessionId);
+    return context.currentSessionId!;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const verifyResponseBody = (body: any, email: EmailAddress, isLoggedIn: boolean = true) => {
+    expect(body).not.toBeUndefined();
+    expect(body.isLoggedIn).toEqual(isLoggedIn);
+    expect(body.email, 'email in auth body should be provided email').toEqual(email);
+  };
+
   test('Should return a new sesion id and set as cookie with new credentials if already logged in with another user.',
     async (context: ApiTestContext) => {
-      context.app = testableApp(context.sessionOptions);
-      const loginBody = createLoginBody('test@example.com');
+      const response = await loginWith(context, 'test@example.com');
+      expect(response.statusCode).toEqual(HttpStatusCode.OK);
 
-      let firstSessionId: SessionId | undefined = undefined;
+      const firstSessionId = verifySessionId(response, context);
+      verifyResponseBody(response.body, 'test@example.com');
 
-      await supertest(context.app).post('/login').send(loginBody)
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect((response) => {
-          expect(response.statusCode).toEqual(HttpStatusCode.OK);
+      const response2 = await loginWith(context, 'test2@example.com');
+      expect(response2.statusCode).toEqual(HttpStatusCode.OK);
 
-          firstSessionId = getSupertestSessionIdCookie(response);
-          expect(firstSessionId).not.toBeUndefined();
-          assert(validate(firstSessionId!), 'session ID should be a UUID value');
-          expect(response.body.sessionId).toEqual(firstSessionId);
-          expect(response.body.email, 'email in auth body should be provided email').toEqual('test@example.com');
-        });
+      const secondSessionId = verifySessionId(response2, context);
+      verifyResponseBody(response2.body, 'test2@example.com');
 
-      const secondLoginBody = createLoginBody('test2@example.com');
-      let secondSessionId: SessionId | undefined = undefined;
-
-      console.log('-----', 'Starting second call');
-
-      await supertest(context.app).post('/login').send(secondLoginBody)
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .set(SESSION_ID_HEADER_KEY, firstSessionId!)
-        .expect((response) => {
-          expect(response.statusCode).toEqual(HttpStatusCode.OK);
-
-          secondSessionId = getSupertestSessionIdCookie(response);
-          expect(secondSessionId).not.toBeUndefined();
-          assert(validate(secondSessionId!), 'session ID should be a UUID value');
-          expect(firstSessionId).not.toEqual(secondSessionId);
-          expect(response.body.sessionId).toEqual(secondSessionId);
-          expect(response.body.email, 'email in auth body should be provided email').toEqual('test2@example.com');
-        });
+      expect(firstSessionId).not.toEqual(secondSessionId);
     });
 
-  test.todo('Should a 400 if a login call is provided without the required details for login.',
-    (context: ApiTestContext) => {
-      context.app = testableApp(context.sessionOptions);
-
-      supertest(context.app).get('/login').expect(HttpStatusCode.OK);
+  test.fails('Should a 400 if a login call is provided without the required details for login.',
+    async (context: ApiTestContext) => {
+      const response = await loginWith(context, 'test@example.com');
+      expect(response.statusCode).toEqual(HttpStatusCode.BAD_REQUEST);
     });
 
-  test.todo('Should return a new sesion id with new credentials if already logged in with the same user.', () => {
-  });
+  test('Should return a new sesion id with new credentials if already logged in with the same user.',
+    async (context: ApiTestContext) => {
+      const response = await loginWith(context, 'test@example.com');
+      expect(response.statusCode).toEqual(HttpStatusCode.OK);
+
+      const firstSessionId = verifySessionId(response, context);
+      verifyResponseBody(response.body, 'test@example.com');
+
+      const response2 = await loginWith(context, 'test@example.com');
+      expect(response2.statusCode).toEqual(HttpStatusCode.OK);
+
+      const secondSessionId = verifySessionId(response2, context);
+      verifyResponseBody(response2.body, 'test@example.com');
+
+      expect(firstSessionId).not.toEqual(secondSessionId);
+    });
 
   test.todo('Should return a 403 and new session ID if login credential authentication fails.', () => {
   });
 
   test('Should return a 200 and new session ID if login credential authentication succeeds.',
     async (context: ApiTestContext) => {
-      context.app = testableApp(context.sessionOptions);
-      const loginBody = createLoginBody('test@example.com');
+      const response = await loginWith(context, 'test@example.com');
+      expect(response.statusCode).toEqual(HttpStatusCode.OK);
 
-      let sessionId: SessionId | undefined = undefined;
-
-      await supertest(context.app).post('/login').send(loginBody)
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect((response) => {
-          expect(response.statusCode).toEqual(HttpStatusCode.OK);
-
-          sessionId = getSupertestSessionIdCookie(response);
-          expect(sessionId).not.toBeUndefined();
-          assert(validate(sessionId!), 'Cookie session ID should be a UUID value');
-          console.log('Response body received', response.body);
-
-          expect(response.body).not.toBeUndefined();
-          expect(response.body.isLoggedIn).toEqual(true);
-          expect(response.body.email, 'email in auth body should be provided email').toEqual('test@example.com');
-          expect(response.body.sessionId, 'sessionId in body should match cookie sessionId').toEqual(sessionId);
-        });
+      verifySessionId(response, context);
+      verifyResponseBody(response.body, 'test@example.com');
     });
 
   test('Should simply accept a user email from the json body if no custom user handler is configured.',
@@ -120,22 +133,10 @@ describe('api.login', () => {
       setRetrieveUserDataFunction(undefined!);
       expect(hasRetrieveUserDataFunction()).toEqual(false);
 
-      context.app = testableApp(context.sessionOptions);
-      const loginBody = createLoginBody('test@example.com');
+      const response = await loginWith(context, 'test@example.com');
+      expect(response.statusCode).toEqual(HttpStatusCode.OK);
 
-      await supertest(context.app).post('/login').send(loginBody)
-        .set('Content-Type', 'application/json')
-        .set('Accept', 'application/json')
-        .expect((response) => {
-          const cookieSessionId = getSupertestSessionIdCookie(response);
-          expect(cookieSessionId).not.toBeUndefined();
-          assert(validate(cookieSessionId!), 'Cookie session ID should be a UUID value');
-
-          expect(response.statusCode).toEqual(HttpStatusCode.OK);
-          expect(response.body).not.toBeUndefined();
-          expect(response.body.isLoggedIn).toEqual(true);
-          expect(response.body.email, 'email in auth body should be provided email').toEqual('test@example.com');
-          expect(response.body.sessionId, 'sessionId in body should match cookie sessionId').toEqual(cookieSessionId);
-        });
+      verifySessionId(response, context);
+      verifyResponseBody(response.body, 'test@example.com');
     });
 });
