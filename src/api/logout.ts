@@ -1,7 +1,5 @@
+import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
 import {
-  AlreadyLoggedOutError,
-  LogoutFailedError,
-  NotLoggedInError,
   RegeneratingSessionIdError,
   SessionNotGeneratedError,
   SessionSaveError
@@ -13,6 +11,7 @@ import {
 import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
 import express, { NextFunction } from '../express/index.js';
 
+import { LogoutFailedError } from '../errors/inputValidationErrorClasses.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { UserId } from '../types.js';
 import { UserSessionData } from '../types/session.js';

@@ -1,7 +1,7 @@
+import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
 import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
-import { login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
 
 import {
   UserSessionOptions
@@ -53,9 +53,9 @@ export const sessionUserRouteHandlers = (app: express.Express,
   if (!sessionOptions?.disableLoginEndpoints) {
     // express.json will be required if we are going to use req.body for /login
     app.use(express.json()),
-    app.get(sessionOptions?.loginPath ?? '/login', login,
+    app.get(sessionOptions?.loginPath ?? '/login', checkLogin, login,
       regenerateAfterLogin, regenerateAfterLoginError);
-    app.post(sessionOptions?.loginPath ?? '/login', login,
+    app.post(sessionOptions?.loginPath ?? '/login', checkLogin, login,
       regenerateAfterLogin, regenerateAfterLoginError
     );
     app.get(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,

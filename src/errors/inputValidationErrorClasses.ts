@@ -1,5 +1,5 @@
 import {
-  USER_AUTHENTICATION_ERROR,
+  LOGOUT_FAILED_ERROR,
   USER_INPUT_EMAIL_VALIDATION_ERROR,
   USER_INPUT_VALIDATION_ERROR
 } from '../errors/errorCodes.js';
@@ -30,23 +30,16 @@ export class EmailValidationError extends UserInputValidationError {
   }
 }
 
-export class AuthenticationError extends SessionHandlerError {
-  constructor(cause?: Error) {
-    super(USER_AUTHENTICATION_ERROR, HttpStatusCode.FORBIDDEN, 'Authentication error', cause);
-    this.name = 'AuthenticationError';
-  }
-}
-
-export class UnknownAuthenticationError extends SessionHandlerError {
-  constructor(cause: unknown) {
-    super(USER_AUTHENTICATION_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR, 'Unknown authentication error', cause);
-    this.name = 'UnknownAuthenticationError';
-  }
-}
-
 export class LoginBodyFormatError extends UserInputValidationError {
   constructor(message: string) {
     super(USER_INPUT_VALIDATION_ERROR, HttpStatusCode.BAD_REQUEST, message);
     this.name = 'LoginBodyFormatError';
+  }
+}
+
+export class LogoutFailedError extends SessionHandlerError {
+  constructor(code: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR,
+    message: string = 'Error logging out.', cause?: unknown) {
+    super(LOGOUT_FAILED_ERROR, code, message, cause);
   }
 }

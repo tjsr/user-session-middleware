@@ -1,20 +1,31 @@
 import { EmailAddress } from '../types.js';
+import { MiddlewareConfigurationError } from '../errors/errorClasses.js';
 import { UserModel } from '../types/model.js';
 import { createUserIdFromEmail } from './user.js';
 
-let retrieveUserData: ((_email: EmailAddress) => Promise<UserModel>) | undefined = undefined;
+export type RetrieveUserDataFn<T extends UserModel = UserModel> = (_email: EmailAddress) => Promise<T>;
 
-export const getDbUserByEmail = async (email: EmailAddress): Promise<UserModel> => {
+let retrieveUserData: RetrieveUserDataFn | undefined = undefined;
+
+// TODO: This needs to return <T extends UserModel> but I'm not sure how to do that.
+export const getDbUserByEmail = async <T extends UserModel>(email: EmailAddress): Promise<T> => {
   if (retrieveUserData) {
-    return retrieveUserData(email);
+    return retrieveUserData(email) as Promise<T>;
   }
   return Promise.resolve({
     email: email,
     userId: createUserIdFromEmail(email),
-  });
+  } as T);
 };
 
-export const setRetrieveUserDataFunction = async (fn: (_email: EmailAddress) => Promise<UserModel>) => {
+const isAsyncFunction = (fn: Function): boolean => {
+  return fn && fn.constructor.name === 'AsyncFunction';
+};
+
+export const setRetrieveUserDataFunction = <T extends UserModel>(fn: RetrieveUserDataFn<T>) => {
+  if (fn !== undefined && !isAsyncFunction(fn)) {
+    throw new MiddlewareConfigurationError(`Retrieve user data function must be an async function.`);
+  }
   retrieveUserData = fn;
 };
 

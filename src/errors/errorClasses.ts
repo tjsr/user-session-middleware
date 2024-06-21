@@ -4,7 +4,6 @@ import {
   ERROR_SESSION_ID_NOT_GENERATED,
   ERROR_SESSION_NOT_INITIALIZED,
   ERROR_SESSION_VALUES_MISSING,
-  LOGOUT_FAILED_ERROR,
   NEW_SESSION_ID_DATA_EXISTS,
   NO_SESSION_DATA_FROM_STORE,
   NO_SESSION_ID_IN_REQUEST,
@@ -14,7 +13,7 @@ import {
   SESSION_ID_GENERATION_ERROR,
   SESSION_ID_MISMATCH_ERROR,
   SESSION_ID_TYPE_ERROR,
-  SESSION_STORE_NOT_CONFIGURED
+  SESSION_STORE_NOT_CONFIGURED,
 } from "./errorCodes.js";
 import { HandlerName, SessionId } from "../types.js";
 
@@ -76,6 +75,12 @@ export class MiddlewareConfigurationError extends SessionHandlerError {
   }
 }
 
+export class UserRetrieveMustBeAsyncError extends MiddlewareConfigurationError {
+  constructor (message = 'User retrieval middleware function must be async.') {
+    super(message);
+  }
+}
+
 export class SessionStoreNotConfiguredError extends SessionHandlerError {
   constructor(handlerChain: HandlerName[]) {
     super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');
@@ -133,16 +138,9 @@ export class SessionNotGeneratedError extends SessionHandlerError {
 }
 
 export class SessionSaveError extends SessionHandlerError {
-  constructor(cause: Error) {
+  constructor(cause: Error, message: string = 'Error saving session.') {
     super(ERROR_SAVING_SESSION, HttpStatusCode.INTERNAL_SERVER_ERROR,
-      'Error saving session.', cause);
-  }
-}
-
-export class LogoutFailedError extends SessionHandlerError {
-  constructor(code: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR,
-    message: string = 'Error logging out.', cause?: unknown) {
-    super(LOGOUT_FAILED_ERROR, code, message, cause);
+      message, cause);
   }
 }
 
@@ -150,17 +148,5 @@ export class SessionUserInfoError extends SessionHandlerError {
   constructor(message: string, code: HttpStatusCode = HttpStatusCode.UNAUTHORIZED) {
     super(ERROR_SESSION_VALUES_MISSING, code,
       message);
-  }
-}
-
-export class NotLoggedInError extends LogoutFailedError {
-  constructor(code: HttpStatusCode = HttpStatusCode.UNAUTHORIZED, message = 'Not logged in.') {
-    super(code, message);
-  }
-}
-
-export class AlreadyLoggedOutError extends NotLoggedInError {
-  constructor(message = 'Already logged out.') {
-    super(HttpStatusCode.UNAUTHORIZED, message);
   }
 }

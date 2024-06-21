@@ -1,4 +1,8 @@
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
+
+import { EmailAddress } from '../types.js';
+import { UserModel } from '../types/model.js';
+import { setRetrieveUserDataFunction } from '../auth/getDbUser.js';
 
 describe('login', () => {
   test.todo('Should call next with a validationerror if the email is invalid', () => {
@@ -35,5 +39,19 @@ describe('login', () => {
 
   test.todo('Should set the userId and email on the session to the retrieved users details', () => {
 
+  });
+});
+
+describe('setRetrieveUserDataFunction', () => {
+  test('Should fail if provided method is not async', () => {
+    const testFunction = (email: EmailAddress): UserModel => {
+      return {
+        email,
+        userId: 'test',
+      };
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => setRetrieveUserDataFunction(testFunction as any)).toThrow(expect.any(Error));
   });
 });

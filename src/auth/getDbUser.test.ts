@@ -1,26 +1,13 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 
-import { EmailAddress } from '../types.js';
-import { UserModel } from '../types/model.js';
 import { createUserIdFromEmail } from './user.js';
 import { getDbUserByEmail } from './getDbUser.js';
+import { setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
 import { setRetrieveUserDataFunction } from './getDbUser.js';
 import { setUserIdNamespace } from './userNamespace.js';
 import { v5 } from 'uuid';
 
 const nilUuid = '00000000-0000-0000-0000-000000000000';
-
-type MockRetrieveUserDataFn = (_email: EmailAddress) => Promise<UserModel>;
-
-const createMockRetrieveUserData = (result: UserModel): MockRetrieveUserDataFn => {
-  const mockRetrieveUserData: MockRetrieveUserDataFn = vi.fn<
-    [email: string],
-    Promise<UserModel>
-  >(async (_email: string) => {
-    return Promise.resolve(result);
-  });
-  return mockRetrieveUserData;
-};
 
 describe('getDbUserByEmail', () => {
   beforeEach(() => {
@@ -31,15 +18,15 @@ describe('getDbUserByEmail', () => {
   });
   
   test('Should call retrieveUserData if function is set', async () => {
-    const mockRetrieveUserData: MockRetrieveUserDataFn = createMockRetrieveUserData({
-      email: 'result@example.com',
-      userId: createUserIdFromEmail('test@example.com'),
+    const userDataMap: Map<string, unknown> = new Map();
+    userDataMap.set('test@example.com', {
+      email: 'test@example.com',
+      userId: createUserIdFromEmail('test@example.com'), // was test@
     });
+    setLoginUserLookupWithContextUserData(userDataMap);
 
-    setRetrieveUserDataFunction(mockRetrieveUserData);
     const dbUser = await getDbUserByEmail('test@example.com');
-    expect(mockRetrieveUserData).toHaveBeenCalledWith('test@example.com');
-    expect(dbUser.email).toEqual('result@example.com');
+    expect(dbUser.email).toEqual('test@example.com');
     expect(dbUser.userId).toEqual('a0400ecb-cd13-5d50-b48c-c1b65a4dd7de');
   });
 

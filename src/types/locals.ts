@@ -10,4 +10,5 @@ export interface SystemResponseLocals<
   skipHandlerDependencyChecks?: boolean;
   sendAuthenticationResult?: boolean;
   userAuthenticationData?: UserModel;
+  debugCallHandlers?: boolean;
 }

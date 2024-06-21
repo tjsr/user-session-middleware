@@ -8,12 +8,14 @@ import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorC
 import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { UserSessionData } from '../types/session.js';
+import assert from 'node:assert';
 import { createRandomId } from '../utils/createRandomId.js';
 import { getUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
 import { v5 as uuidv5 } from 'uuid';
 
 export const createUserIdFromEmail = (email: EmailAddress): uuid5 => {
+  assert(email !== undefined);
   return uuidv5(email, getUserIdNamespace());
 };
 
