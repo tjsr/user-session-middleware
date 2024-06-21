@@ -33,7 +33,7 @@ export const addCalledHandler = (
   handlerName: HandlerName,
   silentCallHandlers = false
 ): void => {
-  if (silentCallHandlers) {
+  if (silentCallHandlers || response.locals?.debugCallHandlers === true) {
     console.debug(addCalledHandler, 'Handler called', handlerName);
   }
   if (response.locals.calledHandlers === undefined) {
@@ -46,7 +46,7 @@ export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpRespons
   response: ResponseType,
   handlerName: HandlerName
 ): void => {
-  if (handlerAssertionsEnabled() && response.locals.calledHandlers) {
+  if (handlerAssertionsEnabled() && response.locals?.calledHandlers) {
     if (!response.locals?.calledHandlers?.includes(handlerName)) {
       const lastHandler = response.locals?.calledHandlers[response.locals.calledHandlers.length - 1];
       assert (lastHandler !== undefined, 'calledHandlers stack had no elements!  This should never happen!');

@@ -1,4 +1,5 @@
 import { HandlerName } from "../types.js";
+import { UserModel } from "./model.js";
 import { UserSessionData } from "./session.js";
 
 export interface SystemResponseLocals<
@@ -8,4 +9,6 @@ export interface SystemResponseLocals<
   retrievedSessionData?: SD | undefined;
   skipHandlerDependencyChecks?: boolean;
   sendAuthenticationResult?: boolean;
+  userAuthenticationData?: UserModel;
+  debugCallHandlers?: boolean;
 }

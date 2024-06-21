@@ -43,6 +43,7 @@ export class SessionHandlerError extends SessionMiddlewareError {
   private readonly _sessionErrorCode: number;
   private _clientMessage?: string;
 
+  // TODO: Make this constructor protected.
   constructor (
     sesisonErrorCode: number,
     status?: number,

@@ -1,4 +1,4 @@
-import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/errorClasses.js';
+import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
 import {
   SessionDataTestContext,
   createContextForSessionTest,

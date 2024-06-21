@@ -12,6 +12,9 @@ export const useUserSessionMiddleware = (
   app: express.Express,
   sessionOptions?: Partial<UserSessionOptions> | undefined
 ) => {
+  if (sessionOptions?.debugCallHandlers) {
+    app.set('debugCallHandlers', true);
+  }
   if (sessionOptions?.userIdNamespace) {
     setUserIdNamespace(sessionOptions.userIdNamespace);
   }

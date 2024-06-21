@@ -27,4 +27,6 @@ export interface UserSessionOptions extends expressSession.SessionOptions {
   logoutPath?: Path;
   loginPath?: Path;
   sessionPath?: Path;
+
+  debugCallHandlers?: boolean;
 }
