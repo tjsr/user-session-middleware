@@ -31,6 +31,26 @@ export const saveSessionPromise = async (session: Session): Promise<void> => {
   });
 };
 
+export const regenerateSessionPromise = async (session: Session): Promise<void> => {
+  const currentSession = session;
+  currentSession.hasLoggedOut = true;
+  session.userId = undefined!;
+  session.email = undefined!;
+  
+  return new Promise((resolve, reject) => {
+    console.debug(regenerateSessionPromise, `Regenerating session ${session.id}.`);
+
+    session.regenerate((err) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve();
+    });
+  });
+};
+
+
 export const assignUserIdToSession = async <ApplicationDataType extends UserSessionData>(
   session: Session & Partial<ApplicationDataType>
 ): Promise<void> => {

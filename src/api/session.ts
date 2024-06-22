@@ -1,16 +1,59 @@
+import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+
+import { EmailAddress } from '../types.js';
+import { SessionRegenerationFailedError } from '../errors/authenticationErrorClasses.js';
+import { SystemHttpRequestType } from '../types/request.js';
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import express from 'express';
+import express from '../express/index.js';
+import { regenerateSessionPromise } from '../sessionUser.js';
+import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
 
 export const session: UserSessionMiddlewareRequestHandler = (
-  request,
+  request: SystemHttpRequestType,
   response,
   next: express.NextFunction
 ) => {
-  console.debug(session, 'Retrieving session id:', request.sessionID, request.session.id);
-  request.session.save();
-  response.status(200);
-  response.send({
-    sessionId: request.sessionID,
-  });
+  console.debug(session, 'Regenerating session id:', request.sessionID, request.session.id);
+  const email: EmailAddress = request.session.email;
+
+  try {
+    request.regenerateSessionId = true;
+  
+    regenerateSessionPromise(request.session).then(() => {
+      retrieveUserDataForSession(email, request.session, response.locals, next)
+        .catch((err) => {
+          const regenerateErr = new SessionRegenerationFailedError(err);
+          console.error(session, 'Failed regenerating session', regenerateErr, err);
+          return next(regenerateErr);
+    
+          // passAuthOrUnknownError(response.locals, err, next);
+        });
+    }).catch((err) => {
+      const regenerateErr = new SessionRegenerationFailedError(err);
+      console.error(session, 'Failed regenerating session', regenerateErr, err);
+      return next(regenerateErr);
+
+      // passAuthOrUnknownError(response.locals, err, next);
+    });
+  } catch (fnErr) {
+    const regenerateErr = new SessionRegenerationFailedError(fnErr);
+    console.error(session, 'Failed regenerating session', regenerateErr, fnErr);
+    return next(regenerateErr);
+
+    // passAuthOrUnknownError(response.locals, fnErr, next);
+  }
+};
+
+export const assignUserDataToRegeneratedSession: UserSessionMiddlewareRequestHandler = (
+  request: SystemHttpRequestType,
+  response,
+  next: express.NextFunction
+) => {
+  addCalledHandler(response, assignUserDataToRegeneratedSession.name);
+  verifyPrerequisiteHandler(response, session.name);
+
+  console.debug(assignUserDataToRegeneratedSession,
+    'Assigning user data to regenerated session:', response.locals.userAuthenticationData);
+  Object.assign(request.session, response.locals.userAuthenticationData);
   next();
 };

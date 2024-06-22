@@ -1,4 +1,4 @@
-import { LOGOUT_FAILED_ERROR, USER_AUTHENTICATION_ERROR } from "./errorCodes.js";
+import { LOGOUT_FAILED_ERROR, SESSION_REGENERATION_ERROR, USER_AUTHENTICATION_ERROR } from "./errorCodes.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { LogoutFailedError } from "./inputValidationErrorClasses.js";
@@ -40,4 +40,13 @@ export class UnknownAuthenticationError extends AuthenticationError {
       'Unknown authentication error', cause as Error);
     this.name = 'UnknownAuthenticationError';
   }
+}
+
+export class SessionRegenerationFailedError extends SessionHandlerError {
+  constructor(cause: unknown) {
+    super(SESSION_REGENERATION_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Unknown error regenerating session', cause as Error);
+    this.name = 'UnknownAuthenticationError';
+  }
+
 }

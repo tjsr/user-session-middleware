@@ -1,3 +1,4 @@
+import { assignUserDataToRegeneratedSession, session } from './api/session.js';
 import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "express";
@@ -22,7 +23,6 @@ import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRe
 import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
 import { handleSessionUserBodyResults } from "./middleware/handlers/handleSessionUserBodyResults.js";
 import { handleSessionWithNewlyGeneratedId } from './middleware/handlers/handleSessionWithNewlyGeneratedId.js';
-import { session } from './api/session.js';
 import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
 
 export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
@@ -48,7 +48,7 @@ export const sessionUserRouteHandlers = (app: express.Express,
   sessionOptions?: Partial<UserSessionOptions> | undefined): void => {
   // Handle login, logout before we send back a cookie
   if (!sessionOptions?.disableSessionRefresh) {
-    app.get(sessionOptions?.sessionPath ?? '/session', session);
+    app.get(sessionOptions?.sessionPath ?? '/session', session, assignUserDataToRegeneratedSession);
   }
   if (!sessionOptions?.disableLoginEndpoints) {
     // express.json will be required if we are going to use req.body for /login

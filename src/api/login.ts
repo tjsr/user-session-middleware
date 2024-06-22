@@ -2,14 +2,13 @@ import * as EmailValidator from 'email-validator';
 import * as express from '../express/index.js';
 
 import {
-  AuthenticationError,
-  LoginCredentialsError,
-  UnknownAuthenticationError
-} from '../errors/authenticationErrorClasses.js';
-import {
   EmailValidationError,
   LoginBodyFormatError,
 } from '../errors/inputValidationErrorClasses.js';
+import {
+  LoginCredentialsError,
+  UnknownAuthenticationError
+} from '../errors/authenticationErrorClasses.js';
 import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
@@ -21,10 +20,10 @@ import { RegeneratingSessionIdError } from '../errors/errorClasses.js';
 import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { SystemResponseLocals } from '../types/locals.js';
-import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';
-import { getDbUserByEmail } from '../auth/getDbUser.js';
 import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
+import { passAuthOrUnknownError } from '../auth/authErrorUtils.js';
+import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
 import { saveSessionPromise } from '../sessionUser.js';
 
 export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> =
@@ -53,7 +52,7 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> =
     next();
   };
 
-const handleAuthenticationFailure = async <SD extends UserSessionData>(
+export const handleLoginAuthenticationFailure = async <SD extends UserSessionData>(
   locals: SystemResponseLocals<SD>, session: Session, next: express.NextFunction): Promise<void> => {
   session.userId = undefined!;
   session.email = undefined!;
@@ -68,19 +67,8 @@ const handleAuthenticationFailure = async <SD extends UserSessionData>(
     console.error('Failed saving session', err);
     const authErr: UnknownAuthenticationError = new UnknownAuthenticationError(err);
     next(authErr);
+    return;
   });
-};
-
-const passAuthOrUnknownError = <SD extends UserSessionData>(
-  locals: SystemResponseLocals<SD>, e: unknown, next: express.NextFunction): void => {
-  if (e instanceof AuthenticationError) {
-    locals.sendAuthenticationResult = true;
-    next(e);
-  } else {
-    const err: UnknownAuthenticationError = new UnknownAuthenticationError(e);
-    console.trace(e);
-    next(err);
-  }
 };
 
 export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
@@ -91,28 +79,13 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   addCalledHandler(response, login.name);
   verifyPrerequisiteHandler(response, handleLocalsCreation.name);
   verifyPrerequisiteHandler(response, checkLogin.name);
+  const email: string = request.body.email;
+  console.debug(login, 'Processing login for valid email', email);
   try {
-    const email: string = request.body.email;
-    console.debug(login, 'Processing login for valid email', email);
-
-    getDbUserByEmail(email).then((user: UserModel) => {
-      if (!user) {
-        response.locals.sendAuthenticationResult = true;
-        // This calls to next regardless of what happens.
-        handleAuthenticationFailure(response.locals, request.session, next);
-        return;
-      }
-      
-      request.session.userId = user.userId;
-      request.session.email = email;
-      console.debug(login, `User ${email} logged in and has userId`, user.userId);
-
-      response.locals.sendAuthenticationResult = true;
-      response.locals.userAuthenticationData = user;
-      next();
-    }).catch((e: Error) => {
-      passAuthOrUnknownError(response.locals, e, next);
-    });
+    retrieveUserDataForSession(email, request.session, response.locals, next)
+      .catch((e: Error) => {
+        passAuthOrUnknownError(response.locals, e, next);
+      });
   } catch (e: unknown) {
     passAuthOrUnknownError(response.locals, e, next);
   }

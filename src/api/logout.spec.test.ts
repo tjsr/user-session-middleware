@@ -1,26 +1,21 @@
-import { Cookie, MemoryStore } from "../express-session/index.js";
-import { IdNamespace, SessionId } from "../types.js";
+import { ApiTestContext, setupApiTest } from "./utils/testcontext.js";
 import { beforeEach, describe, test } from "vitest";
 
-import { ApiTestContext } from "./utils/testcontext.js";
+import { Cookie } from "../express-session/index.js";
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
+import { SessionId } from "../types.js";
 import { createUserIdFromEmail } from "../auth/user.js";
 import { expectResponseResetsSessionIdCookie } from "../utils/expectations.js";
 import { generateSessionIdForTest } from "../utils/testIdUtils.js";
 import { mockSession } from "../utils/testing/mocks.js";
-import { setUserIdNamespaceForTest } from "../utils/testNamespaceUtils.js";
 import supertest from "supertest";
 import { testableApp } from "../utils/testing/middlewareTestUtils.js";
 
 describe('api.logout', () => {
   const testUserEmail = 'test-user@example.com';
 
-  beforeEach((context: ApiTestContext) => {
-    const namespace: IdNamespace = setUserIdNamespaceForTest(context);
-    context.userIdNamespace = namespace;
-    context.sessionOptions = { store: new MemoryStore(), userIdNamespace: namespace };
-  });
+  beforeEach((context: ApiTestContext) => setupApiTest(context));
 
   test('Should return a 401 when a user is not currently logged in.', async (context: ApiTestContext) => {
     const app = testableApp(context.sessionOptions);
