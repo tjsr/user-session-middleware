@@ -1,9 +1,15 @@
 import { EmailAddress, IdNamespace, SessionId } from "../../types.js";
+import { TaskContext, assert, expect } from "vitest";
 
+import { AuthenticationRestResult } from "../../types/apiResults.js";
 import { Express } from "../../express/index.js";
-import { TaskContext } from "vitest";
+import { MemoryStore } from "../../express-session/index.js";
 import { UserModel } from "../../types/model.js";
 import { UserSessionOptions } from "../../types/sessionOptions.js";
+import { setRetrieveUserDataFunction } from "../../auth/getDbUser.js";
+import { setUserIdNamespaceForTest } from "../../utils/testNamespaceUtils.js";
+import supertest from "supertest";
+import { validate } from "uuid";
 
 export interface ApiTestContext extends TaskContext {
   userIdNamespace: IdNamespace;
@@ -12,3 +18,36 @@ export interface ApiTestContext extends TaskContext {
   currentSessionId?: SessionId;
   userData: Map<EmailAddress, UserModel|undefined>;
 }
+
+export const setupApiTest = (context: ApiTestContext) => {
+  const namespace: IdNamespace = setUserIdNamespaceForTest(context);
+  context.sessionOptions = {
+    debugCallHandlers: false,
+    store: new MemoryStore(),
+    userIdNamespace: namespace,
+  };
+  context.userIdNamespace = namespace;
+  context.userData = new Map();
+  setRetrieveUserDataFunction(undefined!);
+};
+
+export const verifyAuthSessionId = (response: supertest.Response, context: ApiTestContext): SessionId => {
+  expect(context.currentSessionId).not.toBeUndefined();
+  assert(validate(context.currentSessionId!), 'session ID should be a UUID value');
+  expect(response.body, 'Authentication response body expected to be present').not.toBeUndefined();
+  expect(response.body.sessionId, 'Authentication response body expected to contain sessionId')
+    .toEqual(context.currentSessionId);
+  return context.currentSessionId!;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const verifyAuthResponseBody = (body: AuthenticationRestResult,
+  email: EmailAddress|undefined, isLoggedIn: boolean = true) => {
+  expect(body).not.toBeUndefined();
+  expect(body.isLoggedIn).toEqual(isLoggedIn);
+  if (email === undefined) {
+    expect(body.email, 'email should not be defined').toBeUndefined();
+  } else {
+    expect(body.email, 'email in auth body should be provided email').toEqual(email);
+  }
+};
