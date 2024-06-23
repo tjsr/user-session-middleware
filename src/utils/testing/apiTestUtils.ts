@@ -57,3 +57,24 @@ export const loginWith = async (context: ApiTestContext, email?: EmailAddress, s
 
   return response;
 };
+
+export const logoutFrom = async (context: ApiTestContext, sessionId?: SessionId) => {
+  if (!context.app) {
+    context.app = testableApp(context.sessionOptions);
+  }
+
+  let st = supertest(context.app).get('/logout');
+  
+  st.set('Content-Type', 'application/json')
+    .accept('application/json');
+
+  if (sessionId) {
+    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
+  } else if (context.currentSessionId) {
+    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
+  }
+  const response = await st;
+  context.currentSessionId = getSupertestSessionIdCookie(response);
+
+  return response;
+};
