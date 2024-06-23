@@ -28,17 +28,16 @@ export const session: UserSessionMiddlewareRequestHandler = (
     }
   
     regenerateSessionPromise(request.session).then(() => {
-      if (email) {
+      if (!email) {
+        response.locals.sendAuthenticationResult = true;
+        next();
+      } else {
         retrieveUserDataForSession(email, request.session, response.locals, next)
           .catch((err) => {
             const regenerateErr = new SessionRegenerationFailedError(err);
             console.error(session, 'Failed retrieving data for user while regenerating session', regenerateErr, err);
             return next(regenerateErr);
-      
-            // passAuthOrUnknownError(response.locals, err, next);
           });
-      } else {
-        next();
       }
     }).catch((err) => {
       const regenerateErr = new SessionRegenerationFailedError(err);
