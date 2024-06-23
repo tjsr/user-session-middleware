@@ -1,13 +1,13 @@
-import { ApiTestContext, setupApiTest } from "./utils/testcontext.js";
-import { beforeEach, describe, test } from "vitest";
+import { ApiTestContext, refreshSession, setupApiTest } from "./utils/testcontext.js";
+import { beforeEach, describe, expect, test } from "vitest";
 
 import { Cookie } from "../express-session/index.js";
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { SessionId } from "../types.js";
 import { createUserIdFromEmail } from "../auth/user.js";
-import { expectResponseResetsSessionIdCookie } from "../utils/expectations.js";
 import { generateSessionIdForTest } from "../utils/testIdUtils.js";
+import { logoutFrom } from "../utils/testing/apiTestUtils.js";
 import { mockSession } from "../utils/testing/mocks.js";
 import supertest from "supertest";
 import { testableApp } from "../utils/testing/middlewareTestUtils.js";
@@ -18,8 +18,15 @@ describe('api.logout', () => {
   beforeEach((context: ApiTestContext) => setupApiTest(context));
 
   test('Should return a 401 when a user is not currently logged in.', async (context: ApiTestContext) => {
-    const app = testableApp(context.sessionOptions);
-    return supertest(app).get('/logout').expect(HttpStatusCode.UNAUTHORIZED);
+    const refreshResponse = await refreshSession(context);
+    expect(refreshResponse.statusCode).toEqual(HttpStatusCode.OK);
+    const logoutResponse = await logoutFrom(context);
+    expect(logoutResponse.statusCode).toEqual(HttpStatusCode.UNAUTHORIZED);
+  });
+
+  test('Should return a 401 no session is present.', async (context: ApiTestContext) => {
+    const logoutResponse = await logoutFrom(context);
+    expect(logoutResponse.statusCode).toEqual(HttpStatusCode.UNAUTHORIZED);
   });
 
   test('Should return a 200 when a user is logged in.', async (context: ApiTestContext) => {
@@ -27,8 +34,9 @@ describe('api.logout', () => {
     context.sessionOptions.store!.set(testSessionId, mockSession({
       email: testUserEmail,
     }));
-    const app = testableApp(context.sessionOptions);
-    return supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
+
+    const logoutResponse = await logoutFrom(context, testSessionId);
+    expect(logoutResponse.statusCode).toEqual(HttpStatusCode.OK);
   });
 
   test('Should set session ID cookie to a new value.', async (context: ApiTestContext) => {
@@ -36,10 +44,10 @@ describe('api.logout', () => {
     context.sessionOptions.store!.set(testSessionId, mockSession({
       email: testUserEmail,
     }));
-    const app = testableApp(context.sessionOptions);
-    return supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect((response) => {
-      expectResponseResetsSessionIdCookie(response, testSessionId);
-    });
+
+    const logoutResponse = await logoutFrom(context, testSessionId);
+    expect(logoutResponse.statusCode).toEqual(HttpStatusCode.OK);
+    expect(context.currentSessionId).not.toEqual(testSessionId);
   });
 
   test('Should report 401 for invalid session ID when trying to re-use old session ID.',
