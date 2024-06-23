@@ -6,7 +6,6 @@ import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SESSION_ID_HEADER_KEY } from "../getSession.js";
 import { SessionId } from "../types.js";
 import { createUserIdFromEmail } from "../auth/user.js";
-import { expectResponseResetsSessionIdCookie } from "../utils/expectations.js";
 import { generateSessionIdForTest } from "../utils/testIdUtils.js";
 import { logoutFrom } from "../utils/testing/apiTestUtils.js";
 import { mockSession } from "../utils/testing/mocks.js";
