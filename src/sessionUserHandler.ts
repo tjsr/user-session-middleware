@@ -48,16 +48,12 @@ async <
 
   try {
     const existingRequestSessionId = request.sessionID;
-    const existingSessionId = request.session.id;
     assert(request.sessionID === request.session.id, 'sessionID and session.id do not match! This should never happen');
-    const existingMutation = `${existingRequestSessionId}/${existingSessionId}`;
     await assignUserIdToRequestSession(request);
     const updatedRequestSessionId = request.sessionID;
-    const updatedSessionId = request.session.id;
-    const updatedMutation = `${updatedRequestSessionId}/${updatedSessionId}`;
     assert(request.sessionID === request.session.id,
       'Updated sessionID and session.id do not match! This should never happen');
-    const idMutation = `${existingMutation}=>${updatedMutation}`;
+    const idMutation = `${existingRequestSessionId}=>${updatedRequestSessionId}`;
     console.debug(handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
       `Finished assigning userId for session ${idMutation} with missing session data.`);
     next();

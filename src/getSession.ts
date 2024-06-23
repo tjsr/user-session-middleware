@@ -35,6 +35,10 @@ const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): Se
   return cookieValue;
 };
 
+export const requestHasSessionId = (req: SystemHttpRequestType<UserSessionData>): boolean => {
+  return !!getSessionIdFromRequestHeader(req) || !!getSessionIdFromCookie(req);
+};
+
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
   DataType extends UserSessionData = UserSessionData

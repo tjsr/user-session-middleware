@@ -98,6 +98,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
         next: NextFunction
       ) => {
         if (req.session.userId !== testUserId) {
+          // TODO: Use exception
           response.status(500);
           next(new Error(`userId not set correctly: ${req.session.userId} != '${testUserId}'`));
         } else {

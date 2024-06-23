@@ -49,23 +49,24 @@ describe('api.logout', () => {
         email: testUserEmail,
       }));
       const app = testableApp(context.sessionOptions);
-      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(200);
-      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(401);
+      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
+      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.UNAUTHORIZED);
     });
 
   test('Should return a 404 if logout call is disabled', async (context: ApiTestContext) => {
     context.sessionOptions.disableLoginEndpoints = true;
 
     const app = testableApp(context.sessionOptions);
-    return supertest(app).get('/signout').expect(404);
+    return supertest(app).get('/signout').expect(HttpStatusCode.NOT_FOUND);
   });
 
   test('Should return a 404 at /logout if logout path is changed to not use default',
     async (context: ApiTestContext) => {
+      context.sessionOptions.debugCallHandlers = true;
       context.sessionOptions.logoutPath = '/signout';
 
       const app = testableApp(context.sessionOptions);
-      return supertest(app).get('/logout').expect(404);
+      return supertest(app).get('/logout').expect(HttpStatusCode.NOT_FOUND);
     });
 
   test('Should find logout at alternative path and return 200.',
@@ -81,6 +82,6 @@ describe('api.logout', () => {
         userId: createUserIdFromEmail(testUserEmail),
       });
       const app = testableApp(context.sessionOptions);
-      return supertest(app).get('/signout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(200);
+      return supertest(app).get('/signout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
     });
 });
