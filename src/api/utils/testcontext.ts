@@ -4,11 +4,14 @@ import { TaskContext, assert, expect } from "vitest";
 import { AuthenticationRestResult } from "../../types/apiResults.js";
 import { Express } from "../../express/index.js";
 import { MemoryStore } from "../../express-session/index.js";
+import { SESSION_ID_HEADER_KEY } from "../../getSession.js";
 import { UserModel } from "../../types/model.js";
 import { UserSessionOptions } from "../../types/sessionOptions.js";
+import { getSupertestSessionIdCookie } from "../../utils/testing/cookieTestUtils.js";
 import { setRetrieveUserDataFunction } from "../../auth/getDbUser.js";
 import { setUserIdNamespaceForTest } from "../../utils/testNamespaceUtils.js";
 import supertest from "supertest";
+import { testableApp } from "../../utils/testing/middlewareTestUtils.js";
 import { validate } from "uuid";
 
 export interface ApiTestContext extends TaskContext {
@@ -50,4 +53,25 @@ export const verifyAuthResponseBody = (body: AuthenticationRestResult,
   } else {
     expect(body.email, 'email in auth body should be provided email').toEqual(email);
   }
+};
+
+export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId) => {
+  if (!context.app) {
+    context.app = testableApp(context.sessionOptions);
+  }
+
+  let st = supertest(context.app).get('/session');
+
+  st.set('Content-Type', 'application/json')
+    .accept('application/json');
+
+  if (sessionId) {
+    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
+  } else if (context.currentSessionId) {
+    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
+  }
+  const response = await st;
+  context.currentSessionId = getSupertestSessionIdCookie(response);
+
+  return response;
 };

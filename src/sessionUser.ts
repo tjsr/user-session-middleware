@@ -20,7 +20,7 @@ export const createRandomUserId = (): uuid5 => {
 
 export const saveSessionPromise = async (session: Session): Promise<void> => {
   return new Promise((resolve, reject) => {
-    console.debug(saveSessionPromise, `Saving session ${session.id} data to store.`);
+    console.trace(saveSessionPromise, `Saving session ${session.id} data to store.`);
 
     session.save((err) => {
       if (err) {

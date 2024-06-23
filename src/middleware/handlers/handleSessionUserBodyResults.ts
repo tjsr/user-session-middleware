@@ -7,7 +7,10 @@ import { UserSessionData } from "../../types/session.js";
 import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
 import { handleLocalsCreation } from "./handleLocalsCreation.js";
 
-export const sendAuthResultBody = (session: UserSessionData & Session, response: SystemHttpResponseType) => {
+export const sendAuthResultBody = (
+  session: UserSessionData & Session,
+  response: SystemHttpResponseType
+): AuthenticationRestResult => {
   const result: AuthenticationRestResult = {
     email: session.email,
     isLoggedIn: session.email !== undefined,
@@ -16,17 +19,17 @@ export const sendAuthResultBody = (session: UserSessionData & Session, response:
   console.debug(sendAuthResultBody, 'Sending body to client, no further headers allowed.');
   response.send(result);
   response.end();
-  return;
+  return result;
 };
 
 export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler = (request, response, next) => {
   addCalledHandler(response, handleSessionUserBodyResults.name);
   verifyPrerequisiteHandler(response, handleLocalsCreation.name);
   if (response.locals.sendAuthenticationResult) {
-    sendAuthResultBody(request.session, response);
-  }
-  if (request.body) {
-    console.log(handleSessionUserBodyResults, request.body);
+    const result = sendAuthResultBody(request.session, response);
+    if (result) {
+      console.log(handleSessionUserBodyResults, result);
+    }
   }
   next();
 };

@@ -21,7 +21,7 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
   if (SessionHandlerError.isType(error) || error instanceof SessionHandlerError) {
     if (response.locals.sendAuthenticationResult) {
       response.status(error.status);
-      return sendAuthResultBody(request.session, response);
+      sendAuthResultBody(request.session, response);
     } else {
       const sessionError: SessionHandlerError = error as SessionHandlerError;
       response.status(sessionError.status);
