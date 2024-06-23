@@ -35,7 +35,7 @@ export const session: UserSessionMiddlewareRequestHandler = (
         retrieveUserDataForSession(email, request.session, response.locals, next)
           .catch((err) => {
             const regenerateErr = new SessionRegenerationFailedError(err);
-            console.error(session, 'Failed regenerating session', regenerateErr, err);
+            console.error(session, 'Failed retrieving data for user while regenerating session', regenerateErr, err);
             return next(regenerateErr);
           });
       }
