@@ -62,8 +62,6 @@
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^1.6.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-config-prettier": "^9.1.0",
     "expect-cookies": "^0.2.0",
     "linkteam": "^0.0.11",
     "rimraf": "^5.0.7",
