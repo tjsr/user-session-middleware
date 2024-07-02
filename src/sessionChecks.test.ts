@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.js';
 
 import { SessionData } from "express-session";

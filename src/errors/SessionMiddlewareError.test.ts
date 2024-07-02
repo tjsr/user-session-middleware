@@ -1,5 +1,3 @@
-import { describe, expect, test } from 'vitest';
-
 import { SessionMiddlewareError } from './SessionMiddlewareError.js';
 
 describe('SessionMiddlewareError', () => {

@@ -5,7 +5,6 @@ import {
   createMockPromisePair,
   createTestRequestSessionData,
 } from '../testUtils.js';
-import { beforeEach, describe, expect, test } from 'vitest';
 import { checkLogout, logout } from './logout.js';
 
 import { generateSessionIdForTest } from '../utils/testIdUtils.js';

@@ -1,5 +1,4 @@
 import { ApiTestContext, setupApiTest } from './utils/testcontext.js';
-import { beforeEach, describe, expect, test } from 'vitest';
 
 import { HttpStatusCode } from '../httpStatusCodes.js';
 import { SessionId } from '../types.js';

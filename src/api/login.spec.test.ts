@@ -1,5 +1,4 @@
 import { ApiTestContext, setupApiTest, verifyAuthResponseBody, verifyAuthSessionId } from './utils/testcontext.js';
-import { beforeAll, beforeEach, describe, expect, test } from 'vitest';
 import { hasRetrieveUserDataFunction, setRetrieveUserDataFunction } from '../auth/getDbUser.js';
 import { loginWith, setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
 

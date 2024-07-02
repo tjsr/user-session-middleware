@@ -1,5 +1,3 @@
-import { describe, expect, test } from 'vitest';
-
 import { EmailAddress } from '../types.js';
 import { UserModel } from '../types/model.js';
 import { setRetrieveUserDataFunction } from '../auth/getDbUser.js';
