@@ -1,5 +1,4 @@
 import { NamespaceUUIDFormatError, UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.js';
-import { beforeEach, describe, expect, test } from 'vitest';
 import { getUserIdNamespace, setUserIdNamespace } from './userNamespace.js';
 
 import { v5 } from 'uuid';

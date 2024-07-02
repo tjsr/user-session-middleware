@@ -6,7 +6,6 @@ import {
   createTestRequestSessionData,
 } from '../testUtils.js';
 import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { createRandomIdAndSave, createUserIdFromEmail, getUserIdFromSession } from './user.js';
 import { createTestSessionId, generateUserIdForTest } from '../utils/testIdUtils.js';
 import { v5, validate as validateUuid } from 'uuid';

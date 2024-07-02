@@ -1,5 +1,3 @@
-import { describe, test } from 'vitest';
-
 describe('session', () => {
   test.todo('Should generate a new session ID if no existing one is given.', () => {
   

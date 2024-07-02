@@ -1,5 +1,3 @@
-import { describe, expect, test } from 'vitest';
-
 import { NO_SESSION_DATA_FROM_STORE } from './errorCodes.js';
 import { SessionHandlerError } from './SessionHandlerError.js';
 

@@ -1,6 +1,5 @@
 import { Cookie, MemoryStore, Session, Store } from './express-session/index.js';
 import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
-import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { SessionDataTestContext } from "./testUtils.js";
 import { SystemHttpRequestType } from "./types/request.js";
