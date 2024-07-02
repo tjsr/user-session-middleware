@@ -35,7 +35,6 @@ jobs:
           ${{ runner.os }}-
 
     - run: npm ci
-    - run: npm run link
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
