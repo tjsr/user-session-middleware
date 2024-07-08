@@ -1,29 +1,28 @@
 import { assignUserDataToRegeneratedSession, session } from './api/session.js';
 import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
-import express, { ErrorRequestHandler, RequestHandler } from "express";
-import { handleSessionCookie, handleSessionCookieOnError } from "./middleware/handlers/handleSessionCookie.js";
+import express, { ErrorRequestHandler, RequestHandler } from "./express/index.js";
+import {
+  handleCopySessionStoreDataToSession,
+  handleExistingSessionWithNoSessionData,
+  handleLocalsCreation,
+  handleNewSessionWithNoSessionData,
+  handleSessionCookie,
+  handleSessionCookieOnError,
+  handleSessionDataRetrieval,
+  handleSessionIdAfterDataRetrieval,
+  handleSessionIdRequired,
+  handleSessionStoreRequired,
+  handleSessionUserBodyResults,
+  handleSessionWithNewlyGeneratedId
+} from './middleware/handlers/index.js';
 
 import {
   UserSessionOptions
 } from "./types/sessionOptions.js";
 import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
-import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
-import {
-  handleExistingSessionWithNoSessionData
-} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
-import { handleLocalsCreation } from "./middleware/handlers/handleLocalsCreation.js";
-import {
-  handleNewSessionWithNoSessionData
-} from './middleware/handlers/handleSessionWithNoData.js';
-import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
-import { handleSessionIdAfterDataRetrieval } from "./middleware/handlers/handleSessionIdAfterDataRetrieval.js";
-import { handleSessionIdRequired } from "./middleware/handlers/handleSessionIdRequired.js";
-import { handleSessionStoreRequired } from "./middleware/handlers/handleSessionStoreRequired.js";
-import { handleSessionUserBodyResults } from "./middleware/handlers/handleSessionUserBodyResults.js";
-import { handleSessionWithNewlyGeneratedId } from './middleware/handlers/handleSessionWithNewlyGeneratedId.js';
-import { sessionErrorHandler } from './middleware/sessionErrorHandler.js';
+import { sessionErrorHandler } from './middleware/index.js';
 
 export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
     RequestHandler | ErrorRequestHandler
