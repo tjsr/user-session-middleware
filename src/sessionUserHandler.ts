@@ -25,11 +25,11 @@ async <
   response: ResponseType,
   next: express.NextFunction
 ) => {
-  addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData.name);
-  assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
-  assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
-  assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
-  assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+  addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData);
+  assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession);
+  assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData);
+  assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData);
+  assertPrerequisiteHandler(response, handleSessionDataRetrieval);
 
   if (response.locals?.retrievedSessionData) {
     // Nothing to do here if there's already data in the session store as we'll use that ID.

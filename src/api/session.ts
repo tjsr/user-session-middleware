@@ -60,8 +60,8 @@ export const assignUserDataToRegeneratedSession: UserSessionMiddlewareRequestHan
   response,
   next: express.NextFunction
 ) => {
-  addCalledHandler(response, assignUserDataToRegeneratedSession.name);
-  assertPrerequisiteHandler(response, session.name);
+  addCalledHandler(response, assignUserDataToRegeneratedSession);
+  assertPrerequisiteHandler(response, session);
 
   assert(request.session.userId !== undefined, 'No userId assigned to session');
   console.debug(assignUserDataToRegeneratedSession,

@@ -15,10 +15,11 @@ import {
   SESSION_ID_TYPE_ERROR,
   SESSION_STORE_NOT_CONFIGURED,
 } from "./errorCodes.js";
-import { HandlerName, SessionId } from "../types.js";
+import { ErrorRequestHandler, Handler } from "../express/index.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionId } from "../types.js";
 
 export class SaveSessionError extends SessionHandlerError {
   constructor (message = 'Error writing session data to store.', cause?: unknown) {
@@ -57,7 +58,7 @@ export class AssignUserIdError extends SessionHandlerError {
 }
 
 export class RequiredMiddlewareNotCalledError extends SessionHandlerError {
-  constructor (requiredHandler: string, currentHandler: string) {
+  constructor (requiredHandler: Handler|ErrorRequestHandler, currentHandler: Handler|ErrorRequestHandler) {
     super(REQUIRED_MIDDLEWARE_NOT_CALLED, HttpStatusCode.NOT_IMPLEMENTED, 
       `Prerequisite handler ${requiredHandler} not called before ${currentHandler}.`);
   }
@@ -82,7 +83,7 @@ export class UserRetrieveMustBeAsyncError extends MiddlewareConfigurationError {
 }
 
 export class SessionStoreNotConfiguredError extends SessionHandlerError {
-  constructor(handlerChain: HandlerName[]) {
+  constructor(handlerChain: (Handler|ErrorRequestHandler)[]) {
     super(SESSION_STORE_NOT_CONFIGURED, HttpStatusCode.NOT_IMPLEMENTED, 'Session store not configured in middleware.');
     super.handlerChain = handlerChain;
   }

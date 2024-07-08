@@ -27,7 +27,6 @@ export type {
   uuid4,
   uuid5,
   EmailAddress,
-  HandlerName,
   IPAddress,
   UserId
 } from './types.js';

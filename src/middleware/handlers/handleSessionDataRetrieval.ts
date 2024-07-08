@@ -16,16 +16,16 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler = (
   response,
   next: express.NextFunction
 ): void => {
-  addCalledHandler(response, handleSessionDataRetrieval.name);
+  addCalledHandler(response, handleSessionDataRetrieval);
   try {
-    assertPrerequisiteHandler(response, handleLocalsCreation.name);
+    assertPrerequisiteHandler(response, handleLocalsCreation);
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers!);
   } catch (err) {
     next(err);
     return;
   }
 
-  assertPrerequisiteHandler(response, handleSessionIdRequired.name);
+  assertPrerequisiteHandler(response, handleSessionIdRequired);
 
   if (checkNewlyGeneratedId(request as SystemHttpRequestType, next)) {
     return;

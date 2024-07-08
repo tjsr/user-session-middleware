@@ -1,6 +1,6 @@
+import { ErrorRequestHandler, Handler } from "../express/index.js";
 import { MiddlewareCallOrderError, RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
-import { HandlerName } from "../types.js";
 import { SystemHttpResponseType } from '../types/response.js';
 import assert from "node:assert";
 import { isTestMode } from "@tjsr/simple-env-utils";
@@ -30,27 +30,28 @@ const handlerAssertionsEnabled = (): boolean => {
 
 export const addCalledHandler = (
   response: SystemHttpResponseType,
-  handlerName: HandlerName,
+  handler: Handler|ErrorRequestHandler,
   silentCallHandlers = false
 ): void => {
   if (silentCallHandlers || response.locals?.debugCallHandlers === true) {
-    console.debug(addCalledHandler, 'Handler called', handlerName);
+    console.debug(addCalledHandler, 'Handler called', handler);
   }
   if (response.locals.calledHandlers === undefined) {
     response.locals.calledHandlers = [];
   }
-  response.locals.calledHandlers.push(handlerName);
+  assert(typeof handler !== 'string');
+  response.locals.calledHandlers.push(handler);
 };
 
 export const assertPrerequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
-  handlerName: HandlerName
+  handler: Handler|ErrorRequestHandler
 ): void => {
   if (handlerAssertionsEnabled() && response.locals?.calledHandlers) {
-    if (!response.locals?.calledHandlers?.includes(handlerName)) {
+    if (!response.locals?.calledHandlers?.includes(handler)) {
       const lastHandler = response.locals?.calledHandlers[response.locals.calledHandlers.length - 1];
       assert (lastHandler !== undefined, 'calledHandlers stack had no elements!  This should never happen!');
-      const err = new RequiredMiddlewareNotCalledError(handlerName, lastHandler);
+      const err = new RequiredMiddlewareNotCalledError(handler, lastHandler);
       console.error(assertPrerequisiteHandler, err.message);
       throw err;
     }
@@ -59,7 +60,7 @@ export const assertPrerequisiteHandler = <ResponseType extends SystemHttpRespons
 
 export const assertCorequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
-  handlerName: HandlerName
+  handlerName: Handler|ErrorRequestHandler
 ): void => {
   if (handlerAssertionsEnabled() && response.locals.calledHandlers) {
     if (response.locals.calledHandlers.includes(handlerName)) {

@@ -5,7 +5,9 @@ import { SessionStoreNotConfiguredError } from "./errorClasses.js";
 import { requireSessionStoreConfigured } from './sessionErrorChecks.js';
 
 describe('requireSessionStoreConfigured', () => {
-  const handlerChain = ['testHandler'];
+  const testHandler = () => {};
+
+  const handlerChain = [testHandler];
   test('Should throw an error if sessionStore is undefined', () => {
     const sessionStore: Store|undefined = undefined;
     const act = () => requireSessionStoreConfigured(sessionStore, handlerChain);

@@ -17,16 +17,16 @@ export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHand
     response: ResponseType,
     next: express.NextFunction
   ): void => {
-  addCalledHandler(response, handleNewSessionWithNoSessionData.name);
+  addCalledHandler(response, handleNewSessionWithNoSessionData);
   // This must be called *before* handleExistingSessionWithNoSessionData because it sets newSessionIdGenerated
-  assertCorequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
+  assertCorequisiteHandler(response, handleExistingSessionWithNoSessionData);
   if (request.newSessionIdGenerated !== true) {
     console.debug(handleNewSessionWithNoSessionData, 'Skipping because using provided sessionID.');
     next();
     return;
   }
 
-  assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+  assertPrerequisiteHandler(response, handleSessionDataRetrieval);
 
   if (response.locals?.retrievedSessionData) {
     console.debug(handleNewSessionWithNoSessionData, 'Skipping because sessionData was retrieved.');

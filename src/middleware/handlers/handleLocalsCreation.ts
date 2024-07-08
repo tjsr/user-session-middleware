@@ -26,6 +26,6 @@ export const handleLocalsCreation: UserSessionMiddlewareRequestHandler = (
   }
 
   // We do this at the end for this handler, but would usually do it first for all other handlers.
-  addCalledHandler(response, handleLocalsCreation.name);
+  addCalledHandler(response, handleLocalsCreation);
   next();
 };

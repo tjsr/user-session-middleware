@@ -23,4 +23,4 @@ declare module "express" {
 
 export default express;
 
-export type { ErrorRequestHandler, Express, Request, RequestHandler, Response, NextFunction  } from 'express';
+export type { ErrorRequestHandler, Express, Handler, Request, RequestHandler, Response, NextFunction  } from 'express';

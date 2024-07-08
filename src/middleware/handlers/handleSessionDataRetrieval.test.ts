@@ -9,16 +9,18 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { SessionData } from "../../express-session/index.js";
 import { SessionHandlerError } from "../../errors/SessionHandlerError.js";
 import { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
+import { handleSessionIdRequired } from "./index.js";
 
 describe('handleSessionDataRetrieval', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
   
   test('Should error when newly generated session has no sessionID.', async (context) => {
+    // TODO: Don't mark handlers called, disable assertion instead.
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: true,
       sessionID: undefined,
     }, {
-      markHandlersCalled: ['handleSessionIdRequired'],
+      markHandlersCalled: [handleSessionIdRequired],
     });
 
     // should not call store.get
@@ -33,11 +35,12 @@ describe('handleSessionDataRetrieval', () => {
   });
 
   test('Should call next handler function for a newly generated session.', async (context) => {
+    // TODO: Don't mark handlers called, disable assertion instead.
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: true,
       sessionID: 'session-1234',
     }, {
-      markHandlersCalled: ['handleSessionIdRequired'],
+      markHandlersCalled: [handleSessionIdRequired],
     });
 
     // should not call store.get
@@ -54,11 +57,12 @@ describe('handleSessionDataRetrieval', () => {
 
   test('Should call next handler function for existing id that returns no data.', async (context) => {
     const testSessionId = 'session-5432';
+    // TODO: Don't mark handlers called, disable assertion instead.
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
     }, {
-      markHandlersCalled: ['handleSessionIdRequired'],
+      markHandlersCalled: [handleSessionIdRequired],
     });
     context.memoryStore?.set(testSessionId, context.testSessionStoreData);
 
@@ -79,11 +83,12 @@ describe('handleSessionDataRetrieval', () => {
 
   test('Should not call next when an error occurs for an existing id.', async (context) => {
     const testSessionId = 'session-5432';
+    // TODO: Don't mark handlers called, disable assertion instead.
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
     }, {
-      markHandlersCalled: ['handleSessionIdRequired'],
+      markHandlersCalled: [handleSessionIdRequired],
     });
 
     const testError: Error = new Error('Generic session storage error occurred.');
@@ -102,14 +107,15 @@ describe('handleSessionDataRetrieval', () => {
 
   test('Should call next hanlder function for existing id that has data.', async (context) => {
     const testSessionId = 'session-6543';
+    // TODO: Don't mark handlers called, disable assertion instead.
     const { next, request, response } = createTestRequestSessionData(context, {
       newSessionIdGenerated: false,
       sessionID: testSessionId,
     }, {
-      markHandlersCalled: ['handleSessionIdRequired'],
+      markHandlersCalled: [handleSessionIdRequired],
     });
 
-    response.locals.calledHandlers = ['handleSessionIdRequired'];
+    response.locals.calledHandlers = [handleSessionIdRequired];
 
     context.memoryStore?.set(testSessionId, context.testSessionStoreData);
     const [callbackPromiseNext, callbackMockNext]: [Promise<void>, typeof next] = createMockPromisePair(next);

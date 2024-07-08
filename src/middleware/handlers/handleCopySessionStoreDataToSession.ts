@@ -14,8 +14,8 @@ export const handleCopySessionStoreDataToSession: UserSessionMiddlewareRequestHa
   next: express.NextFunction // handleAssignUserIdToRequestSessionWhenNoExistingSessionData
 ): void => {
   try {
-    addCalledHandler(response, handleCopySessionStoreDataToSession.name);
-    assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+    addCalledHandler(response, handleCopySessionStoreDataToSession);
+    assertPrerequisiteHandler(response, handleSessionDataRetrieval);
   } catch (err) {
     next(err);
     return;

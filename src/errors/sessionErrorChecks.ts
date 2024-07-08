@@ -4,7 +4,7 @@ import {
   NO_SESSION_ID_IN_REQUEST,
   SESSION_ID_NOT_GENERATED,
 } from "./errorCodes.js";
-import { HandlerName, SessionId } from "../types.js";
+import { ErrorRequestHandler, Handler } from "../express/index.js";
 import {
   MiddlewareConfigurationError,
   SessionDataNotExpectedError,
@@ -13,6 +13,7 @@ import {
 import { Session, SessionData, Store } from "express-session";
 
 import { SessionHandlerError } from "./SessionHandlerError.js";
+import { SessionId } from "../types.js";
 import { SystemResponseLocals } from "../types/locals.js";
 import assert from "node:assert";
 
@@ -85,7 +86,7 @@ export const requireHandlerChainCreated = (
 
 export const requireSessionStoreConfigured = (
   sessionStore: Store | undefined,
-  handlerChain: HandlerName[]
+  handlerChain: (Handler|ErrorRequestHandler)[]
 ): void => {
   assert(handlerChain !== undefined && handlerChain !== null);
   if (!sessionStore) {

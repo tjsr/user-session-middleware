@@ -10,7 +10,7 @@ export const handleSessionIdRequired: UserSessionMiddlewareRequestHandler =
     response: SystemHttpResponseType,
     handleSessionWithNewlyGeneratedId: NextFunction
   ): void => {
-    addCalledHandler(response, handleSessionIdRequired.name);
+    addCalledHandler(response, handleSessionIdRequired);
     try {
       requireSessionIdGenerated(request.sessionID);
     } catch (sessionError) {
