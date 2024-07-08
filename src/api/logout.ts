@@ -8,7 +8,7 @@ import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
-import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
 import express, { NextFunction } from '../express/index.js';
 
 import { LogoutFailedError } from '../errors/inputValidationErrorClasses.js';
@@ -27,7 +27,7 @@ export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> =
     next: express.NextFunction
   ): void => {
     addCalledHandler(response, checkLogout.name);
-    verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+    assertPrerequisiteHandler(response, handleLocalsCreation.name);
     if (!request.session) {
       const logoutError = new LogoutFailedError(undefined, undefined, new SessionNotGeneratedError());
       console.error(logout, 'No session on request.');
@@ -68,8 +68,8 @@ export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> =
     next: express.NextFunction
   ): void => {
     addCalledHandler(response, logout.name);
-    verifyPrerequisiteHandler(response, checkLogout.name);
-    verifyPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
+    assertPrerequisiteHandler(response, checkLogout.name);
+    assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
     request.session.userId = undefined!;
     request.session.email = undefined!;
     request.session.hasLoggedOut = true;
@@ -107,8 +107,8 @@ export const regenerateAfterLogoutError: UserSessionMiddlewareErrorHandler<UserS
   next: NextFunction
 ): void => {
   addCalledHandler(response, regenerateAfterLogoutError.name);
-  verifyPrerequisiteHandler(response, checkLogout.name);
-  verifyPrerequisiteHandler(response, logout.name);
+  assertPrerequisiteHandler(response, checkLogout.name);
+  assertPrerequisiteHandler(response, logout.name);
 
   request.regenerateSessionId = true;
   request.session.regenerate((err) => {

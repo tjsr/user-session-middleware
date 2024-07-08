@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from '../handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../handlerChainLog.js';
 
 import { SessionHandlerError } from '../../errors/SessionHandlerError.js';
 import { SessionSaveError } from '../../errors/errorClasses.js';
@@ -15,7 +15,7 @@ export const handleCopySessionStoreDataToSession: UserSessionMiddlewareRequestHa
 ): void => {
   try {
     addCalledHandler(response, handleCopySessionStoreDataToSession.name);
-    verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+    assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
   } catch (err) {
     next(err);
     return;

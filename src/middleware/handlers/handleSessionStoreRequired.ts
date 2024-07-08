@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from '../handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../handlerChainLog.js';
 import { requireHandlerChainCreated, requireSessionStoreConfigured } from "../../errors/sessionErrorChecks.js";
 
 import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
@@ -11,7 +11,7 @@ export const handleSessionStoreRequired: UserSessionMiddlewareRequestHandler = (
   next: express.NextFunction
 ): void => {
   addCalledHandler(response, handleSessionStoreRequired.name);
-  verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+  assertPrerequisiteHandler(response, handleLocalsCreation.name);
   try {
     requireHandlerChainCreated(response.locals);
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers!);

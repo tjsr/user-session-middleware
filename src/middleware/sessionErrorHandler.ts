@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "./handlerChainLog.js";
 
 import { NextFunction } from "express";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
@@ -16,7 +16,7 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
   next: NextFunction
 ) => {
   addCalledHandler(response, sessionErrorHandler.name);
-  verifyPrerequisiteHandler(response, handleSessionCookieOnError.name);
+  assertPrerequisiteHandler(response, handleSessionCookieOnError.name);
 
   if (SessionHandlerError.isType(error) || error instanceof SessionHandlerError) {
     if (response.locals.sendAuthenticationResult) {

@@ -42,7 +42,7 @@ export const addCalledHandler = (
   response.locals.calledHandlers.push(handlerName);
 };
 
-export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpResponseType>(
+export const assertPrerequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName
 ): void => {
@@ -51,13 +51,13 @@ export const verifyPrerequisiteHandler = <ResponseType extends SystemHttpRespons
       const lastHandler = response.locals?.calledHandlers[response.locals.calledHandlers.length - 1];
       assert (lastHandler !== undefined, 'calledHandlers stack had no elements!  This should never happen!');
       const err = new RequiredMiddlewareNotCalledError(handlerName, lastHandler);
-      console.error(verifyPrerequisiteHandler, err.message);
+      console.error(assertPrerequisiteHandler, err.message);
       throw err;
     }
   }
 };
 
-export const verifyCorequisiteHandler = <ResponseType extends SystemHttpResponseType>(
+export const assertCorequisiteHandler = <ResponseType extends SystemHttpResponseType>(
   response: ResponseType,
   handlerName: HandlerName
 ): void => {

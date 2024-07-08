@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "../handlerChainLog.js";
 
 import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
 import express from "express";
@@ -13,8 +13,8 @@ export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHand
     next: express.NextFunction
   ) => {
     addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
-    verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
-    verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
+    assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
+    assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
 
     try {
       requireSessionIdGenerated(request.sessionID);

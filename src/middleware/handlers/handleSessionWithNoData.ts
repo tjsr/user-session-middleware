@@ -1,6 +1,6 @@
 import * as express from '../../express/index.js';
 
-import { addCalledHandler, verifyCorequisiteHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
+import { addCalledHandler, assertCorequisiteHandler, assertPrerequisiteHandler } from "../handlerChainLog.js";
 
 import { SystemHttpRequestType } from "../../types/request.js";
 import { SystemHttpResponseType } from '../../types/response.js';
@@ -19,14 +19,14 @@ export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHand
   ): void => {
   addCalledHandler(response, handleNewSessionWithNoSessionData.name);
   // This must be called *before* handleExistingSessionWithNoSessionData because it sets newSessionIdGenerated
-  verifyCorequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
+  assertCorequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
   if (request.newSessionIdGenerated !== true) {
     console.debug(handleNewSessionWithNoSessionData, 'Skipping because using provided sessionID.');
     next();
     return;
   }
 
-  verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+  assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
 
   if (response.locals?.retrievedSessionData) {
     console.debug(handleNewSessionWithNoSessionData, 'Skipping because sessionData was retrieved.');

@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from '../handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../handlerChainLog.js';
 
 import { ERROR_RETRIEVING_SESSION_DATA } from "../../errors/errorCodes.js";
 import { SessionHandlerError } from '../../errors/SessionHandlerError.js';
@@ -18,14 +18,14 @@ export const handleSessionDataRetrieval: UserSessionMiddlewareRequestHandler = (
 ): void => {
   addCalledHandler(response, handleSessionDataRetrieval.name);
   try {
-    verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+    assertPrerequisiteHandler(response, handleLocalsCreation.name);
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers!);
   } catch (err) {
     next(err);
     return;
   }
 
-  verifyPrerequisiteHandler(response, handleSessionIdRequired.name);
+  assertPrerequisiteHandler(response, handleSessionIdRequired.name);
 
   if (checkNewlyGeneratedId(request as SystemHttpRequestType, next)) {
     return;
