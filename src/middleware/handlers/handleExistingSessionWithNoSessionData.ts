@@ -1,6 +1,6 @@
 import * as express from '../../express/index.js';
 
-import { addCalledHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "../handlerChainLog.js";
 
 import { ERROR_SESSION_ID_WITH_NO_DATA } from "../../errors/errorCodes.js";
 import { HttpStatusCode } from "../../httpStatusCodes.js";
@@ -32,8 +32,8 @@ export const handleExistingSessionWithNoSessionData: UserSessionMiddlewareReques
     return;
   }
 
-  verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
-  verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
+  assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+  assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
 
   if (response.locals?.retrievedSessionData) {
     console.debug(handleExistingSessionWithNoSessionData, 'Skipping because sessionData was retrieved.');

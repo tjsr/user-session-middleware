@@ -2,7 +2,7 @@ import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
 } from "../types/middlewareHandlerTypes.js";
-import { addCalledHandler, verifyPrerequisiteHandler } from "./handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "./handlerChainLog.js";
 import { handleSessionCookie, handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
 
 import { HttpStatusCode } from "../httpStatusCodes.js";
@@ -16,7 +16,7 @@ export const endRequest: UserSessionMiddlewareRequestHandler = (
   _next: NextFunction
 ):void => {
   addCalledHandler(response, endRequest.name);
-  verifyPrerequisiteHandler(response, handleSessionCookie.name);
+  assertPrerequisiteHandler(response, handleSessionCookie.name);
   response.send();
   response.end();
 };
@@ -30,7 +30,7 @@ export const endErrorRequest: UserSessionMiddlewareErrorHandler = (
   addCalledHandler(response, endErrorRequest.name);
   console.warn(endErrorRequest, 'Got end error request', err, response.statusCode);
   try {
-    verifyPrerequisiteHandler(response, handleSessionCookieOnError.name);
+    assertPrerequisiteHandler(response, handleSessionCookieOnError.name);
     response.sendStatus(response.statusCode);
   } catch (err) {
     response.sendStatus(HttpStatusCode.NOT_IMPLEMENTED);

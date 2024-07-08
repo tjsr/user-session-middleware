@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
 
 import { EmailAddress } from '../types.js';
 import { SessionRegenerationFailedError } from '../errors/authenticationErrorClasses.js';
@@ -61,7 +61,7 @@ export const assignUserDataToRegeneratedSession: UserSessionMiddlewareRequestHan
   next: express.NextFunction
 ) => {
   addCalledHandler(response, assignUserDataToRegeneratedSession.name);
-  verifyPrerequisiteHandler(response, session.name);
+  assertPrerequisiteHandler(response, session.name);
 
   assert(request.session.userId !== undefined, 'No userId assigned to session');
   console.debug(assignUserDataToRegeneratedSession,

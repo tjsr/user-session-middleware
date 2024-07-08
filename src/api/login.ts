@@ -13,7 +13,7 @@ import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler
 } from '../types/middlewareHandlerTypes.js';
-import { addCalledHandler, verifyPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
 
 import { NextFunction } from '../express/index.js';
 import { RegeneratingSessionIdError } from '../errors/errorClasses.js';
@@ -33,7 +33,7 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> =
     next: express.NextFunction
   ): void => {
     addCalledHandler(response, checkLogin.name);
-    verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+    assertPrerequisiteHandler(response, handleLocalsCreation.name);
 
     const email: string = request.body.email;
     if (request.body === undefined) {
@@ -77,8 +77,8 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   next: express.NextFunction
 ) => {
   addCalledHandler(response, login.name);
-  verifyPrerequisiteHandler(response, handleLocalsCreation.name);
-  verifyPrerequisiteHandler(response, checkLogin.name);
+  assertPrerequisiteHandler(response, handleLocalsCreation.name);
+  assertPrerequisiteHandler(response, checkLogin.name);
   const email: string = request.body.email;
   console.debug(login, 'Processing login for valid email', email);
   try {
@@ -97,8 +97,8 @@ export const regenerateAfterLogin: UserSessionMiddlewareRequestHandler<UserSessi
   next: NextFunction
 ) => {
   addCalledHandler(response, regenerateAfterLoginError.name);
-  verifyPrerequisiteHandler(response, checkLogin.name);
-  verifyPrerequisiteHandler(response, login.name);
+  assertPrerequisiteHandler(response, checkLogin.name);
+  assertPrerequisiteHandler(response, login.name);
   regenerateAfterLoginError(undefined, request, response, next);
 };
 
@@ -109,7 +109,7 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
   next: NextFunction
 ): void => {
   addCalledHandler(response, regenerateAfterLoginError.name);
-  verifyPrerequisiteHandler(response, checkLogin.name);
+  assertPrerequisiteHandler(response, checkLogin.name);
 
   const originalSessionId = request.session.id;
   request.regenerateSessionId = true;

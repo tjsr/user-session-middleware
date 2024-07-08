@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from "./middleware/handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "./middleware/handlerChainLog.js";
 
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from './types/response.js';
@@ -28,10 +28,10 @@ async <
   next: express.NextFunction
 ) => {
   addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData.name);
-  verifyPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
-  verifyPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
-  verifyPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
-  verifyPrerequisiteHandler(response, handleSessionDataRetrieval.name);
+  assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
+  assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
+  assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
+  assertPrerequisiteHandler(response, handleSessionDataRetrieval.name);
 
   if (response.locals?.retrievedSessionData) {
     // Nothing to do here if there's already data in the session store as we'll use that ID.

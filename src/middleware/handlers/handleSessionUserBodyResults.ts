@@ -1,4 +1,4 @@
-import { addCalledHandler, verifyPrerequisiteHandler } from "../handlerChainLog.js";
+import { addCalledHandler, assertPrerequisiteHandler } from "../handlerChainLog.js";
 
 import { AuthenticationRestResult } from "../../types/apiResults.js";
 import { Session } from "../../express-session/index.js";
@@ -24,7 +24,7 @@ export const sendAuthResultBody = (
 
 export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler = (request, response, next) => {
   addCalledHandler(response, handleSessionUserBodyResults.name);
-  verifyPrerequisiteHandler(response, handleLocalsCreation.name);
+  assertPrerequisiteHandler(response, handleLocalsCreation.name);
   if (response.locals.sendAuthenticationResult) {
     const result = sendAuthResultBody(request.session, response);
     if (result) {
