@@ -1,11 +1,8 @@
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
-import { ErrorRequestHandler, NextFunction, RequestHandler } from './express/index.js';
+import { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
 import { Mock, MockInstance, TaskContext, expect, vi } from "vitest";
 import { getMockReq, getMockRes } from "vitest-mock-express";
 
-import {
-  HandlerName,
-} from "./types.js";
 import { MockRequest } from "vitest-mock-express/dist/src/request";
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from "./types/response.js";
@@ -104,7 +101,7 @@ interface SessionTestRunOptions {
   skipAddToStore?: boolean;
   spyOnSave?: boolean;
   overrideSessionData?: Partial<UserSessionData>;
-  markHandlersCalled?: HandlerName[],
+  markHandlersCalled?: (Handler|ErrorRequestHandler)[],
   silentCallHandlers?: boolean;
 }
 

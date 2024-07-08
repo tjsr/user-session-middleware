@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import express, { Handler } from '../express/index.js';
+
 import { SystemHttpRequestType } from '../types/request.js';
 import { SystemResponseLocals } from '../types/locals.js';
 import { UserSessionData } from '../types/session.js';
 import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
-import express from 'express';
 
 export const testRequestHandler: UserSessionMiddlewareRequestHandler = (
   _request: express.Request,
@@ -38,9 +39,10 @@ describe('Verify types for middleware are valid.', () => {
     const recordLocals: Record<string, any> = { user: { id: '1234' } };
     let recordLocalsCheck: Record<string, any> = recordLocals;
     expect(recordLocals).toBeDefined();
+    const someHandler: Handler = () => {};
 
     const sysResponseLocals: SystemResponseLocals<UserSessionData> = {
-      calledHandlers: ['someHandler'],
+      calledHandlers: [someHandler],
       retrievedSessionData: undefined,
       skipHandlerDependencyChecks: false,
       user: { id: '1234' },
