@@ -32,8 +32,8 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> =
     response,
     next: express.NextFunction
   ): void => {
-    addCalledHandler(response, checkLogin.name);
-    assertPrerequisiteHandler(response, handleLocalsCreation.name);
+    addCalledHandler(response, checkLogin);
+    assertPrerequisiteHandler(response, handleLocalsCreation);
 
     const email: string = request.body.email;
     if (request.body === undefined) {
@@ -76,9 +76,9 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   response,
   next: express.NextFunction
 ) => {
-  addCalledHandler(response, login.name);
-  assertPrerequisiteHandler(response, handleLocalsCreation.name);
-  assertPrerequisiteHandler(response, checkLogin.name);
+  addCalledHandler(response, login);
+  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, checkLogin);
   const email: string = request.body.email;
   console.debug(login, 'Processing login for valid email', email);
   try {
@@ -96,9 +96,9 @@ export const regenerateAfterLogin: UserSessionMiddlewareRequestHandler<UserSessi
   response,
   next: NextFunction
 ) => {
-  addCalledHandler(response, regenerateAfterLoginError.name);
-  assertPrerequisiteHandler(response, checkLogin.name);
-  assertPrerequisiteHandler(response, login.name);
+  addCalledHandler(response, regenerateAfterLoginError);
+  assertPrerequisiteHandler(response, checkLogin);
+  assertPrerequisiteHandler(response, login);
   regenerateAfterLoginError(undefined, request, response, next);
 };
 
@@ -108,8 +108,8 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
   response,
   next: NextFunction
 ): void => {
-  addCalledHandler(response, regenerateAfterLoginError.name);
-  assertPrerequisiteHandler(response, checkLogin.name);
+  addCalledHandler(response, regenerateAfterLoginError);
+  assertPrerequisiteHandler(response, checkLogin);
 
   const originalSessionId = request.session.id;
   request.regenerateSessionId = true;

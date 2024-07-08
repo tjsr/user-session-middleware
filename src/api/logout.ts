@@ -26,8 +26,8 @@ export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> =
     response,
     next: express.NextFunction
   ): void => {
-    addCalledHandler(response, checkLogout.name);
-    assertPrerequisiteHandler(response, handleLocalsCreation.name);
+    addCalledHandler(response, checkLogout);
+    assertPrerequisiteHandler(response, handleLocalsCreation);
     if (!request.session) {
       const logoutError = new LogoutFailedError(undefined, undefined, new SessionNotGeneratedError());
       console.error(logout, 'No session on request.');
@@ -67,9 +67,9 @@ export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> =
     response,
     next: express.NextFunction
   ): void => {
-    addCalledHandler(response, logout.name);
-    assertPrerequisiteHandler(response, checkLogout.name);
-    assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession.name);
+    addCalledHandler(response, logout);
+    assertPrerequisiteHandler(response, checkLogout);
+    assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession);
     request.session.userId = undefined!;
     request.session.email = undefined!;
     request.session.hasLoggedOut = true;
@@ -106,9 +106,9 @@ export const regenerateAfterLogoutError: UserSessionMiddlewareErrorHandler<UserS
   response,
   next: NextFunction
 ): void => {
-  addCalledHandler(response, regenerateAfterLogoutError.name);
-  assertPrerequisiteHandler(response, checkLogout.name);
-  assertPrerequisiteHandler(response, logout.name);
+  addCalledHandler(response, regenerateAfterLogoutError);
+  assertPrerequisiteHandler(response, checkLogout);
+  assertPrerequisiteHandler(response, logout);
 
   request.regenerateSessionId = true;
   request.session.regenerate((err) => {

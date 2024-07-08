@@ -13,7 +13,7 @@ export const handleSessionWithNewlyGeneratedId: UserSessionMiddlewareRequestHand
     response: ResponseType,
     next: express.NextFunction
   ) => {
-  addCalledHandler(response, handleSessionWithNewlyGeneratedId.name);
+  addCalledHandler(response, handleSessionWithNewlyGeneratedId);
 
   try {
     requireSessionInitialized(request.session);

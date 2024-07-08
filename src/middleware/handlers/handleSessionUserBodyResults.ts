@@ -23,8 +23,8 @@ export const sendAuthResultBody = (
 };
 
 export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler = (request, response, next) => {
-  addCalledHandler(response, handleSessionUserBodyResults.name);
-  assertPrerequisiteHandler(response, handleLocalsCreation.name);
+  addCalledHandler(response, handleSessionUserBodyResults);
+  assertPrerequisiteHandler(response, handleLocalsCreation);
   if (response.locals.sendAuthenticationResult) {
     const result = sendAuthResultBody(request.session, response);
     if (result) {

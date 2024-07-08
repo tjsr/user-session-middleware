@@ -1,6 +1,7 @@
 import { addCalledHandler, assertPrerequisiteHandler } from "./handlerChainLog.js";
 import { handleSessionCookieOnError, sendAuthResultBody } from "./handlers/index.js";
 
+import { AssertionError } from "node:assert";
 import { NextFunction } from "express";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import {
@@ -14,8 +15,8 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
   response,
   next: NextFunction
 ) => {
-  addCalledHandler(response, sessionErrorHandler.name);
-  assertPrerequisiteHandler(response, handleSessionCookieOnError.name);
+  addCalledHandler(response, sessionErrorHandler);
+  assertPrerequisiteHandler(response, handleSessionCookieOnError);
 
   if (SessionHandlerError.isType(error) || error instanceof SessionHandlerError) {
     if (response.locals.sendAuthenticationResult) {
@@ -27,6 +28,8 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
       response.json({ message: sessionError.message });
       console.error(sessionErrorHandler, 'Session error', sessionError);
     }
+  } else if (error instanceof AssertionError) {
+    console.error(sessionErrorHandler, 'Got assertion error', error);
   } else if (error.name) {
     console.warn('Got error of type with name', error.name);
   }

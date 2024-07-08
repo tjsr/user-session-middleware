@@ -10,8 +10,8 @@ export const handleSessionStoreRequired: UserSessionMiddlewareRequestHandler = (
   response,
   next: express.NextFunction
 ): void => {
-  addCalledHandler(response, handleSessionStoreRequired.name);
-  assertPrerequisiteHandler(response, handleLocalsCreation.name);
+  addCalledHandler(response, handleSessionStoreRequired);
+  assertPrerequisiteHandler(response, handleLocalsCreation);
   try {
     requireHandlerChainCreated(response.locals);
     requireSessionStoreConfigured(request.sessionStore, response.locals.calledHandlers!);

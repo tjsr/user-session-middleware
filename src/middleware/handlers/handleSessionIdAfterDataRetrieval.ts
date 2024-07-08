@@ -12,9 +12,9 @@ export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHand
     response,
     next: express.NextFunction
   ) => {
-    addCalledHandler(response, handleSessionIdAfterDataRetrieval.name);
-    assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData.name);
-    assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData.name);
+    addCalledHandler(response, handleSessionIdAfterDataRetrieval);
+    assertPrerequisiteHandler(response, handleNewSessionWithNoSessionData);
+    assertPrerequisiteHandler(response, handleExistingSessionWithNoSessionData);
 
     try {
       requireSessionIdGenerated(request.sessionID);

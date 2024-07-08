@@ -1,6 +1,6 @@
 import { DEFAULT_ERROR_CODES } from "./defaultErrorCodes.js";
-import { HandlerName } from "../types.js";
 import { SessionMiddlewareError } from "./SessionMiddlewareError.js";
+import { ErrorRequestHandler, Handler } from "../express/index.js";
 
 export class SessionHandlerError extends SessionMiddlewareError {
   public get status(): number {
@@ -19,11 +19,11 @@ export class SessionHandlerError extends SessionMiddlewareError {
     return defaultMessage;
   }
 
-  public set handlerChain(chain: HandlerName[]) {
+  public set handlerChain(chain: (Handler|ErrorRequestHandler)[]) {
     this._handlerChain = chain;
   }
 
-  public get handlerChain(): HandlerName[]|undefined {
+  public get handlerChain(): (Handler|ErrorRequestHandler)[]|undefined {
     return this._handlerChain;
   }
 
@@ -38,7 +38,7 @@ export class SessionHandlerError extends SessionMiddlewareError {
     this._clientMessage = message;
   }
 
-  private _handlerChain?: HandlerName[];
+  private _handlerChain?: (Handler|ErrorRequestHandler)[];
   private readonly _status?: number;
   private readonly _sessionErrorCode: number;
   private _clientMessage?: string;

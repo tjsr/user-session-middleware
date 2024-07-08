@@ -15,8 +15,8 @@ export const endRequest: UserSessionMiddlewareRequestHandler = (
   response: SystemHttpResponseType,
   _next: NextFunction
 ):void => {
-  addCalledHandler(response, endRequest.name);
-  assertPrerequisiteHandler(response, handleSessionCookie.name);
+  addCalledHandler(response, endRequest);
+  assertPrerequisiteHandler(response, handleSessionCookie);
   response.send();
   response.end();
 };
@@ -27,10 +27,10 @@ export const endErrorRequest: UserSessionMiddlewareErrorHandler = (
   response: SystemHttpResponseType,
   _next: NextFunction
 ) => {
-  addCalledHandler(response, endErrorRequest.name);
+  addCalledHandler(response, endErrorRequest);
   console.warn(endErrorRequest, 'Got end error request', err, response.statusCode);
   try {
-    assertPrerequisiteHandler(response, handleSessionCookieOnError.name);
+    assertPrerequisiteHandler(response, handleSessionCookieOnError);
     response.sendStatus(response.statusCode);
   } catch (err) {
     response.sendStatus(HttpStatusCode.NOT_IMPLEMENTED);

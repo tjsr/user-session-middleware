@@ -17,7 +17,7 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
   response,
   next: NextFunction
 ) => {
-  addCalledHandler(response, handleSessionCookie.name);
+  addCalledHandler(response, handleSessionCookie);
   if (request.sessionID === undefined) {
     console.error(handleSessionCookie, 'Got to handleSessionCookie with undefined request.sessionID');
     const err = new SessionIDNotGeneratedError();
@@ -43,7 +43,7 @@ export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
   response,
   nextErrorHandler: NextFunction
 ):void => {
-  addCalledHandler(response, handleSessionCookieOnError.name);
+  addCalledHandler(response, handleSessionCookieOnError);
   if (request.sessionID === undefined) {
     console.error(handleSessionCookieOnError,
       'No sessionID on request when setting cookie in cookie error handler.  Something is wrong here.');
