@@ -1,4 +1,10 @@
 import { addCalledHandler, assertPrerequisiteHandler } from "./middleware/handlerChainLog.js";
+import {
+  handleCopySessionStoreDataToSession,
+  handleExistingSessionWithNoSessionData,
+  handleNewSessionWithNoSessionData,
+  handleSessionDataRetrieval
+} from "./middleware/handlers/index.js";
 
 import { SystemHttpRequestType } from "./types/request.js";
 import { SystemHttpResponseType } from './types/response.js';
@@ -6,15 +12,7 @@ import { UserSessionData } from "./types/session.js";
 import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
 import assert from "node:assert";
 import { assignUserIdToRequestSession } from "./sessionUser.js";
-import express from "express";
-import { handleCopySessionStoreDataToSession } from './middleware/handlers/handleCopySessionStoreDataToSession.js';
-import {
-  handleExistingSessionWithNoSessionData
-} from './middleware/handlers/handleExistingSessionWithNoSessionData.js';
-import {
-  handleNewSessionWithNoSessionData
-} from './middleware/handlers/handleSessionWithNoData.js';
-import { handleSessionDataRetrieval } from "./middleware/handlers/handleSessionDataRetrieval.js";
+import express from "./express/index.js";
 
 // TODO: This works??
 // This comes after setting data from the session store.

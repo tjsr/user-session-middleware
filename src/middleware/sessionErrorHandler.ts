@@ -1,12 +1,11 @@
 import { addCalledHandler, assertPrerequisiteHandler } from "./handlerChainLog.js";
+import { handleSessionCookieOnError, sendAuthResultBody } from "./handlers/index.js";
 
 import { NextFunction } from "express";
 import { SessionHandlerError } from "../errors/SessionHandlerError.js";
 import {
   UserSessionMiddlewareErrorHandler,
 } from '../types/middlewareHandlerTypes.js';
-import { handleSessionCookieOnError } from "./handlers/handleSessionCookie.js";
-import { sendAuthResultBody } from "./handlers/handleSessionUserBodyResults.js";
 
 export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
 (
