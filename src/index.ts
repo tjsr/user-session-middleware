@@ -4,8 +4,9 @@ import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtil
 import { HttpStatusCode } from './httpStatusCodes.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
-import { mysqlSessionStore } from './sessionStore.js';
 import { setUserIdNamespace } from './auth/userNamespace.js';
+
+export { getMysqlSessionStore } from './sessionStore.js';
 
 export {
   createRandomId,
@@ -15,7 +16,6 @@ export {
   getUserIdFromRequest,
   getUserIdFromSession,
   HttpStatusCode,
-  mysqlSessionStore,
   setUserIdNamespace,
   validateHasUserId
 };
