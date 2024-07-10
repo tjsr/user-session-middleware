@@ -4,10 +4,7 @@ import {
 } from "../errors/middlewareErrorClasses.js";
 
 import { IdNamespace } from "../types.js";
-import { loadEnv } from "@tjsr/simple-env-utils";
 import { validate } from "uuid";
-
-loadEnv();
 
 let USERID_UUID_NAMESPACE: IdNamespace|undefined = process.env['USERID_UUID_NAMESPACE'];
 // || 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
