@@ -61,15 +61,14 @@ export const getMysqlSessionStore = (): MySQLStore => {
         sessionStoreOptions /* session store options */
       );
       mysqlSessionStore.validateOptions(sessionStoreOptions);
-  const sessionConnection: Connection | Pool = mysqlSessionStore.connection;
+      const sessionConnection: Connection | Pool = mysqlSessionStore.connection;
       checkDeletePrivileges(sessionConnection).then((complete: boolean) => {
         if (complete) {
           console.log('Successfully checked delete privileges on MySQL session table.');
-            mysqlSessionStoreSingleton = mysqlSessionStore;
+          mysqlSessionStoreSingleton = mysqlSessionStore;
         } else {
           throw new Error('Failed to complete privilege check on MySQL session table.');
         }
-  
 
       }).catch((err) => {
         console.error('Failed checking delete privileges', err);
@@ -82,4 +81,4 @@ export const getMysqlSessionStore = (): MySQLStore => {
   }
 
   return mysqlSessionStoreSingleton;
-}
+};
