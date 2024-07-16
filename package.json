@@ -54,7 +54,6 @@
   "devDependencies": {
     "@tjsr/eslint-config": "github:tjsr/eslint-config#main",
     "@tjsr/testutils": "^0.0.6",
-    "@tjsr/user-session-middleware": "^0.0.24",
     "@types/express": "^4.17.21",
     "@types/express-mysql-session": "^3.0.6",
     "@types/express-session": "^1.18.0",
@@ -65,7 +64,8 @@
     "@vitest/coverage-v8": "^1.6.0",
     "expect-cookies": "^0.2.0",
     "linkteam": "^0.0.17",
-    "rimraf": "^6.0.0",
+    "prettier-plugin-sort-members": "^0.2.0-rc.0",
+    "rimraf": "^6.0.1",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
@@ -87,7 +87,8 @@
   "overrides": {
     "braces": ">=3.0.3",
     "mysql2": ">=3.10.0",
-    "glob": ">=11.0.0"
+    "glob": ">=11.0.0",
+    "rimraf@<=4": "$rimraf"
   },
   "optionalDependencies": {
     "nodemon": "^3.1.4"
