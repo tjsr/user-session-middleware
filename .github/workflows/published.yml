@@ -4,6 +4,9 @@ on:
   registry_package:
     types: [published]
   workflow_dispatch:
+  push: 
+    branches:
+      - workflow/published.yml
 
 env:
   repo_owner: tjsr
