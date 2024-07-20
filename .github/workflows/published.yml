@@ -1,4 +1,5 @@
 name: Fire webhooks to dependent repositories when published
+run-name: ${{ github.actor }} Update an npm dependency when published
 on:
   registry_package:
     types: [published]
