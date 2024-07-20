@@ -13,14 +13,14 @@ env:
   repo_name: tagtool
 
 jobs:
-  job:
+  fire-dependent-update:
     runs-on: ubuntu-latest
     steps:
       - name: Fire webhook to dependency update
         uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: ${{ env.repo_owner }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.BUILD_WEBHOOK_TOKEN }}
           workflow_file_name: dependency.yml
           ref: main
           repo: ${{ env.repo_name }}
