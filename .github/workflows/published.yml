@@ -10,11 +10,13 @@ on:
 
 env:
   repo_owner: tjsr
-  repo_name: tagtool
 
 jobs:
-  fire-dependent-update:
+  fire-tagtool-update:
+    name: Fire webhook to check dependency updates on tagtool
     runs-on: ubuntu-latest
+    env:
+      repo_name: tagtool
     steps:
       - name: Fire webhook to dependency update
         uses: convictional/trigger-workflow-and-wait@v1.6.5
