@@ -1,0 +1,62 @@
+name: "Update version number and publish to package repository (${{ steps.output.version }})."
+run-name: "${{ github.actor }} Bump the version number and publish ${{ github.repository}}"
+on:
+  workflow_dispatch:
+    inputs:
+      patchlevel:
+        type: choice
+        description: 'Patch level'
+        required: true
+        default: 'prerelease'
+        options:
+        - 'prerelease'
+        - 'patch'
+        - 'minor'
+        - 'major'
+      noTag:
+        description: 'Do not create a tag'
+        default: false
+        type: boolean
+      noPublish:
+        description: 'Do not publish'
+        default: false
+        type: boolean
+  
+jobs:
+  bump:
+    permissions:
+      contents: write
+      packages: write
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify inputs
+        run: |
+          if [ -z "${{ inputs.patchlevel }}" ]; then
+            echo "Patch level is required"
+            exit 1
+          fi
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Bump and publish
+        id: bump
+        uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          patchlevel: ${{ inputs.patchlevel }}
+          bump: ${{ inputs.package }}
+          noTag: ${{ inputs.noTag }}
+          noPublish: ${{ inputs.noPublish }}
+          npmVersion: 'latest'
+          nodeVersion: '20.15.1'
+
+      - name: "Confirm published: ${{ steps.bump.outputs.version }}"
+        if: !inputs.noPublish
+        run: |
+          if [ -z "${{ steps.bump.outputs.version }}" ]; then
+            echo "No version published"
+            exit 1
+          fi
+          echo "Published: ${{ steps.bump.outputs.version }}"
