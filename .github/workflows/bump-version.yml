@@ -53,7 +53,7 @@ jobs:
           nodeVersion: '20.15.1'
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
-        if: !inputs.noPublish
+        if: ${{ inputs.noPublish == 'false' }}
         run: |
           if [ -z "${{ steps.bump.outputs.version }}" ]; then
             echo "No version published"
