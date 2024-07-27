@@ -24,7 +24,9 @@ on:
   
 jobs:
   bump:
-    # permissions:
+    env:
+      NODE_CACHE_KEY: "node-cache-${{ github.run_number }}"
+      # permissions:
     #   contents: write
     #   packages: write
     
@@ -46,6 +48,7 @@ jobs:
         with:
           token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           scope: "@tjsr"
+          cacheKey: ${{ env.NODE_CACHE_KEY}}
 
       - name: Bump and publish
         id: bump
@@ -54,6 +57,7 @@ jobs:
           patchlevel: ${{ inputs.patchlevel }}
           noTag: ${{ inputs.noTag }}
           noPublish: ${{ inputs.noPublish }}
+          cacheKey: ${{ env.NODE_CACHE_KEY}}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ inputs.noPublish == 'false' }}
