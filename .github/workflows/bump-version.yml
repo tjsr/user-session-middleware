@@ -40,6 +40,10 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Common node/npm setup
+        id: node-setup
+        uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+
       - name: Bump and publish
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
