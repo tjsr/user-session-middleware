@@ -1,0 +1,43 @@
+name: Update dependency
+run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package }}
+on:
+  workflow_dispatch:
+    inputs:
+      patchlevel:
+        type: choice
+        description: 'Patch level'
+        required: true
+        default: 'prerelease'
+        options:
+        - 'prerelease'
+        - 'patch'
+        - 'minor'
+        - 'major'
+      noTag:
+        description: 'Do not create a tag'
+        default: false
+        type: boolean
+      noPublish:
+        description: 'Do not publish'
+        default: false
+        type: boolean
+  
+jobs:
+  bump:
+    permissions:
+      contents: write
+      packages: write
+    
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bump and publish
+        id: bump
+        uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          patchlevel: ${{ inputs.patchlevel }}
+          bump: ${{ inputs.package }}
+          noTag: ${{ inputs.noTag }}
+          noPublish: ${{ inputs.noPublish }}
+          npmVersion: 'latest'
+          nodeVersion: '20.15.1'
