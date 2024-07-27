@@ -30,6 +30,13 @@ jobs:
     
     runs-on: ubuntu-latest
     steps:
+      - name: Verify inputs
+        run: |
+          if [ -z "${{ inputs.patchlevel }}" ]; then
+            echo "Patch level is required"
+            exit 1
+          fi
+
       - name: Bump and publish
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
