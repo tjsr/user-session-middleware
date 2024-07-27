@@ -24,9 +24,9 @@ on:
   
 jobs:
   bump:
-    permissions:
-      contents: write
-      packages: write
+    # permissions:
+    #   contents: write
+    #   packages: write
     
     runs-on: ubuntu-latest
     steps:
@@ -51,7 +51,6 @@ jobs:
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           patchlevel: ${{ inputs.patchlevel }}
           noTag: ${{ inputs.noTag }}
           noPublish: ${{ inputs.noPublish }}
