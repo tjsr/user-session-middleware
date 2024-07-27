@@ -1,0 +1,70 @@
+name: Update dependency
+run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package }}
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        type: choice
+        description: 'Environment ID (required)'
+        required: true
+        default: 'dev'
+        options:
+        - '@tjsr/mysql-pool-utils'
+        - '@tjsr/simple-env-utils'
+        - '@tjsr/testutils'
+        - '@types/node'
+        - 'typescript'
+        - 'vitest'
+      package-version:
+        description: 'Package version to use (optional)'
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      package:
+        type: string
+        required: true
+      package-version:
+        type: string
+        required: false
+  
+jobs:
+  create-branch:
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: read
+
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PROJECT: tagtool
+      PACKAGE: ${{ inputs.package || '@types/node' }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.15.1
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          scope: '@tjsr'
+
+      - name: Check latest version and create PR
+        id: raise-version-pr
+        uses: tjsr/gh-util-actions/npm-dependency-pr@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          dependency: ${{ inputs.package }}
+          packageVersion: ${{ inputs.package-version }}
+          reviewers: 'tjsr'
+
+      - name: Verify PR creation details (skipped if no PR was created)
+        id: pr-details
+        if: steps.raise-version-pr.outputs.pullRequestNumber
+        run: |
+          echo "PR ${{ steps.raise-version-pr.outputs.pullRequestNumber }} crated at ${{ steps.raise-version-pr.outputs.pullRequestUrl }}"
+
