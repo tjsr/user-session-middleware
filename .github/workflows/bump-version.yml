@@ -44,7 +44,7 @@ jobs:
         id: node-setup
         uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           scope: "@tjsr"
 
       - name: Bump and publish
