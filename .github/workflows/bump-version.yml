@@ -46,7 +46,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           patchlevel: ${{ inputs.patchlevel }}
-          bump: ${{ inputs.package }}
           noTag: ${{ inputs.noTag }}
           noPublish: ${{ inputs.noPublish }}
           npmVersion: 'latest'
