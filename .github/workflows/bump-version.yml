@@ -1,5 +1,5 @@
-name: Update dependency
-run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package }}
+name: "Update version number and publish to package repository (${{ steps.output.version }})."
+run-name: "${{ github.actor }} Bump the version number and publish ${{ github.repository}}"
 on:
   workflow_dispatch:
     inputs:
@@ -36,6 +36,9 @@ jobs:
             echo "Patch level is required"
             exit 1
           fi
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
 
       - name: Bump and publish
         id: bump
