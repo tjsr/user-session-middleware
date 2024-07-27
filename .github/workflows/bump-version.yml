@@ -43,6 +43,9 @@ jobs:
       - name: Common node/npm setup
         id: node-setup
         uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          scope: "@tjsr"
 
       - name: Bump and publish
         id: bump
@@ -52,8 +55,6 @@ jobs:
           patchlevel: ${{ inputs.patchlevel }}
           noTag: ${{ inputs.noTag }}
           noPublish: ${{ inputs.noPublish }}
-          npmVersion: 'latest'
-          nodeVersion: '20.15.1'
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ inputs.noPublish == 'false' }}
