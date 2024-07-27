@@ -1,4 +1,4 @@
-name: "Update version number and publish to package repository (${{ steps.output.version }})."
+name: "Update version number and publish to package repository."
 run-name: "${{ github.actor }} Bump the version number and publish ${{ github.repository}}"
 on:
   workflow_dispatch:
@@ -33,7 +33,7 @@ jobs:
       - name: Verify inputs
         run: |
           if [ -z "${{ inputs.patchlevel }}" ]; then
-            echo "Patch level is required"
+            echo "Patch level is required."
             exit 1
           fi
 
