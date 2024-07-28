@@ -53,7 +53,7 @@
   "homepage": "https://github.com/tjsr/user-session-middleware#readme",
   "devDependencies": {
     "@tjsr/eslint-config": "github:tjsr/eslint-config#main",
-    "@tjsr/testutils": "^0.0.6",
+    "@tjsr/testutils": "^0.0.7",
     "@types/express": "^4.17.21",
     "@types/express-mysql-session": "^3.0.6",
     "@types/express-session": "^1.18.0",

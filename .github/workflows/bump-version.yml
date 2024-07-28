@@ -1,4 +1,4 @@
-name: "Update version number and publish to package repository (${{ steps.output.version }})."
+name: "Update version number and publish to package repository."
 run-name: "${{ github.actor }} Bump the version number and publish ${{ github.repository}}"
 on:
   workflow_dispatch:
@@ -15,45 +15,64 @@ on:
         - 'major'
       noTag:
         description: 'Do not create a tag'
-        default: false
+        default: true
         type: boolean
       noPublish:
         description: 'Do not publish'
-        default: false
+        default: true
         type: boolean
   
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   bump:
-    permissions:
-      contents: write
-      packages: write
+    env:
+      NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
+      NODE_VERSION: "20.15.1"
+      NPM_VERSION: "10.8.2"
+      NODE_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     
     runs-on: ubuntu-latest
     steps:
       - name: Verify inputs
         run: |
           if [ -z "${{ inputs.patchlevel }}" ]; then
-            echo "Patch level is required"
+            echo "Patch level is required."
             exit 1
           fi
 
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Common node/npm setup
+        id: node-setup
+        uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+        with:
+          # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          scope: "@tjsr"
+          cache-key: ${{ env.NODE_CACHE_KEY}}
+          node-version: ${{ env.NODE_VERSION }}
+          npm-version: ${{ env.NPM_VERSION }}
+
       - name: Bump and publish
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
         with:
+          # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          scope: "@tjsr"
           patchlevel: ${{ inputs.patchlevel }}
-          bump: ${{ inputs.package }}
-          noTag: ${{ inputs.noTag }}
-          noPublish: ${{ inputs.noPublish }}
-          npmVersion: 'latest'
-          nodeVersion: '20.15.1'
+          no-tag: ${{ inputs.noTag }}
+          no-publish: ${{ inputs.noPublish }}
+          cache-key: ${{ env.NODE_CACHE_KEY}}
+          node-version: ${{ env.NODE_VERSION }}
+          npm-version: ${{ env.NPM_VERSION }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
-        if: !inputs.noPublish
+        if: ${{ inputs.noPublish == 'false' }}
         run: |
           if [ -z "${{ steps.bump.outputs.version }}" ]; then
             echo "No version published"
