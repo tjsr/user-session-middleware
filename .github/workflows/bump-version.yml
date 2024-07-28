@@ -32,6 +32,7 @@ jobs:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
       NODE_VERSION: "20.15.1"
       NPM_VERSION: "10.8.2"
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
     
     runs-on: ubuntu-latest
     steps:
