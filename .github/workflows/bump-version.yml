@@ -28,9 +28,9 @@ jobs:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
       NODE_VERSION: "20.15.1"
       NPM_VERSION: "10.8.2"
-      # permissions:
-    #   contents: write
-    #   packages: write
+    permissions:
+      contents: write
+      packages: write
     
     runs-on: ubuntu-latest
     steps:
@@ -48,7 +48,8 @@ jobs:
         id: node-setup
         uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
         with:
-          token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           scope: "@tjsr"
           cache-key: ${{ env.NODE_CACHE_KEY}}
           node-version: ${{ env.NODE_VERSION }}
@@ -58,7 +59,8 @@ jobs:
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
         with:
-          token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           scope: "@tjsr"
           patchlevel: ${{ inputs.patchlevel }}
           no-tag: ${{ inputs.noTag }}
