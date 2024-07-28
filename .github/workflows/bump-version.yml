@@ -58,6 +58,8 @@ jobs:
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
         with:
+          token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          scope: "@tjsr"
           patchlevel: ${{ inputs.patchlevel }}
           no-tag: ${{ inputs.noTag }}
           no-publish: ${{ inputs.noPublish }}
