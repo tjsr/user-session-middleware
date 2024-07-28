@@ -15,11 +15,11 @@ on:
         - 'major'
       noTag:
         description: 'Do not create a tag'
-        default: false
+        default: true
         type: boolean
       noPublish:
         description: 'Do not publish'
-        default: false
+        default: true
         type: boolean
   
 jobs:
