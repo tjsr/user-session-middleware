@@ -25,7 +25,7 @@ on:
 jobs:
   bump:
     env:
-      NODE_CACHE_KEY: "node-cache-${{ github.run_number }}"
+      NODE_CACHE_KEY: "node-cache-${{ github.run_id }}-${{ github.run_number }}"
       # permissions:
     #   contents: write
     #   packages: write
