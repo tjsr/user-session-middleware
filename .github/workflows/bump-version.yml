@@ -15,12 +15,16 @@ on:
         - 'major'
       noTag:
         description: 'Do not create a tag'
-        default: true
+        default: false
         type: boolean
       noPublish:
         description: 'Do not publish'
         default: true
         type: boolean
+      preid:
+        description: 'Version prerelease refix. Use "release" for release versions which will be stripped.'
+        required: false
+        type: string
   
 permissions:
   contents: write
@@ -48,7 +52,7 @@ jobs:
 
       - name: Common node/npm setup
         id: node-setup
-        uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/node-common-setup@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +63,7 @@ jobs:
 
       - name: Bump and publish
         id: bump
-        uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/version-bump-publish@develop/input-env-preid
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -70,6 +74,7 @@ jobs:
           cache-key: ${{ env.NODE_CACHE_KEY}}
           node-version: ${{ env.NODE_VERSION }}
           npm-version: ${{ env.NPM_VERSION }}
+          preid: ${{ inputs.preid != '' && inputs.preid || 'dev' }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ inputs.noPublish == 'false' }}
