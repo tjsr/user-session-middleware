@@ -77,7 +77,7 @@ jobs:
           preid: ${{ inputs.preid != '' && inputs.preid || 'dev' }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
-        if: ${{ inputs.noPublish == 'false' }}
+        if: ${{ inputs.noPublish == false }}
         run: |
           if [ -z "${{ steps.bump.outputs.version }}" ]; then
             echo "No version published"
