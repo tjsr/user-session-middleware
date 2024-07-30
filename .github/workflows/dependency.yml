@@ -50,8 +50,6 @@ jobs:
           node-version: 20.15.1
           cache: 'npm'
           registry-url: 'https://npm.pkg.github.com'
-          # Defaults to the user or organization that owns the workflow file
-          scope: '@tjsr'
 
       - name: Check latest version and create PR
         id: raise-version-pr
