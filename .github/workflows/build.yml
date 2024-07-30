@@ -1,5 +1,5 @@
 name: Build user-session-middleware
-run-name: ${{ github.actor }} Running user-session-middleware build.
+run-name: ${{ github.actor }} Running user-session-middleware build on ${{ github.base_ref == 'main' && 'main' || 'branch'}}.
 on: [push]
 jobs:
   build-user-session-middleware:
@@ -16,8 +16,6 @@ jobs:
       with:
         node-version: 20.12.2
         registry-url: 'https://npm.pkg.github.com'
-        # Defaults to the user or organization that owns the workflow file
-        scope: '@tjsr'
 
     - name: Cache node modules
       id: cache-npm
