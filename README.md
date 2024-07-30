@@ -9,7 +9,9 @@ This code wraps express-session, but significant additional checks to protect ag
 
 ## Requirements
 
-Expects node 20.12.1 or higher, and express to be provided by the parent app including this library.
+Expects `node@20.12.1` or higher but is built on 20.15.1 presently.  
+`npm@10.8.2` is required by workflows due to json schema changes in 10.8.1 and higher.
+`express@>=4` must be provided by the parent app including this library.
 
 Nodemon can be used optionally to watch and re-build on changes automatically.
 
@@ -51,5 +53,3 @@ USM currently has the following config options:
 ### Building
 
 First, `npm install` for dependencies.  To verify everything is okay, `npm build` and `npm test`.
-
-### 

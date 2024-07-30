@@ -97,5 +97,8 @@
     "extends": [
       "@tjsr/eslint-config"
     ]
+  },
+  "engines": {
+    "node": ">=20.12.2"
   }
 }
