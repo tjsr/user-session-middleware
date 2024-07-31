@@ -48,7 +48,7 @@ jobs:
 
       - name: Common node/npm setup
         id: node-setup
-        uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/node-common-setup@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +59,7 @@ jobs:
 
       - name: Bump and publish
         id: bump
-        uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/version-bump-publish@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
