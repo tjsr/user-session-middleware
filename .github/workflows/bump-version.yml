@@ -15,11 +15,11 @@ on:
         - 'major'
       noTag:
         description: 'Do not create a tag'
-        default: true
+        default: false
         type: boolean
       noPublish:
         description: 'Do not publish'
-        default: true
+        default: false
         type: boolean
   
 permissions:
@@ -28,6 +28,7 @@ permissions:
 
 jobs:
   bump:
+    name: "Bump version number and publish"
     env:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
       NODE_VERSION: ${{ vars.NODE_VERSION }}
@@ -48,7 +49,7 @@ jobs:
 
       - name: Common node/npm setup
         id: node-setup
-        uses: tjsr/gh-util-actions/node-common-setup@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/node-common-setup@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +60,7 @@ jobs:
 
       - name: Bump and publish
         id: bump
-        uses: tjsr/gh-util-actions/version-bump-publish@workflows/version-bump-publish
+        uses: tjsr/gh-util-actions/version-bump-publish@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -70,9 +71,10 @@ jobs:
           cache-key: ${{ env.NODE_CACHE_KEY}}
           node-version: ${{ env.NODE_VERSION }}
           npm-version: ${{ env.NPM_VERSION }}
+          preid: ${{ github.ref != 'refs/head/main' && 'dev' || 'release' }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
-        if: ${{ inputs.noPublish == 'false' }}
+        if: ${{ steps.bump.conclusion == 'success' }}
         run: |
           if [ -z "${{ steps.bump.outputs.version }}" ]; then
             echo "No version published"
