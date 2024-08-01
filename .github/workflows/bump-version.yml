@@ -28,6 +28,7 @@ permissions:
 
 jobs:
   bump:
+    name: "Bump version number and publish"
     env:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
       NODE_VERSION: ${{ vars.NODE_VERSION }}
