@@ -60,7 +60,7 @@ jobs:
 
       - name: Bump and publish
         id: bump
-        uses: tjsr/gh-util-actions/version-bump-publish@main
+        uses: tjsr/gh-util-actions/version-bump-publish@develop/commit-version-bump
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
