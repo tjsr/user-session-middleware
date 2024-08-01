@@ -72,7 +72,7 @@ jobs:
           npm-version: ${{ env.NPM_VERSION }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
-        if: ${{ inputs.noPublish == 'false' }}
+        if: ${{ steps.bump.conclusion == 'success' }}
         run: |
           if [ -z "${{ steps.bump.outputs.version }}" ]; then
             echo "No version published"
