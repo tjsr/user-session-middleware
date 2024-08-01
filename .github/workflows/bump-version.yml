@@ -15,11 +15,11 @@ on:
         - 'major'
       noTag:
         description: 'Do not create a tag'
-        default: true
+        default: false
         type: boolean
       noPublish:
         description: 'Do not publish'
-        default: true
+        default: false
         type: boolean
   
 permissions:
@@ -60,7 +60,7 @@ jobs:
 
       - name: Bump and publish
         id: bump
-        uses: tjsr/gh-util-actions/version-bump-publish@develop/published-version-bump
+        uses: tjsr/gh-util-actions/version-bump-publish@main
         with:
           # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
