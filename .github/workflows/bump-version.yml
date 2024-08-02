@@ -1,5 +1,5 @@
 name: "Update version number and publish to package repository."
-run-name: "${{ github.actor }} Bump the version number and publish ${{ github.repository}}"
+run-name: "${{ github.actor }} Bump version (${{ inputs.patchlevel }}) ${{ inputs.noPublish == 'true' && 'and publish' || 'on'}} ${{ github.repository}}"
 on:
   workflow_dispatch:
     inputs:
