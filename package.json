@@ -1,6 +1,6 @@
 {
   "name": "@tjsr/user-session-middleware",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "description": "User session handling middleware and utilities",
   "type": "module",
   "main": "dist/esm/index.js",
