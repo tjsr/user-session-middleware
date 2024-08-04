@@ -48,11 +48,11 @@ jobs:
           fi
           echo "Current branch: $REF_BRANCH"
           REQUIRES_PR=false
-          if [ "$REF_BRANCH" = "refs/head/main" ]; then
+          if [ "$REF_BRANCH" = "refs/heads/main" ]; then
             echo "Running on main branch."
             REQUIRES_PR=true
           fi
-          if [ "$REF_BRANCH" = "refs/head/develop/require-pr" ]; then
+          if [ "$REF_BRANCH" = "refs/heads/develop/require-pr" ]; then
             echo "Running on main branch."
             REQUIRES_PR=true
           fi
@@ -89,8 +89,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           npm-version: ${{ env.NPM_VERSION }}
           requiresPr: ${{ env.REQUIRES_PR }}
-          # requiresPr: ${{ github.ref == 'refs/head/main' }}
-          preid: ${{ github.ref != 'refs/head/main' && 'dev' || 'release' }}
+          # requiresPr: ${{ github.ref == 'refs/heads/main' }}
+          preid: ${{ github.ref != 'refs/heads/main' && 'dev' || 'release' }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ steps.bump.conclusion == 'success' }}
