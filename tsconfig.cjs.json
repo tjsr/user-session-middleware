@@ -5,7 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "Node",
     "target": "ESNext",
-    "declaration": false,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
-    "declarationMap": false,                           /* Create sourcemaps for d.ts files. */
+    "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
+    "declarationMap": true /* Create sourcemaps for d.ts files. */
   }
 }
