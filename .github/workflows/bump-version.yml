@@ -64,7 +64,6 @@ jobs:
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@main
         with:
-          # token: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
           scope: "@tjsr"
           patchlevel: ${{ inputs.patchlevel }}
