@@ -21,7 +21,11 @@ on:
         description: 'Do not publish'
         default: false
         type: boolean
-  
+      usePr:
+        description: 'Force use of PR on parent branch to raise changes.'
+        default: false
+        type: boolean
+    
 permissions:
   contents: write
   packages: write
@@ -34,15 +38,33 @@ jobs:
       NODE_VERSION: ${{ vars.NODE_VERSION }}
       NPM_VERSION: ${{ vars.NPM_VERSION }}
       NODE_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      REQUIRES_PR: false
     
     runs-on: ubuntu-latest
     steps:
       - name: Verify inputs
+        env:
+          REF_BRANCH: ${{ github.ref }}
+          USE_PR_INPUT: ${{ inputs.usePr }}
         run: |
           if [ -z "${{ inputs.patchlevel }}" ]; then
             echo "Patch level is required."
             exit 1
           fi
+
+          echo "Current branch: $REF_BRANCH"
+
+          USE_PR=false
+          if [ "$USE_PR_INPUT" = "true" ]; then
+            USE_PR=true
+          fi
+
+          if [ "$REF_BRANCH" = "refs/heads/main" ]; then
+            echo "Running on main branch."
+            USE_PR=true
+          fi
+
+          echo "USE_PR=$USE_PR">> "$GITHUB_ENV"
 
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -65,14 +87,11 @@ jobs:
         uses: tjsr/gh-util-actions/version-bump-publish@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          scope: "@tjsr"
           patchlevel: ${{ inputs.patchlevel }}
           no-tag: ${{ inputs.noTag }}
           no-publish: ${{ inputs.noPublish }}
-          cache-key: ${{ env.NODE_CACHE_KEY}}
-          node-version: ${{ env.NODE_VERSION }}
-          npm-version: ${{ env.NPM_VERSION }}
-          preid: ${{ github.ref != 'refs/head/main' && 'dev' || 'release' }}
+          preid: ${{ github.ref != 'refs/heads/main' && 'dev' || 'release' }}
+          requiresPr: ${{ env.USE_PR }}
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ steps.bump.conclusion == 'success' }}

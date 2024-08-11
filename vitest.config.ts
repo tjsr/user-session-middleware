@@ -1,8 +1,8 @@
-import { findEnvFile, findPackageJson } from '@tjsr/testutils';
 import { defineConfig } from 'vitest/config';
-// import { findPackageJson } from '@tjsr/testutils';
-
+import { findPackageJson } from '@tjsr/testutils';
 import path from 'path';
+
+// import { findPackageJson } from '@tjsr/testutils';
 
 const packageJsonFile = findPackageJson(__dirname);
 const projectPath = path.dirname(packageJsonFile);
