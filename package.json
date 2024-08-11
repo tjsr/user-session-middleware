@@ -74,7 +74,7 @@
     "vitest-mock-express": "^2.2.0"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.1.9",
+    "@tjsr/mysql-pool-utils": "^0.1.11",
     "@tjsr/simple-env-utils": "^0.1.5",
     "email-validator": "^2.0.4",
     "express-mysql-session": "^3.0.3",
