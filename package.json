@@ -1,6 +1,6 @@
 {
   "name": "@tjsr/user-session-middleware",
-  "version": "0.0.36-dev.9",
+  "version": "0.0.36",
   "description": "User session handling middleware and utilities",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
+    "build:dev": "linkteam && tsc -w",
     "build:dist": "rimraf dist && tsc -p tsconfig.publish.json && tsc -p tsconfig.cjs.json",
     "check": "npx npm-check",
     "clean": "npx rimraf build dist coverage",
