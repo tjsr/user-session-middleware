@@ -1,20 +1,25 @@
 name: Update dependency
-run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package }}
+run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package == 'other' && inputs.free-package || inputs.package }}
 on:
   workflow_dispatch:
     inputs:
       package:
         type: choice
-        description: 'Environment ID (required)'
+        description: 'Dependency to update'
         required: true
-        default: 'dev'
+        default: 'other'
         options:
+        - 'other'
         - '@tjsr/mysql-pool-utils'
         - '@tjsr/simple-env-utils'
         - '@tjsr/testutils'
         - '@types/node'
         - 'typescript'
         - 'vitest'
+      free-package:
+        type: string
+        description: 'Free-form package name to update (optional)'
+        required: false
       package-version:
         description: 'Package version to use (optional)'
         type: string
@@ -39,7 +44,7 @@ jobs:
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PROJECT: tagtool
-      PACKAGE: ${{ inputs.package || '@types/node' }}
+      PACKAGE: ${{ inputs.package == 'other' && inputs.free-package || inputs.package }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -56,7 +61,7 @@ jobs:
         uses: tjsr/gh-util-actions/npm-dependency-pr@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          dependency: ${{ inputs.package }}
+          dependency: ${{ env.PACKAGE }}
           packageVersion: ${{ inputs.package-version }}
           reviewers: 'tjsr'
 
