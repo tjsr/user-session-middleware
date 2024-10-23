@@ -1,5 +1,5 @@
 name: Update dependency
-run-name: ${{ github.actor }} Update the npm dependency for ${{ inputs.package == 'other' && inputs.free-package || inputs.package }}
+run-name: Update the npm dependency for ${{ inputs.package == 'other' && inputs.free-package || inputs.package }}
 on:
   workflow_dispatch:
     inputs:
