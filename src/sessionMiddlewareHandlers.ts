@@ -51,7 +51,7 @@ export const sessionUserRouteHandlers = (app: express.Express,
   }
   if (!sessionOptions?.disableLoginEndpoints) {
     // express.json will be required if we are going to use req.body for /login
-    app.use(express.json()),
+    app.use(express.json());
     app.get(sessionOptions?.loginPath ?? '/login', checkLogin, login,
       regenerateAfterLogin, regenerateAfterLoginError);
     app.post(sessionOptions?.loginPath ?? '/login', checkLogin, login,
