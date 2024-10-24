@@ -9,8 +9,7 @@ import {
   createContextForSessionTest,
   createTestRequestSessionData,
 } from "./testUtils.js";
-import { addIgnoredLog, clearIgnoredFunctions } from "./setup-tests.js";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.js';
 import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser.js";
 
 import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";

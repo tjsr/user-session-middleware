@@ -1,6 +1,4 @@
-import { describe, expect, test } from "vitest";
-
-import { getSessionIdFromSetCookieString } from "./cookieTestUtils.js";
+import { getSessionIdFromSetCookieString } from './cookieTestUtils.js';
 
 describe('getSessionIdFromSetCookieString', () => {
   test('Should return a sessionId value in a string with path.', () => {

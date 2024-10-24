@@ -1,9 +1,4 @@
-import {
-  SessionDataTestContext,
-  createContextForSessionTest,
-  createTestRequestSessionData
-} from "../../testUtils.js";
-import { beforeEach, describe, expect, test } from "vitest";
+import { SessionDataTestContext, createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../../middlewareTestUtils.js";
 

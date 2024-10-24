@@ -1,6 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
-
-import { clearIgnoredFunctions } from "./setup-tests.js";
+import { clearIgnoredFunctions } from './setup-tests.js';
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));
@@ -25,7 +23,7 @@ describe('handleSessionWithNewlyGeneratedId', () => {
   //     sessionStore: memoryStore,
   //   });
   //   const { res, next } = getMockRes<Express.Response>();
-    
+
   //   memoryStore.createSession(req, testSessionData);
 
   //   vi.spyOn(req.session, 'save');
@@ -42,7 +40,7 @@ describe('handleSessionWithNewlyGeneratedId', () => {
   //     sessionStore: memoryStore,
   //   });
   //   const { res, next } = getMockRes<Express.Response>();
-    
+
   //   memoryStore.createSession(req, testSessionData);
 
   //   vi.spyOn(req.session, 'save');
@@ -59,7 +57,7 @@ describe('handleSessionWithNewlyGeneratedId', () => {
   //     sessionStore: memoryStore,
   //   });
   //   const { res, next } = getMockRes<Express.Response>();
-    
+
   //   memoryStore.createSession(req, testSessionData);
 
   //   vi.spyOn(req.session, 'save');
@@ -151,7 +149,7 @@ describe('retrieveSessionData with mocked async callbacks', () => {
   //     expect(req.session.save).toHaveBeenCalled();
   //     expect(req.session.userId).toBe('mutated-user-id');
   //     expect(req.session.email).toBe('mutated-email');
-      
+
   //     expect(next).toHaveBeenCalled();
   //   });
 });
@@ -160,7 +158,7 @@ describe('requiresSessionId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));
   // let testSessionData: Session & Partial<SystemSessionDataType>;
   // let memoryStore: Store;
-  
+
   // beforeEach(() => {
   //   testSessionData = {
   //     cookie: new Cookie(),
@@ -171,7 +169,7 @@ describe('requiresSessionId', () => {
   //     cookie: new Cookie(),
   //   });
   // });
-  
+
   // test('Should send a 401 if the sessionID is undefined', async () => {
   //   const req = getMockReq<SystemHttpRequestType<SystemSessionDataType>>({
   //     newSessionIdGenerated: false,
@@ -179,7 +177,7 @@ describe('requiresSessionId', () => {
   //     sessionStore: memoryStore,
   //   });
   //   const { res, next } = getMockRes<Express.Response>();
-    
+
   //   memoryStore.createSession(req, testSessionData);
   //   expect(req.session).toBeDefined();
   //   expect(req.sessionID).toBeUndefined();
@@ -274,10 +272,7 @@ describe('retrieveSessionData supertest tests', () => {
   //   });
   // });
 
-  
   // });
-
-
 });
 
 describe('retrieveSessionDataFromStore', () => {

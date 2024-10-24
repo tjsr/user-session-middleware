@@ -3,9 +3,8 @@ import {
   SessionDataTestContext,
   createContextForSessionTest,
   createMockPromisePair,
-  createTestRequestSessionData
-} from "../../testUtils.js";
-import { beforeEach, describe, expect, test } from "vitest";
+  createTestRequestSessionData,
+} from '../../testUtils.js';
 
 import { SessionHandlerError } from "../../errors/SessionHandlerError.js";
 import { Store } from "../../express-session/index.js";

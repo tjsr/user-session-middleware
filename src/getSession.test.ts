@@ -1,13 +1,14 @@
-import { TestContext, beforeEach, describe, test } from "vitest";
-import { checkForDefault, checkForOverride } from "./testUtils.js";
+import { checkForDefault, checkForOverride } from './testUtils.js';
 import { defaultExpressSessionCookieOptions, defaultExpressSessionOptions } from './getSession.js';
-import expressSession, { MemoryStore } from "express-session";
+import expressSession, { MemoryStore } from 'express-session';
+
+import { TestContext } from 'vitest';
 
 describe('expressSessionConfig', () => {
   type ExpressSessionTestContextOptions = TestContext & {
     options: expressSession.SessionOptions;
   };
-  
+
   const defaultOptions: expressSession.SessionOptions = defaultExpressSessionOptions();
 
   beforeEach((context: ExpressSessionTestContextOptions) => {
@@ -17,16 +18,16 @@ describe('expressSessionConfig', () => {
       saveUninitialized: false,
       secret: 'overridden-secret',
       store: new MemoryStore(),
-    }  as expressSession.SessionOptions ;
+    } as expressSession.SessionOptions;
   });
 
-  test('Should take default value for each property', (context: ExpressSessionTestContextOptions) =>  {
+  test('Should take default value for each property', (context: ExpressSessionTestContextOptions) => {
     ['resave', 'rolling', 'saveUninitialized', 'secret', 'store'].forEach((key: string) => {
       checkForDefault(defaultOptions, context.options, key, defaultExpressSessionOptions);
     });
   });
 
-  test('Should take default value', (context: ExpressSessionTestContextOptions) =>  {
+  test('Should take default value', (context: ExpressSessionTestContextOptions) => {
     ['resave', 'rolling', 'saveUninitialized', 'secret'].forEach((key: string) => {
       checkForOverride(defaultOptions, context.options, key, defaultExpressSessionOptions);
     });
@@ -45,16 +46,16 @@ describe('expressSessionCookie', () => {
       path: '/path',
       sameSite: true,
       secure: true,
-    }  as expressSession.CookieOptions ;
+    } as expressSession.CookieOptions;
   });
 
-  test('Should take default value for each property', (context: ExpressSessionCookieTestContextOptions) =>  {
+  test('Should take default value for each property', (context: ExpressSessionCookieTestContextOptions) => {
     ['maxAge', 'path', 'sameSite', 'secure'].forEach((key: string) => {
       checkForDefault(defaultCookie, context.cookie, key, defaultExpressSessionCookieOptions);
     });
   });
 
-  test('Should take default resave value', (context: ExpressSessionCookieTestContextOptions) =>  {
+  test('Should take default resave value', (context: ExpressSessionCookieTestContextOptions) => {
     ['maxAge', 'path', 'sameSite', 'secure'].forEach((key: string) => {
       checkForOverride(defaultCookie, context.cookie, key, defaultExpressSessionCookieOptions);
     });
