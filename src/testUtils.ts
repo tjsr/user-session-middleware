@@ -39,7 +39,6 @@ declare module 'vitest' {
   }
 };
 
-// eslint-disable-next-line valid-jsdoc
 /**
  * @deprecated This method should not be called directly. Use XYZ instead.
  */
