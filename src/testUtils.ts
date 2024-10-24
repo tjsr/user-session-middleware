@@ -13,7 +13,7 @@ export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -21,6 +21,7 @@ export interface MockReqRespSet<
   next: NextFunction;
   request: RequestType;
   response: ResponseType;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   spies?: Map<Function, MockInstance>;
 };
 
@@ -38,7 +39,6 @@ declare module 'vitest' {
   }
 };
 
-// eslint-disable-next-line valid-jsdoc
 /**
  * @deprecated This method should not be called directly. Use XYZ instead.
  */
