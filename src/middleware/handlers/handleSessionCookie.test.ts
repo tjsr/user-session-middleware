@@ -1,4 +1,3 @@
-import { describe, expect, test } from "vitest";
 import {
   expectDifferentSetCookieSessionId,
   expectResponseResetsSessionIdCookie,
@@ -6,8 +5,8 @@ import {
 } from '../../utils/expectations.js';
 import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
 
-import { HttpStatusCode } from "../../httpStatusCodes.js";
-import { SESSION_ID_HEADER_KEY } from "../../getSession.js";
+import { HttpStatusCode } from '../../httpStatusCodes.js';
+import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
 import { generateNewSessionId } from '../../session/sessionId.js';
 import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';

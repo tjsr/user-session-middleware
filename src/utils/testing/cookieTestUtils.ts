@@ -1,7 +1,6 @@
 import { COOKIE_WITH_HEADER } from "../../middleware/setSessionCookie.js";
 import { Response } from '../../express/index.js';
-import { SessionId } from "../../types.js";
-import { expect } from "vitest";
+import { SessionId } from '../../types.js';
 import supertest from "supertest";
 
 export const expectSetSessionCookieOnResponseMock = (response: Response, sessionID: string) => {

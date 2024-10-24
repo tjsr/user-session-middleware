@@ -1,6 +1,6 @@
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
 import { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
-import { Mock, MockInstance, TaskContext, expect, vi } from "vitest";
+import { Mock, MockInstance, TaskContext } from 'vitest';
 import { getMockReq, getMockRes } from "vitest-mock-express";
 
 import { MockRequest } from "vitest-mock-express/dist/src/request";

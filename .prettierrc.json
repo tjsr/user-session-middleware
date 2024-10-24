@@ -3,5 +3,6 @@
   "plugins": ["prettier-plugin-sort-members"],
   "singleQuote": true,
   "sortMembersAlphabetically": true,
+  "tabWidth": 2,
   "trailingComma": "es5"
 }
