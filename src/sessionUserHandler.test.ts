@@ -1,19 +1,19 @@
-import { TaskContext, afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
-import { disableHandlerAssertions, forceHandlerAssertions } from "./middleware/index.js";
-import express, { NextFunction } from "./express/index.js";
+import { disableHandlerAssertions, forceHandlerAssertions } from './middleware/index.js';
+import express, { NextFunction } from './express/index.js';
 import {
   handleCopySessionStoreDataToSession,
   handleExistingSessionWithNoSessionData,
-  handleSessionDataRetrieval
+  handleSessionDataRetrieval,
 } from './middleware/handlers/index.js';
 
-import { SESSION_ID_HEADER_KEY } from "./getSession.js";
-import { SystemHttpRequestType } from "./types/request.js";
-import { UserSessionData } from "./types/session.js";
+import { SESSION_ID_HEADER_KEY } from './getSession.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { TaskContext } from 'vitest';
+import { UserSessionData } from './types/session.js';
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
-import { generateSessionIdForTest } from "./utils/testIdUtils.js";
-import { mockSession } from "./utils/testing/mocks.js";
-import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
+import { generateSessionIdForTest } from './utils/testIdUtils.js';
+import { mockSession } from './utils/testing/mocks.js';
+import { setUserIdNamespaceForTest } from './utils/testNamespaceUtils.js';
 import supertest from 'supertest';
 
 describe('assignUserIdToRequestSessionHandler', () => {

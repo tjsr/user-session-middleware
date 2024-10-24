@@ -1,13 +1,12 @@
-import { Assertion, expect, vi } from "vitest";
-
-import { MockRequest } from "vitest-mock-express/dist/src/request";
-import { SessionHandlerError } from "./errors/SessionHandlerError.js";
-import { SystemHttpRequestType } from "./types/request.js";
-import { SystemHttpResponseType } from "./types/response.js";
-import { UserSessionData } from "./types/session.js";
-import { UserSessionMiddlewareRequestHandler } from "./types/middlewareHandlerTypes.js";
-import express from "express";
-import { getMockReqResp } from "./testUtils.js";
+import { Assertion } from 'vitest';
+import { MockRequest } from 'vitest-mock-express/dist/src/request';
+import { SessionHandlerError } from './errors/SessionHandlerError.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { SystemHttpResponseType } from './types/response.js';
+import { UserSessionData } from './types/session.js';
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
+import express from 'express';
+import { getMockReqResp } from './testUtils.js';
 
 // export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
 //   _req: RequestType, _res: express.Response, _next: express.NextFunction
@@ -19,16 +18,16 @@ type ParamsWrapper = {
 };
 
 export type HandlerExpectionResult = {
-  response: express.Response;
   expected: Assertion<express.NextFunction>;
   next: express.NextFunction;
   nextParams: ParamsWrapper;
+  response: express.Response;
 };
 
 export type HandlerErrorResult = {
-  response: express.Response;
   error: SessionHandlerError;
   next: express.NextFunction;
+  response: express.Response;
 };
 
 const expectVerifyHandlerFunction = <
@@ -44,8 +43,8 @@ const expectVerifyHandlerFunction = <
     { ...mockRespose } as Partial<ResponseType>
   );
 
-  const paramsWrapper: ParamsWrapper = { };
-  
+  const paramsWrapper: ParamsWrapper = {};
+
   const result: Partial<HandlerExpectionResult> = {
     next,
     nextParams: paramsWrapper,
@@ -66,10 +65,9 @@ const expectVerifyHandlerFunction = <
   return result as HandlerExpectionResult;
 };
 
-export const verifyHandlerFunctionCallsNextWithError = 
-<
-RequestType extends SystemHttpRequestType<UserSessionData>,
-ResponseType extends SystemHttpResponseType<UserSessionData>
+export const verifyHandlerFunctionCallsNextWithError = <
+  RequestType extends SystemHttpRequestType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,
@@ -79,16 +77,15 @@ ResponseType extends SystemHttpResponseType<UserSessionData>
   const { response, expected, next, nextParams } = expectVerifyHandlerFunction(
     handlerFunction, mockRequest, mockResponse);
   expected.toBeCalledWith(expectNextArgs);
-  
+
   const error: SessionHandlerError = nextParams.params as unknown as SessionHandlerError;
 
   return { error, next, response };
 };
 
-export const verifyHandlerFunctionCallsNext =
-<
-RequestType extends SystemHttpRequestType,
-ResponseType extends SystemHttpResponseType
+export const verifyHandlerFunctionCallsNext = <
+  RequestType extends SystemHttpRequestType,
+  ResponseType extends SystemHttpResponseType,
 >(
     handlerFunction: HandlerFunction,
     mockRequest = {} as Partial<RequestType>,
