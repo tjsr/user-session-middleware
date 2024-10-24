@@ -83,7 +83,7 @@
     "uuid": "^10.0.0"
   },
   "peerDependencies": {
-    "express": "^4.19.2"
+    "express": "^4.21.1"
   },
   "overrides": {
     "braces": ">=3.0.3",
