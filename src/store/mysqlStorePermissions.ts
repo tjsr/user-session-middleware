@@ -36,7 +36,7 @@ export const checkDeletePrivileges = async (conn: Connection | Pool): Promise<bo
         });
     } catch (err) {
       console.error(`Failed checking delete privileges`, err);
-      reject(err);
+      return reject(err);
     }
   });
 };
