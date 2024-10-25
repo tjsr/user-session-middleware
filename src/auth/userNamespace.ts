@@ -9,6 +9,15 @@ import { validate } from "uuid";
 let USERID_UUID_NAMESPACE: IdNamespace|undefined = process.env['USERID_UUID_NAMESPACE'];
 // || 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
 
+export const setUserIdNamespace = (app: express.Express, namespace: IdNamespace): IdNamespace => {
+  if (app === undefined || namespace === undefined) {
+    throw new Error(
+      'setUserIdNamespace requires an express app and a namespace, with old ' +
+        'call giving just namespace being deprecated.'
+    );
+  }
+};
+
 export const setUserIdNamespace = (namespace: IdNamespace): IdNamespace => {
   const envNamespace: IdNamespace|undefined = process.env['USERID_UUID_NAMESPACE'] === "undefined"
     ? undefined : process.env['USERID_UUID_NAMESPACE'];
