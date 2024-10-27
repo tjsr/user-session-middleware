@@ -83,7 +83,7 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
     resolver = resolve;
   });
 
-  const mock:Mock = vi.fn<Params, Return>((...args: Params): Return => {
+  const mock: Mock = vi.fn((...args: Params): Return => {
     if (resolver) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       resolver(args as any);
