@@ -1,5 +1,5 @@
 name: Build user-session-middleware
-run-name: ${{ github.actor }} Running user-session-middleware build on ${{ github.ref_name == 'main' && 'main' || 'branch'}}.
+run-name: Running user-session-middleware build on ${{ github.ref_name == 'main' && 'main' || 'branch'}}.
 on: [push]
 jobs:
   build-user-session-middleware:
