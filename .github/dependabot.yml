@@ -9,7 +9,19 @@ updates:
     directory: '/'
     registries:
     - npm-github
-    - npm-npmjs
+    schedule:
+      interval: 'daily'
+    assignees:
+      - 'tjsr'
+    groups:
+      linter:
+        applies-to: version-updates
+        patterns:
+        - "@typescript-eslint/*"
+        - "eslint-*"
+        - "@tjsr/eslint-config"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
       interval: 'daily'
     assignees:
