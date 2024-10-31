@@ -65,7 +65,7 @@
     "@vitest/coverage-v8": "^2.1.4",
     "expect-cookies": "^0.2.0",
     "linkteam": "^0.0.17",
-    "prettier-plugin-sort-members": "^0.2.0-rc.0",
+    "prettier-plugin-sort-members": "^0.2.1",
     "rimraf": "^6.0.1",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
