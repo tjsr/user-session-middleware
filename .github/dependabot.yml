@@ -3,11 +3,11 @@ registries:
   npm-github:
     type: npm-registry
     url: https://npm.pkg.github.com
-    token: ${{secrets.GITHUB_TOKEN}}
+    token: ${{ github.token }}
   npm-npmjs:
     type: npm-registry
     url: https://registry.npmjs.org
-    token: ${{secrets.NPM_TOKEN}}
+    token: ${{ secrets.NPM_TOKEN }}
 updates:
   - package-ecosystem: 'npm'
     directory: '/'
@@ -18,13 +18,22 @@ updates:
       interval: 'daily'
     assignees:
       - 'tjsr'
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: ["version-update:semver-major"]
     groups:
       linter:
         applies-to: version-updates
         patterns:
         - "@typescript-eslint/*"
         - "eslint-*"
+        - "eslint"
         - "@tjsr/eslint-config"
+      vitest:
+        applies-to: version-updates
+        patterns:
+        - "vitest"
+        - "@vitest/*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
