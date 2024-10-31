@@ -50,6 +50,11 @@ USM currently has the following config options:
 - loginPath - default `/login` - the GET/POST URL available to authenticate the user.
 - sessionPath - default `/session` - the GET/POST URL available to forcibly regenerate and assign a new session ID.
 
+## Dependabot
+
+The repo will requires an NPM_TOKEN to update npm dependencies using dependabot.  
+`gh secret set NPM_TOKEN --app dependabot --body "$NPM_TOKEN"`
+
 ### Building
 
 First, `npm install` for dependencies.  To verify everything is okay, `npm build` and `npm test`.
