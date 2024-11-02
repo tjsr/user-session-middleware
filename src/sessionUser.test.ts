@@ -12,10 +12,8 @@ import { createContextForSessionTest, createTestRequestSessionData } from './tes
 describe<SessionDataTestContext>('assignUserIdToSession', () => {
   beforeEach((context) => createContextForSessionTest(context));
 
-  // eslint-disable-next-line max-len
   test('Should assign a new userId to the session if there is not already one set.', async (context) => {
     addIgnoredLog(
-      // eslint-disable-next-line
       /Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i
     );
     const { request, spies } = createTestRequestSessionData(

@@ -8,9 +8,9 @@ import { IdNamespace } from '../types.js';
 import express from '../express/index.js';
 import { validate } from 'uuid';
 
-let USERID_UUID_NAMESPACE: IdNamespace | undefined = process.env['USERID_UUID_NAMESPACE'];
+export const USER_ID_NAMESPACE_KEY = 'USERID_UUID_NAMESPACE';
+let USERID_UUID_NAMESPACE: IdNamespace | undefined = process.env[USER_ID_NAMESPACE_KEY];
 // || 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
-const USER_ID_NAMESPACE_KEY = 'USERID_UUID_NAMESPACE';
 
 export const setAppUserIdNamespace = (app: express.Application, namespace: IdNamespace): IdNamespace => {
   if (app === undefined || namespace === undefined) {
@@ -40,7 +40,7 @@ export const setUserIdNamespace = (namespace: IdNamespace): IdNamespace => {
     );
   }
   const envNamespace: IdNamespace | undefined =
-    process.env['USERID_UUID_NAMESPACE'] === 'undefined' ? undefined : process.env['USERID_UUID_NAMESPACE'];
+    process.env[USER_ID_NAMESPACE_KEY] === 'undefined' ? undefined : process.env[USER_ID_NAMESPACE_KEY];
 
   if (namespace === undefined) {
     if (envNamespace === undefined) {

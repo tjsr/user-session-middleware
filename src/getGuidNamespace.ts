@@ -8,9 +8,7 @@ export const getUuidNamespace = (systemDefault?: string): uuid5 => {
   const libUidNamespace: uuid5|undefined = process.env['LIBRARY_DEFAULT_USERID_UUID_NAMESPACE'];
   if (libUidNamespace) {
     if (!validate(libUidNamespace)) {
-      throw new Error(
-        `Invalid environment value for 'USERID_UUID_NAMESPACE' ${libUidNamespace}`
-      );
+      throw new Error(`Invalid environment value for 'LIBRARY_DEFAULT_USERID_UUID_NAMESPACE' ${libUidNamespace}`);
     }
     return libUidNamespace;
   }
