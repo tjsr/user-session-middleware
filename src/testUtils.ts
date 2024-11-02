@@ -71,7 +71,10 @@ export const getMockReqResp = <
     if (mockApp.set) {
       console.info('Mock app has set method.', mockApp.set);
     } else {
-      mockApp.set = (name: string, val: any): Application => (appStorage[name] = val);
+      mockApp.set = (name: string, val: unknown): Application => {
+        appStorage[name] = val;
+        return mockApp as Application;
+      };
     }
 
     // if (mockApp.get) {
