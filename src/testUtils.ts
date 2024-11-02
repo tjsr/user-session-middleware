@@ -3,7 +3,6 @@ import { Cookie, MemoryStore, SessionData, Store } from './express-session/index
 import { Mock, MockInstance } from 'vitest';
 import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
-import { setAppUserIdNamespace, setUserIdNamespace } from './auth/userNamespace.js';
 
 import { MockRequest } from 'vitest-mock-express/dist/src/request';
 import { SystemHttpRequestType } from './types/request.js';
@@ -11,6 +10,7 @@ import { SystemHttpResponseType } from './types/response.js';
 import { UserIdTaskContext } from './utils/testing/types.js';
 import { UserSessionData } from './types/session.js';
 import { markHandlersCalled } from './utils/testing/markHandlers.js';
+import { setAppUserIdNamespace } from './auth/userNamespace.js';
 import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
@@ -44,6 +44,7 @@ declare module 'vitest' {
   }
 }
 
+/* eslint-disable indent */
 /**
  * @deprecated This method should not be called directly. Use XYZ instead.
  */
@@ -54,6 +55,7 @@ export const getMockReqResp = <
   requestProps?: MockRequest | undefined,
   mockResponseData?: Partial<ResponseType>
 ): MockReqRespSet => {
+  /* eslint-enable indent */
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
   const request: RequestType & { app: express.Application } = getMockReq(requestProps);
@@ -99,7 +101,7 @@ export const getMockReqResp = <
     // TODO: Clear response mocks
   };
 
-  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response, appStorage };
+  return { appStorage, clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
 /**
@@ -107,10 +109,9 @@ export const getMockReqResp = <
  */
 export const getMockRequestResponse: <
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
-  // eslint-disable-next-line no-unused-vars
 >(
-  values?: MockRequest | undefined,
-  mockResponseData?: Partial<ResponseType>
+  _values?: MockRequest | undefined,
+  _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;
 export const getMockRequest = getMockReq;
 export const getMockResponse = getMockRes;

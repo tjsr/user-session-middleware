@@ -13,14 +13,13 @@ import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.js';
 import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser.js";
 
 import { UserAppTaskContext } from './utils/testing/types.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
 describe('assignUserIdToSession', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
   test('Should assign a new userId to the session if there is not already one set.', async (context: SessionDataTestContext) => {
-    // eslint-disable-next-line
     addIgnoredLog(
+      // eslint-disable-next-line
       /Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i
     );
     const { request, spies } = createTestRequestSessionData(
