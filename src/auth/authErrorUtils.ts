@@ -12,7 +12,10 @@ export const passAuthOrUnknownError = <SD extends UserSessionData>(
     next(e);
   } else {
     const err: UnknownAuthenticationError = new UnknownAuthenticationError(e);
-    console.trace(e);
+    console.warn(
+      'UnknownAuthenticationError thrown - an error occurred in the authenication process which was was not known about to be handled.',
+      e
+    );
     next(err);
   }
 };

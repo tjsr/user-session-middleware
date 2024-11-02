@@ -6,9 +6,10 @@ import {
   createTestRequestSessionData,
 } from '../../testUtils.js';
 
-import { SessionHandlerError } from "../../errors/SessionHandlerError.js";
-import { Store } from "../../express-session/index.js";
-import { UserSessionData } from "../../types/session.js";
+import { IdNamespace } from '../../types.js';
+import { SessionHandlerError } from '../../errors/SessionHandlerError.js';
+import { Store } from '../../express-session/index.js';
+import { UserSessionData } from '../../types/session.js';
 import { handleSessionWithNewlyGeneratedId } from './handleSessionWithNewlyGeneratedId.js';
 
 declare module 'vitest' {
@@ -16,6 +17,7 @@ declare module 'vitest' {
     memoryStore?: Store;
     testRequestData: MockRequestWithSession;
     testSessionStoreData: UserSessionData;
+    userIdNamespace: IdNamespace;
   }
 };
 

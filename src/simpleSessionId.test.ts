@@ -8,7 +8,7 @@ import { assignUserIdToRequestSession } from "./sessionUser.js";
 import { getMockReq } from "vitest-mock-express";
 import { mockSession } from "./utils/testing/mocks.js";
 import { saveSessionDataToSession } from './store/loadData.js';
-import { setUserIdNamespaceForTest } from "./utils/testNamespaceUtils.js";
+import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {
@@ -140,10 +140,10 @@ describe('saveSessionDataToSession', () => {
     expect(session.save).toBeCalled();
     return session;
   };
-  
+
   beforeEach((context: SessionDataTestContext) => {
     setUserIdNamespaceForTest(context);
-    testSessionData = mockSession();
+    testSessionData = mockSession(context.userIdNamespace);
 
     memoryStore = new MemoryStore();
     memoryStore.set('some-session-id', {
@@ -188,43 +188,28 @@ describe('saveSessionDataToSession', () => {
   });
 
   test('Should take existing session data email if no email is already on session', () => {
-    const sessionToVerify: Session = withTestSession(
-      { email: 'test-user-emnail' },
-      { email: 'existing-user-email' }
-    );
+    const sessionToVerify: Session = withTestSession({ email: 'test-user-emnail' }, { email: 'existing-user-email' });
     expect(sessionToVerify.email).toBe('existing-user-email');
   });
 
   test('Should take newId flag if not already on session', () => {
-    const sessionToVerify: Session = withTestSession(
-      { newId: true },
-      { newId: undefined }
-    );
+    const sessionToVerify: Session = withTestSession({ newId: true }, { newId: undefined });
     expect(sessionToVerify.newId).toBe(false);
   });
 
   test('Should not override newId flag if explicitly set to false session', () => {
-    const sessionToVerify: Session = withTestSession(
-      { newId: true },
-      { newId: false }
-    );
+    const sessionToVerify: Session = withTestSession({ newId: true }, { newId: false });
     expect(sessionToVerify.newId).toBe(false);
   });
 
   test('Should not override newId=true flag if explicitly set to false session', () => {
-    const sessionToVerify: Session = withTestSession(
-      { newId: false },
-      { newId: true }
-    );
+    const sessionToVerify: Session = withTestSession({ newId: false }, { newId: true });
     expect(sessionToVerify.newId).toBe(false);
   });
 
   test('Should take newId value from existing session', () => {
     [true, false].forEach((storedNewId) => {
-      const sessionToVerify: Session = withTestSession(
-        { newId: storedNewId },
-        { newId: undefined }
-      );
+      const sessionToVerify: Session = withTestSession({ newId: storedNewId }, { newId: undefined });
       expect(sessionToVerify.newId).toBe(false);
     });
   });

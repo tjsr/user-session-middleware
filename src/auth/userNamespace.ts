@@ -3,6 +3,7 @@ import {
   UUIDNamespaceNotDefinedError
 } from "../errors/middlewareErrorClasses.js";
 
+import { DeprecatedFunctionError } from '../utils/testing/types.js';
 import { IdNamespace } from '../types.js';
 import express from '../express/index.js';
 import { validate } from 'uuid';
@@ -31,6 +32,13 @@ export const setAppUserIdNamespace = (app: express.Application, namespace: IdNam
 };
 
 export const setUserIdNamespace = (namespace: IdNamespace): IdNamespace => {
+  if (namespace === undefined) {
+    throw new DeprecatedFunctionError(
+      'setUserIdNamespace',
+      undefined,
+      'Use of setUserIdNamespace with undefined namespace is now deprecated and should set this value on app instead.'
+    );
+  }
   const envNamespace: IdNamespace | undefined =
     process.env['USERID_UUID_NAMESPACE'] === 'undefined' ? undefined : process.env['USERID_UUID_NAMESPACE'];
 
@@ -62,11 +70,6 @@ export const getAppUserIdNamespace = (app: express.Application): IdNamespace => 
 };
 
 export const getUserIdNamespace = (): IdNamespace => {
-  if (USERID_UUID_NAMESPACE !== undefined) {
-    return USERID_UUID_NAMESPACE;
-  }
-  if (process.env['USERID_UUID_NAMESPACE'] !== undefined) {
-    return process.env['USERID_UUID_NAMESPACE'];
-  }
-  throw new UUIDNamespaceNotDefinedError();
+  console.trace('getUserIdNamespace', 'Deprecated - do not use.');
+  throw new DeprecatedFunctionError('getUserIdNamespace');
 };

@@ -1,10 +1,13 @@
 import { Cookie, SessionData } from "../../express-session/index.js";
 
-import { createUserIdFromEmail } from "../../auth/user.js";
+import { IdNamespace } from '../../types.js';
+import { createUserIdFromEmail } from '../../auth/user.js';
 
-export const mockSession = (overrides?: Partial<SessionData>): SessionData => {
+export const mockSession = (userIdNamespace: IdNamespace, overrides?: Partial<SessionData>): SessionData => {
+  assert(userIdNamespace !== undefined);
+
   const email = overrides?.email ?? 'test@example.com';
-  const userId = overrides?.userId ?? createUserIdFromEmail(email);
+  const userId = overrides?.userId ?? createUserIdFromEmail(userIdNamespace, email);
   return {
     cookie: new Cookie(),
     email: email,

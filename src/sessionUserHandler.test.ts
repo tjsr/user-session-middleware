@@ -9,11 +9,12 @@ import {
 import { SESSION_ID_HEADER_KEY } from './getSession.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { TaskContext } from 'vitest';
+import { UserIdTaskContext } from './utils/testing/types.js';
 import { UserSessionData } from './types/session.js';
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
 import { mockSession } from './utils/testing/mocks.js';
-import { setUserIdNamespaceForTest } from './utils/testNamespaceUtils.js';
+import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 
 describe('assignUserIdToRequestSessionHandler', () => {
@@ -23,7 +24,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
     return Promise.resolve();
   });
 
-  beforeEach(async (context: TaskContext) => {
+  beforeEach(async (context: UserIdTaskContext) => {
     setUserIdNamespaceForTest(context);
   });
 
@@ -33,92 +34,74 @@ describe('assignUserIdToRequestSessionHandler', () => {
     return Promise.resolve(); // closeConnectionPool();
   });
 
-  test(
-    'Should set/save userId on req.session when userId is not yet set and no existing session data in store.',
-    async (context: TaskContext) => {
-      const endValidator = (
-        req: SystemHttpRequestType,
-        _res: express.Response,
-        next: NextFunction
-      ) => {
-        expect(req.session.userId).not.toBeUndefined();
+  test('Should set/save userId on req.session when userId is not yet set and no existing session data in store.', async (context: TaskContext) => {
+    const endValidator = (req: SystemHttpRequestType, _res: express.Response, next: NextFunction) => {
+      expect(req.session.userId).not.toBeUndefined();
+      next();
+    };
+    const { app } = appWithMiddleware(
+      [handleCopySessionStoreDataToSession, handleExistingSessionWithNoSessionData],
+      [endValidator]
+    );
+    const testSessionId = generateSessionIdForTest(context);
+
+    // return new Promise<void>((done) => {
+    const response = await supertest(app)
+      .get('/')
+      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Content-Type', 'application/json')
+      .expect(401);
+
+    expect(response.statusCode).toEqual(401);
+  });
+
+  test('Should set and save the userId on the request session when data in store has no userId.', async (context: UserIdTaskContext) => {
+    const endValidator = (req: SystemHttpRequestType, _res: express.Response, next: NextFunction) => {
+      expect(req.session.userId).not.toBeUndefined();
+      next();
+    };
+    const { app, memoryStore } = appWithMiddleware(
+      [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
+      [endValidator]
+    );
+    const testSessionData: UserSessionData = mockSession(context.userIdNamespace);
+    const testSessionId = generateSessionIdForTest(context);
+    memoryStore.set(testSessionId, testSessionData);
+
+    const response = await supertest(app)
+      .get('/')
+      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Content-Type', 'application/json')
+      .expect(200);
+    expect(response.statusCode).toEqual(200);
+  });
+
+  test('Should set and save the userId on the session when no userId set but data in store has a userId.', async (context: UserIdTaskContext) => {
+    const testSessionData: UserSessionData = mockSession(context.userIdNamespace);
+    const testUserId = testSessionData.userId;
+    const endValidator = (req: SystemHttpRequestType, response: express.Response, next: NextFunction) => {
+      if (req.session.userId !== testUserId) {
+        // TODO: Use exception
+        response.status(500);
+        next(new Error(`userId not set correctly: ${req.session.userId} != '${testUserId}'`));
+      } else {
         next();
-      };
-      const { app } = appWithMiddleware([
-        handleCopySessionStoreDataToSession,
-        handleExistingSessionWithNoSessionData,
-      ], [endValidator]);
-      const testSessionId = generateSessionIdForTest(context);
+      }
+    };
+    const testSessionId = generateSessionIdForTest(context);
 
-      // return new Promise<void>((done) => {
-      const response = await supertest(app)
-        .get('/')
-        .set(SESSION_ID_HEADER_KEY, testSessionId)
-        .set('Content-Type', 'application/json')
-        .expect(401);
+    // handleCopySessionStoreDataToSession must be called first and is responsible for assigment
+    // of the data from the store to session
+    const { app, memoryStore } = appWithMiddleware(
+      [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
+      [endValidator]
+    );
+    memoryStore.set(testSessionId, testSessionData);
 
-      expect(response.statusCode).toEqual(401);
-    });
-
-  test('Should set and save the userId on the request session when data in store has no userId.',
-    async (context: TaskContext) => {
-      const endValidator = (
-        req: SystemHttpRequestType,
-        _res: express.Response,
-        next: NextFunction
-      ) => {
-        expect(req.session.userId).not.toBeUndefined();
-        next();
-      };
-      const { app, memoryStore } = appWithMiddleware([
-        handleSessionDataRetrieval,
-        handleCopySessionStoreDataToSession,
-      ],
-      [endValidator]);
-      const testSessionData: UserSessionData = mockSession();
-      const testSessionId = generateSessionIdForTest(context);
-      memoryStore.set(testSessionId, testSessionData);
-
-      const response = await supertest(app)
-        .get('/')
-        .set(SESSION_ID_HEADER_KEY, testSessionId)
-        .set('Content-Type', 'application/json')
-        .expect(200);
-      expect(response.statusCode).toEqual(200);
-    });
-
-  test(
-    'Should set and save the userId on the session when no userId set but data in store has a userId.',
-    async (context: TaskContext) => {
-      const testSessionData: UserSessionData = mockSession();
-      const testUserId = testSessionData.userId;
-      const endValidator = (
-        req: SystemHttpRequestType,
-        response: express.Response,
-        next: NextFunction
-      ) => {
-        if (req.session.userId !== testUserId) {
-          // TODO: Use exception
-          response.status(500);
-          next(new Error(`userId not set correctly: ${req.session.userId} != '${testUserId}'`));
-        } else {
-          next();
-        }
-      };
-      const testSessionId = generateSessionIdForTest(context);
-
-      // handleCopySessionStoreDataToSession must be called first and is responsible for assigment
-      // of the data from the store to session
-      const { app, memoryStore } = appWithMiddleware([
-        handleSessionDataRetrieval,
-        handleCopySessionStoreDataToSession,
-      ], [endValidator]);
-      memoryStore.set(testSessionId, testSessionData);
-
-      return supertest(app)
-        .get('/')
-        .set(SESSION_ID_HEADER_KEY, testSessionId)
-        .set('Content-Type', 'application/json')
-        .expect(200);
-    });
+    return supertest(app)
+      .get('/')
+      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Content-Type', 'application/json')
+      .expect(200);
+  });
 });

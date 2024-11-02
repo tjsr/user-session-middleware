@@ -1,7 +1,7 @@
 import { IdNamespace, SessionId, UserId } from '../types.js';
 
 import { TaskContext } from 'vitest';
-import { createTestRunNamespace } from './testNamespaceUtils.js';
+import { createTestRunNamespace } from './testing/testNamespaceUtils.js';
 import crypto from 'crypto';
 import { v5 } from 'uuid';
 

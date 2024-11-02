@@ -44,9 +44,12 @@ export class UnknownAuthenticationError extends AuthenticationError {
 
 export class SessionRegenerationFailedError extends SessionHandlerError {
   constructor(cause: unknown) {
-    super(SESSION_REGENERATION_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR,
-      'Unknown error regenerating session', cause as Error);
+    super(
+      SESSION_REGENERATION_ERROR,
+      HttpStatusCode.INTERNAL_SERVER_ERROR,
+      'Unknown error regenerating session',
+      cause as Error
+    );
     this.name = 'UnknownAuthenticationError';
   }
-
 }

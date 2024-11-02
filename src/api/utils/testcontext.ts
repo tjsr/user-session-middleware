@@ -9,7 +9,7 @@ import { UserModel } from '../../types/model.js';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
 import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
 import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
-import { setUserIdNamespaceForTest } from '../../utils/testNamespaceUtils.js';
+import { setUserIdNamespaceForTest } from '../../utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 import { testableApp } from '../../utils/testing/middlewareTestUtils.js';
 import { validate } from 'uuid';
@@ -36,8 +36,9 @@ export const setupApiTest = (context: ApiTestContext) => {
 
 export const verifyAuthSessionId = (response: supertest.Response, context: ApiTestContext): SessionId => {
   expect(context.currentSessionId).not.toBeUndefined();
-  assert(validate(context.currentSessionId!), 'session ID should be a UUID value');
+  assert(validate(context.currentSessionId), 'session ID should be a UUID value');
   expect(response.body, 'Authentication response body expected to be present').not.toBeUndefined();
+  expect(response.body.message).not.toEqual('Unknown authentication error');
   expect(response.body.sessionId, 'Authentication response body expected to contain sessionId').toEqual(
     context.currentSessionId
   );
