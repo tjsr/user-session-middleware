@@ -5,9 +5,9 @@ import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } f
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
 import { MockRequest } from 'vitest-mock-express/dist/src/request';
+import { SessionDataTestContext } from './api/utils/testcontext.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { SystemHttpResponseType } from './types/response.js';
-import { UserIdTaskContext } from './utils/testing/types.js';
 import { UserSessionData } from './types/session.js';
 import { markHandlersCalled } from './utils/testing/markHandlers.js';
 import { setAppUserIdNamespace } from './auth/userNamespace.js';
@@ -30,12 +30,6 @@ export interface MockReqRespSet<
   spies?: Map<Function, MockInstance>;
 }
 
-export interface SessionDataTestContext extends UserIdTaskContext {
-  memoryStore?: Store;
-  testRequestData: MockRequestWithSession;
-  testSessionStoreData: UserSessionData;
-}
-
 declare module 'vitest' {
   export interface TestContext {
     memoryStore?: Store;
@@ -46,8 +40,13 @@ declare module 'vitest' {
 
 /* eslint-disable indent */
 /**
+ * @param {MockRequest | undefined} requestProps Values that should be provided as defaults or
+ * overrides on the request.
+ * @param {Partial<ResponseType>} mockResponseData Values that should be provided as defaults or
+ * overrides on the response.
  * @deprecated This method should not be called directly. Use XYZ instead.
- */
+ * @return {MockReqRespSet} A set of mocks for request and response objects.
+*/
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,

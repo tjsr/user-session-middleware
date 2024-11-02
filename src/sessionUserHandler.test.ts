@@ -8,8 +8,7 @@ import {
 
 import { SESSION_ID_HEADER_KEY } from './getSession.js';
 import { SystemHttpRequestType } from './types/request.js';
-import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from './utils/testing/types.js';
+import { UserIdTaskContext } from './api/utils/testcontext.js';
 import { UserSessionData } from './types/session.js';
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
@@ -17,7 +16,7 @@ import { mockSession } from './utils/testing/mocks.js';
 import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 
-describe('assignUserIdToRequestSessionHandler', () => {
+describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
   beforeAll(async () => {
     forceHandlerAssertions(false);
     disableHandlerAssertions(true);
@@ -34,7 +33,7 @@ describe('assignUserIdToRequestSessionHandler', () => {
     return Promise.resolve(); // closeConnectionPool();
   });
 
-  test('Should set/save userId on req.session when userId is not yet set and no existing session data in store.', async (context: TaskContext) => {
+  test('Should set/save userId on req.session when userId is not yet set and no existing session data in store.', async (context: UserIdTaskContext) => {
     const endValidator = (req: SystemHttpRequestType, _res: express.Response, next: NextFunction) => {
       expect(req.session.userId).not.toBeUndefined();
       next();

@@ -1,17 +1,12 @@
 import { Cookie, Session } from '../express-session/index.js';
 import { EmailAddress, UserId } from '../types.js';
-import {
-  NIL_UUID,
-  SessionDataTestContext,
-  createContextForSessionTest,
-  createTestRequestSessionData,
-} from '../testUtils.js';
+import { NIL_UUID, createContextForSessionTest, createTestRequestSessionData } from '../testUtils.js';
+import { SessionDataTestContext, UserIdTaskContext } from '../api/utils/testcontext.js';
 import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
 import { createRandomIdAndSave, createUserIdFromEmail, getUserIdFromSession } from './user.js';
 import { createTestSessionId, generateUserIdForTest } from '../utils/testIdUtils.js';
 import { v5, validate as validateUuid } from 'uuid';
 
-import { UserIdTaskContext } from '../utils/testing/types.js';
 import { UserSessionData } from '../types/session.js';
 import { setUserIdNamespace } from './userNamespace.js';
 
@@ -82,6 +77,7 @@ describe('getUserIdFromSession', () => {
     expect(idPromise).toEqual('0bdf936c-1af1-572c-817a-539b8727d2d6');
   });
 
+  // eslint-disable-next-line max-len
   test<SessionDataTestContext>('Should create a new userId from the email and save if session exists with no userId', async (context) => {
     const userIdNamespace = v5(context.task.name, NIL_UUID);
     setUserIdNamespace(userIdNamespace);

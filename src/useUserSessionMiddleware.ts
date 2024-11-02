@@ -9,7 +9,10 @@ import { IdNamespace } from './types.js';
 import { UserSessionOptions } from './types/sessionOptions.js';
 import express from 'express';
 
-export const useUserSessionMiddleware = (app: express.Express, sessionOptions?: Partial<UserSessionOptions> | undefined) => {
+export const useUserSessionMiddleware = (
+  app: express.Application,
+  sessionOptions?: Partial<UserSessionOptions> | undefined
+) => {
   if (sessionOptions?.debugCallHandlers) {
     app.set('debugCallHandlers', true);
   }

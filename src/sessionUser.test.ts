@@ -2,22 +2,18 @@ import {
   RequestSessionIdRequiredError,
   SessionDataNotFoundError,
   SessionIdRequiredError,
-  SessionIdTypeError
-} from "./errors/errorClasses.js";
-import {
-  SessionDataTestContext,
-  createContextForSessionTest,
-  createTestRequestSessionData,
-} from "./testUtils.js";
+  SessionIdTypeError,
+} from './errors/errorClasses.js';
+import { SessionDataTestContext, UserAppTaskContext } from './api/utils/testcontext.js';
 import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.js';
-import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from "./sessionUser.js";
+import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from './sessionUser.js';
+import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.js';
 
-import { UserAppTaskContext } from './utils/testing/types.js';
+describe<SessionDataTestContext>('assignUserIdToSession', () => {
+  beforeEach((context) => createContextForSessionTest(context));
 
-describe('assignUserIdToSession', () => {
-  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
-
-  test('Should assign a new userId to the session if there is not already one set.', async (context: SessionDataTestContext) => {
+  // eslint-disable-next-line max-len
+  test('Should assign a new userId to the session if there is not already one set.', async (context) => {
     addIgnoredLog(
       // eslint-disable-next-line
       /Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i

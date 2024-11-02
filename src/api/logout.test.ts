@@ -1,18 +1,14 @@
 import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
-import {
-  SessionDataTestContext,
-  createContextForSessionTest,
-  createMockPromisePair,
-  createTestRequestSessionData,
-} from '../testUtils.js';
 import { checkLogout, logout } from './logout.js';
+import { createContextForSessionTest, createMockPromisePair, createTestRequestSessionData } from '../testUtils.js';
 
+import { SessionDataTestContext } from './utils/testcontext.js';
 import { generateSessionIdForTest } from '../utils/testIdUtils.js';
 
-describe('logout', () => {
+describe<SessionDataTestContext>('logout', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
-  test('Should call session.save with a HTTP 200 result if we currently have a user.', async (context: SessionDataTestContext) => {
+  test('Should call session.save with a HTTP 200 result if we currently have a user.', async (context) => {
     const sessionId = generateSessionIdForTest(context);
     const { next, request, response } = createTestRequestSessionData(
       context,
@@ -67,6 +63,7 @@ describe('checkLogout', () => {
     expect(request.session.save).not.toHaveBeenCalled();
   });
 
+  // eslint-disable-next-line max-len
   test('Should refuse to log out again and return 401 if the session is already written with hasLoggedOut=true', async (context: SessionDataTestContext) => {
     const sessionId = generateSessionIdForTest(context);
 

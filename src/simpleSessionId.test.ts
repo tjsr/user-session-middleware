@@ -1,12 +1,12 @@
 import { Cookie, MemoryStore, Session, Store } from './express-session/index.js';
 import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
 
-import { SessionDataTestContext } from "./testUtils.js";
-import { SystemHttpRequestType } from "./types/request.js";
-import { UserSessionData } from "./types/session.js";
-import { assignUserIdToRequestSession } from "./sessionUser.js";
-import { getMockReq } from "vitest-mock-express";
-import { mockSession } from "./utils/testing/mocks.js";
+import { SessionDataTestContext } from './api/utils/testcontext.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { UserSessionData } from './types/session.js';
+import { assignUserIdToRequestSession } from './sessionUser.js';
+import { getMockReq } from 'vitest-mock-express';
+import { mockSession } from './utils/testing/mocks.js';
 import { saveSessionDataToSession } from './store/loadData.js';
 import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
@@ -112,7 +112,7 @@ describe('handleSessionFromStore', () => {
   // });
 });
 
-describe('saveSessionDataToSession', () => {
+describe<SessionDataTestContext>('saveSessionDataToSession', () => {
   let memoryStore: Store;
   let testSessionData: UserSessionData;
   let req: SystemHttpRequestType<UserSessionData>;

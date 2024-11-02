@@ -1,12 +1,12 @@
 import {
   MockRequestWithSession,
-  SessionDataTestContext,
   createContextForSessionTest,
   createMockPromisePair,
   createTestRequestSessionData,
 } from '../../testUtils.js';
 
 import { IdNamespace } from '../../types.js';
+import { SessionDataTestContext } from '../../api/utils/testcontext.js';
 import { SessionHandlerError } from '../../errors/SessionHandlerError.js';
 import { Store } from '../../express-session/index.js';
 import { UserSessionData } from '../../types/session.js';
@@ -19,9 +19,9 @@ declare module 'vitest' {
     testSessionStoreData: UserSessionData;
     userIdNamespace: IdNamespace;
   }
-};
+}
 
-describe('handler.handleSessionWithNewlyGeneratedId', () => {
+describe<SessionDataTestContext>('handler.handleSessionWithNewlyGeneratedId', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
 
   test('Should call save when a session is newly generated.', async (context) => {
@@ -35,12 +35,16 @@ describe('handler.handleSessionWithNewlyGeneratedId', () => {
   });
 
   test('Should call next when a session is newly generated.', async (context) => {
-    const { next, request, response } = createTestRequestSessionData(context, {
-      newSessionIdGenerated: true,
-      sessionID: 'session-1234',
-    }, {
-      noMockSave: true,
-    });
+    const { next, request, response } = createTestRequestSessionData(
+      context,
+      {
+        newSessionIdGenerated: true,
+        sessionID: 'session-1234',
+      },
+      {
+        noMockSave: true,
+      }
+    );
 
     const [nextPromise, nextMock] = createMockPromisePair(next);
 
@@ -58,9 +62,13 @@ describe('handler.handleSessionWithNewlyGeneratedId', () => {
   });
 
   test('Should call to error handler and not call save if session was not initialized.', (context) => {
-    const { next, request, response } = createTestRequestSessionData(context, {
-      sessionID: 'session-2345',
-    }, { skipCreateSession: true });
+    const { next, request, response } = createTestRequestSessionData(
+      context,
+      {
+        sessionID: 'session-2345',
+      },
+      { skipCreateSession: true }
+    );
 
     context.testRequestData['new'] = true;
     handleSessionWithNewlyGeneratedId(request, response, next);

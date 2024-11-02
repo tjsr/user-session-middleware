@@ -1,14 +1,15 @@
-import { SessionDataTestContext, createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
-import { handleSessionCookie, handleSessionCookieOnError } from "./handleSessionCookie.js";
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from "../../middlewareTestUtils.js";
+import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
+import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
-import { MemoryStore } from "express-session";
-import { SESSION_ID_HEADER_KEY } from "../../getSession.js";
-import { SessionStoreNotConfiguredError } from "../../errors/errorClasses.js";
+import { MemoryStore } from 'express-session';
+import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
+import { SessionDataTestContext } from '../../api/utils/testcontext.js';
+import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
-import { expectResponseSetsSessionIdCookie } from "../../utils/expectations.js";
+import { expectResponseSetsSessionIdCookie } from '../../utils/expectations.js';
 import { generateNewSessionId } from '../../session/sessionId.js';
-import { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
+import { handleSessionStoreRequired } from './handleSessionStoreRequired.js';
 import { sessionlessAppWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
 import supertest from 'supertest';
 
@@ -17,25 +18,32 @@ describe('next.handleSessionStoreRequired', () => {
     verifyHandlerFunctionCallsNextWithError(handleSessionStoreRequired, { sessionStore: undefined });
   });
   test('Should not fail when a sessionStore is configured.', () => {
-    verifyHandlerFunctionCallsNext(handleSessionStoreRequired,
-      { sessionStore: new MemoryStore() as Express.SessionStore });
+    verifyHandlerFunctionCallsNext(handleSessionStoreRequired, {
+      sessionStore: new MemoryStore() as Express.SessionStore,
+    });
   });
 });
 
-describe('handler.handleSessionStoreRequired', () => {
+describe<SessionDataTestContext>('handler.handleSessionStoreRequired', () => {
   beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
-  
+
   test('Should error when a session store is not configured.', async (context) => {
-    const { next, request, response } = createTestRequestSessionData(context,
-      { sessionStore: undefined }, { skipAddToStore: true, skipCreateSession: true });
+    const { next, request, response } = createTestRequestSessionData(
+      context,
+      { sessionStore: undefined },
+      { skipAddToStore: true, skipCreateSession: true }
+    );
 
     handleSessionStoreRequired(request, response, next);
     expect(next).toHaveBeenCalledWith(expect.any(SessionStoreNotConfiguredError));
   });
 
   test('Should not error if session store is configured.', async (context) => {
-    const { next, request, response } = createTestRequestSessionData(context,
-      { }, { skipAddToStore: true, skipCreateSession: true });
+    const { next, request, response } = createTestRequestSessionData(
+      context,
+      {},
+      { skipAddToStore: true, skipCreateSession: true }
+    );
 
     handleSessionStoreRequired(request, response, next);
     expect(next).toHaveBeenCalledWith();
@@ -45,7 +53,7 @@ describe('handler.handleSessionStoreRequired', () => {
 describe('api.handleSessionStoreRequired', () => {
   test('Should error on request when the session store is not configured.', async () => {
     const { app, memoryStore } = sessionlessAppWithMiddleware([handleSessionStoreRequired]);
-    
+
     expect(memoryStore).toBeUndefined();
     const response = await supertest(app)
       .get('/')
@@ -60,7 +68,8 @@ describe('api.handleSessionStoreRequired', () => {
     const { app, memoryStore } = appWithMiddleware([
       handleSessionStoreRequired,
       handleSessionCookie,
-      handleSessionCookieOnError]);
+      handleSessionCookieOnError,
+    ]);
     expect(memoryStore).not.toBeUndefined();
     const response = await supertest(app)
       .get('/')

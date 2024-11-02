@@ -1,4 +1,4 @@
-import { UserIdTaskContext } from '../utils/testing/types.js';
+import { UserIdTaskContext } from '../api/utils/testcontext.js';
 import { createUserIdFromEmail } from './user.js';
 import { getDbUserByEmail } from './getDbUser.js';
 import { setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
