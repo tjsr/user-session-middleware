@@ -77,22 +77,6 @@ export const getMockReqResp = <
       };
     }
 
-    // if (mockApp.get) {
-    //   mockApp.get = appStorage.get;
-    // }
-    // if (mockApp.use) {
-    //   appStorage.use = mockApp.use;
-    // }
-  }
-  // if (request.app === undefined) {
-  //   request.app = vi.mock('express');
-  //   // {} as express.Application;
-  //   // request.app = {} as any;
-  //   request.app.get = vi.fn((key: string): unknown => {
-  //     return appStorage[key];
-  //   });
-  //   throw new Error('Created mock request did not have an app we can use.');
-  // }
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
