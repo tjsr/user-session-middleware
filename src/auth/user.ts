@@ -1,36 +1,59 @@
-import {
-  EmailAddress,
-  UserId,
-  uuid5
-} from '../types.js';
+import { EmailAddress, IdNamespace, UserId, uuid5 } from '../types.js';
 import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
+import { v5 as uuidv5, validate as validateUuid } from 'uuid';
 
+import { DeprecatedFunctionError } from '../utils/testing/types.js';
 import { Session } from '../express-session/index.js';
 import { SystemHttpRequestType } from '../types/request.js';
 import { UserSessionData } from '../types/session.js';
 import assert from 'node:assert';
 import { createRandomId } from '../utils/createRandomId.js';
-import { getUserIdNamespace } from './userNamespace.js';
+import { getAppUserIdNamespace } from './userNamespace.js';
 import { saveSessionPromise } from '../sessionUser.js';
-import { v5 as uuidv5 } from 'uuid';
 
-export const createUserIdFromEmail = (email: EmailAddress): uuid5 => {
+export const createUserIdFromEmail = (userIdNamespace: IdNamespace, email: EmailAddress): uuid5 => {
   assert(email !== undefined);
-  return uuidv5(email, getUserIdNamespace());
+  assert(userIdNamespace !== undefined);
+
+  if (email === undefined) {
+    throw new Error('createUserIdFromEmail called with undefined email parameter.');
+  }
+  if (!validateUuid(userIdNamespace)) {
+    throw new TypeError(
+      `Invalid IdNamespace/UUID '${userIdNamespace?.toString()}' namespace provided to createUserIdFromEmail.`
+    );
+  }
+
+  return uuidv5(email, userIdNamespace);
 };
 
-export const createRandomUserId = (): UserId => {
-  return createRandomId(getUserIdNamespace());
+export const createRandomUserId = (userIdNamespace: IdNamespace): UserId => {
+  if (!userIdNamespace) {
+    throw new DeprecatedFunctionError(
+      'createRandomUserId',
+      undefined,
+      'createRandomUserId must be called with a userIdNamespace parameter, or use createAppRandomUserId'
+    );
+  }
+  if (!validateUuid(userIdNamespace)) {
+    throw new TypeError(
+      `Invalid IdNamespace/UUID ${userIdNamespace?.toString()} namespace provided to createRandomUserId.`
+    );
+  }
+
+  return createRandomId(userIdNamespace);
 };
 
 export const getUserIdFromRequest = async <SD extends UserSessionData = UserSessionData>(
   request: SystemHttpRequestType<SD>,
   noCreate = false
-): Promise<UserId|undefined> => {
-  return getUserIdFromSession(request.session, noCreate);
+): Promise<UserId | undefined> => {
+  const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
+  return getUserIdFromSession(userIdNamespace, request.session, noCreate);
 };
 
 export const getUserIdFromSession = async <SD extends UserSessionData = UserSessionData>(
+  userIdNamespace: IdNamespace,
   session: Session & SD,
   noCreate = false
 ): Promise<UserId> => {
@@ -40,19 +63,23 @@ export const getUserIdFromSession = async <SD extends UserSessionData = UserSess
     // TODO return a UserSessionError
     return Promise.reject(new SessionNotGeneratedError());
   } else if (!noCreate) {
-    return createRandomIdAndSave(session);
+    return createRandomIdAndSave(userIdNamespace, session);
   } else {
     return Promise.reject(new SessionUserInfoError('User session had no credentials.'));
   }
 };
 
-export const createRandomIdAndSave = (session: Session & UserSessionData): Promise<UserId> => {
-  session.userId = createRandomUserId();
+export const createRandomIdAndSave = (
+  userIdNamespace: IdNamespace,
+  session: Session & UserSessionData
+): Promise<UserId> => {
+  session.userId = createRandomUserId(userIdNamespace);
   return new Promise<UserId>((resolve, reject) => {
-    saveSessionPromise(session).then(() => {
-      console.trace(createRandomIdAndSave, 'Returning user id', session.userId);
-      return resolve(session.userId);
-    }).catch(reject);
+    saveSessionPromise(session)
+      .then(() => {
+        console.trace(createRandomIdAndSave, 'Returning user id', session.userId);
+        return resolve(session.userId);
+      })
+      .catch(reject);
   });
 };
-

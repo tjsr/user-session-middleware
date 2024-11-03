@@ -43,8 +43,10 @@ export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessi
   ];
 };
 
-export const sessionUserRouteHandlers = (app: express.Express,
-  sessionOptions?: Partial<UserSessionOptions> | undefined): void => {
+export const sessionUserRouteHandlers = (
+  app: express.Application,
+  sessionOptions?: Partial<UserSessionOptions> | undefined
+): void => {
   // Handle login, logout before we send back a cookie
   if (!sessionOptions?.disableSessionRefresh) {
     app.get(sessionOptions?.sessionPath ?? '/session', session, assignUserDataToRegeneratedSession);
@@ -52,15 +54,22 @@ export const sessionUserRouteHandlers = (app: express.Express,
   if (!sessionOptions?.disableLoginEndpoints) {
     // express.json will be required if we are going to use req.body for /login
     app.use(express.json());
-    app.get(sessionOptions?.loginPath ?? '/login', checkLogin, login,
-      regenerateAfterLogin, regenerateAfterLoginError);
-    app.post(sessionOptions?.loginPath ?? '/login', checkLogin, login,
-      regenerateAfterLogin, regenerateAfterLoginError
+    app.get(sessionOptions?.loginPath ?? '/login', checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError);
+    app.post(sessionOptions?.loginPath ?? '/login', checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError);
+    app.get(
+      sessionOptions?.logoutPath ?? '/logout',
+      checkLogout,
+      logout,
+      regenerateAfterLogout,
+      regenerateAfterLogoutError
     );
-    app.get(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,
-      regenerateAfterLogout, regenerateAfterLogoutError);
-    app.post(sessionOptions?.logoutPath ?? '/logout', checkLogout, logout,
-      regenerateAfterLogout, regenerateAfterLogoutError);
+    app.post(
+      sessionOptions?.logoutPath ?? '/logout',
+      checkLogout,
+      logout,
+      regenerateAfterLogout,
+      regenerateAfterLogoutError
+    );
   }
 };
 

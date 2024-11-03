@@ -1,25 +1,45 @@
 import { EmailAddress, IdNamespace, SessionId } from '../../types.js';
+import { MemoryStore, Store } from '../../express-session/index.js';
 
 import { AuthenticationRestResult } from '../../types/apiResults.js';
-import { Express } from '../../express/index.js';
-import { MemoryStore } from '../../express-session/index.js';
+import { MockRequestWithSession } from '../../testUtils.js';
 import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { TaskContext } from 'vitest';
 import { UserModel } from '../../types/model.js';
+import { UserSessionData } from '../../types/session.js';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
+import express from '../../express/index.js';
 import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
 import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
-import { setUserIdNamespaceForTest } from '../../utils/testNamespaceUtils.js';
+import { setUserIdNamespaceForTest } from '../../utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 import { testableApp } from '../../utils/testing/middlewareTestUtils.js';
 import { validate } from 'uuid';
 
-export interface ApiTestContext extends TaskContext {
-  app?: Express;
+export type UserIdTaskContext = TaskContext & {
+  userIdNamespace: IdNamespace;
+};
+
+export interface SessionDataTestContext extends UserIdTaskContext {
+  memoryStore?: Store;
+  testRequestData: MockRequestWithSession;
+  testSessionStoreData: UserSessionData;
+}
+
+export type UserAppTaskContext = UserIdTaskContext & {
+  app: express.Application;
+};
+
+export type ApiTestContext = TaskContext &
+  UserIdTaskContext &
+  SessionTestContext &
+  UserAppTaskContext & {
+    userData: Map<EmailAddress, UserModel | undefined>;
+  };
+
+export interface SessionTestContext extends TaskContext {
   currentSessionId?: SessionId;
   sessionOptions: Partial<UserSessionOptions>;
-  userData: Map<EmailAddress, UserModel | undefined>;
-  userIdNamespace: IdNamespace;
 }
 
 export const setupApiTest = (context: ApiTestContext) => {
@@ -36,8 +56,9 @@ export const setupApiTest = (context: ApiTestContext) => {
 
 export const verifyAuthSessionId = (response: supertest.Response, context: ApiTestContext): SessionId => {
   expect(context.currentSessionId).not.toBeUndefined();
-  assert(validate(context.currentSessionId!), 'session ID should be a UUID value');
+  assert(validate(context.currentSessionId), 'session ID should be a UUID value');
   expect(response.body, 'Authentication response body expected to be present').not.toBeUndefined();
+  expect(response.body.message).not.toEqual('Unknown authentication error');
   expect(response.body.sessionId, 'Authentication response body expected to contain sessionId').toEqual(
     context.currentSessionId
   );

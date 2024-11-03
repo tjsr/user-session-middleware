@@ -1,13 +1,17 @@
+import { Application, IRouterMatcher } from 'express';
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
-import { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
-import { Mock, MockInstance, TaskContext } from 'vitest';
-import { getMockReq, getMockRes } from "vitest-mock-express";
+import { Mock, MockInstance } from 'vitest';
+import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
+import { getMockReq, getMockRes } from 'vitest-mock-express';
 
-import { MockRequest } from "vitest-mock-express/dist/src/request";
-import { SystemHttpRequestType } from "./types/request.js";
-import { SystemHttpResponseType } from "./types/response.js";
-import { UserSessionData } from "./types/session.js";
-import { markHandlersCalled } from "./utils/testing/markHandlers.js";
+import { MockRequest } from 'vitest-mock-express/dist/src/request';
+import { SessionDataTestContext } from './api/utils/testcontext.js';
+import { SystemHttpRequestType } from './types/request.js';
+import { SystemHttpResponseType } from './types/response.js';
+import { UserSessionData } from './types/session.js';
+import { markHandlersCalled } from './utils/testing/markHandlers.js';
+import { setAppUserIdNamespace } from './auth/userNamespace.js';
+import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -15,6 +19,7 @@ export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 > {
+  appStorage: Record<string, unknown>;
   clearMockReq: () => void;
   clearMockRes: () => void;
   mockClear: () => void;
@@ -23,12 +28,6 @@ export interface MockReqRespSet<
   response: ResponseType;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   spies?: Map<Function, MockInstance>;
-};
-
-export interface SessionDataTestContext extends TaskContext {
-  memoryStore?: Store;
-  testRequestData: MockRequestWithSession;
-  testSessionStoreData: UserSessionData;
 }
 
 declare module 'vitest' {
@@ -37,18 +36,48 @@ declare module 'vitest' {
     testRequestData: MockRequestWithSession;
     testSessionStoreData: UserSessionData;
   }
-};
+}
 
+/* eslint-disable indent */
 /**
+ * @param {MockRequest | undefined} requestProps Values that should be provided as defaults or
+ * overrides on the request.
+ * @param {Partial<ResponseType>} mockResponseData Values that should be provided as defaults or
+ * overrides on the response.
  * @deprecated This method should not be called directly. Use XYZ instead.
- */
+ * @return {MockReqRespSet} A set of mocks for request and response objects.
+*/
 export const getMockReqResp = <
-RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
->(requestProps?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>): MockReqRespSet => {
+  RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
+>(
+  requestProps?: MockRequest | undefined,
+  mockResponseData?: Partial<ResponseType>
+): MockReqRespSet => {
+  /* eslint-enable indent */
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
-  const request: RequestType = getMockReq(requestProps);
+  const request: RequestType & { app: express.Application } = getMockReq(requestProps);
+  // const appStorage: Map<string, unknown> = {};
+  const appStorage: Record<string, unknown> = {};
+  const mockApp: Partial<Application> | undefined = request.app;
+  if (mockApp) {
+    if (mockApp.get) {
+      console.info('Mock app has get method.', mockApp.get);
+    } else {
+      mockApp.get = ((name: string) => appStorage[name]) as IRouterMatcher<Application>;
+    }
+
+    if (mockApp.set) {
+      console.info('Mock app has set method.', mockApp.set);
+    } else {
+      mockApp.set = (name: string, val: unknown): Application => {
+        appStorage[name] = val;
+        return mockApp as Application;
+      };
+    }
+  }
+
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
   };
@@ -58,17 +87,19 @@ ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSession
     clearMockRes();
     // TODO: Clear response mocks
   };
-  
-  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
+
+  return { appStorage, clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
 /**
  * @deprecated This method should not be called directly. Use XYZ instead.
  */
 export const getMockRequestResponse: <
-ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
-// eslint-disable-next-line no-unused-vars
->(values?: MockRequest | undefined, mockResponseData?: Partial<ResponseType>) => MockReqRespSet = getMockReqResp;
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
+>(
+  _values?: MockRequest | undefined,
+  _mockResponseData?: Partial<ResponseType>
+) => MockReqRespSet = getMockReqResp;
 export const getMockRequest = getMockReq;
 export const getMockResponse = getMockRes;
 
@@ -90,28 +121,28 @@ export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
     }
     return template as unknown as Return;
   });
-  return [ promise, mock ];
+  return [promise, mock];
 };
 
 export type MiddlewareTypes = (RequestHandler | ErrorRequestHandler)[];
 
 interface SessionTestRunOptions {
+  markHandlersCalled?: (Handler | ErrorRequestHandler)[];
   noMockSave?: boolean;
-  skipCreateSession?: boolean;
-  skipAddToStore?: boolean;
-  spyOnSave?: boolean;
   overrideSessionData?: Partial<UserSessionData>;
-  markHandlersCalled?: (Handler|ErrorRequestHandler)[],
   silentCallHandlers?: boolean;
+  skipAddToStore?: boolean;
+  skipCreateSession?: boolean;
+  spyOnSave?: boolean;
 }
 
 export const createTestRequestSessionData = (
-  context: SessionDataTestContext, 
+  context: SessionDataTestContext,
   requestDataOverrides: MockRequestWithSession = {},
   testRunOptions: SessionTestRunOptions = {
     silentCallHandlers: true,
   }
-): {  } & MockReqRespSet => {
+): {} & MockReqRespSet => {
   if (context.testRequestData === undefined) {
     createContextForSessionTest(context);
   }
@@ -120,6 +151,10 @@ export const createTestRequestSessionData = (
     ...requestDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
+  setAppUserIdNamespace(mocks.request.app, context.userIdNamespace);
+  const fullTest = `${context.task.suite ? context.task.suite?.name + '/' : ''}${context.task.name}`;
+  console.warn(`created mock getMockReqResp using deprecated method in test ${fullTest}`);
+
   const { request, response } = mocks;
   context.testRequestData['newSessionIdGenerated'] = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
@@ -128,9 +163,11 @@ export const createTestRequestSessionData = (
         console.error(err);
       }
       if (data) {
-        console.warn(createTestRequestSessionData,
+        console.warn(
+          createTestRequestSessionData,
           'createTestRequestSessionData overwrote existing sessionID data in memory store.',
-          mockRequestData.sessionID);
+          mockRequestData.sessionID
+        );
       }
     });
     context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
@@ -159,8 +196,8 @@ export const createTestRequestSessionData = (
 };
 
 export interface MockRequestWithSession extends MockRequest {
-  sessionID?: string | undefined;
   newSessionIdGenerated?: boolean | undefined;
+  sessionID?: string | undefined;
   sessionStore?: Store | undefined;
 }
 
@@ -169,7 +206,10 @@ export const createContextForSessionTest = (
   requestDataDefaults: MockRequestWithSession = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
+  setUserIdNamespaceForTest(context);
+
   const cookie = new Cookie();
+  // context.userIdNamespace = createRandomIdNamespace(context.task.name);
   if (!context.memoryStore) {
     context.memoryStore = new MemoryStore();
   }
@@ -178,15 +218,15 @@ export const createContextForSessionTest = (
   } as SessionData);
 
   context.testRequestData = {
-    newSessionIdGenerated: requestDataDefaults.newSessionIdGenerated !== undefined
-      ? requestDataDefaults.newSessionIdGenerated : false,
+    newSessionIdGenerated:
+      requestDataDefaults.newSessionIdGenerated !== undefined ? requestDataDefaults.newSessionIdGenerated : false,
     sessionID: requestDataDefaults.sessionID !== undefined ? requestDataDefaults.sessionID : undefined,
     sessionStore: context.memoryStore,
   };
 
   context.testSessionStoreData = {
     cookie,
-    email: sessionStoreDefaults.email ?? "test-email",
+    email: sessionStoreDefaults.email ?? 'test-email',
     hasLoggedOut: sessionStoreDefaults.hasLoggedOut ?? false,
     newId: undefined,
     userId: sessionStoreDefaults.userId ?? 'test-user-id',
@@ -198,7 +238,8 @@ export const checkForDefault = <OptionsType extends Record<string, any>>(
   defaultOptions: OptionsType,
   contextOptions: Partial<OptionsType>,
   key: string,
-  defaultOptionsMethod: (_options: Partial<OptionsType>) => OptionsType) => {
+  defaultOptionsMethod: (_options: Partial<OptionsType>) => OptionsType
+) => {
   expect(defaultOptions[key]).not.toBeUndefined();
   delete contextOptions[key];
   const updatedOptions = defaultOptionsMethod(contextOptions);
@@ -220,9 +261,12 @@ export const checkForOverride = <OptionsType extends Record<string, any>>(
   console.log(`Checking ${key}: ${updatedOptions[key]} === ${defaultOptions[key]}`);
 
   if (contextOptions[key] !== defaultOptions[key]) {
-    expect(updatedOptions[key], `For ${key} updated value ${updatedOptions[key]} should not match default.`)
-      .not.toEqual(defaultOptions[key]);
-  };
-  expect(updatedOptions[key], `For ${key} updated value ${updatedOptions[key]} should match context`)
-    .toEqual(contextOptions[key]);
+    expect(
+      updatedOptions[key],
+      `For ${key} updated value ${updatedOptions[key]} should not match default.`
+    ).not.toEqual(defaultOptions[key]);
+  }
+  expect(updatedOptions[key], `For ${key} updated value ${updatedOptions[key]} should match context`).toEqual(
+    contextOptions[key]
+  );
 };

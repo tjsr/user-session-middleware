@@ -31,9 +31,12 @@ describe('api.logout', () => {
 
   test('Should return a 200 when a user is logged in.', async (context: ApiTestContext) => {
     const testSessionId: SessionId = generateSessionIdForTest(context);
-    context.sessionOptions.store!.set(testSessionId, mockSession({
-      email: testUserEmail,
-    }));
+    context.sessionOptions.store!.set(
+      testSessionId,
+      mockSession(context.userIdNamespace, {
+        email: testUserEmail,
+      })
+    );
 
     const logoutResponse = await logoutFrom(context, testSessionId);
     expect(logoutResponse.statusCode).toEqual(HttpStatusCode.OK);
@@ -41,25 +44,30 @@ describe('api.logout', () => {
 
   test('Should set session ID cookie to a new value.', async (context: ApiTestContext) => {
     const testSessionId: SessionId = generateSessionIdForTest(context);
-    context.sessionOptions.store!.set(testSessionId, mockSession({
-      email: testUserEmail,
-    }));
+    context.sessionOptions.store!.set(
+      testSessionId,
+      mockSession(context.userIdNamespace, {
+        email: testUserEmail,
+      })
+    );
 
     const logoutResponse = await logoutFrom(context, testSessionId);
     expect(logoutResponse.statusCode).toEqual(HttpStatusCode.OK);
     expect(context.currentSessionId).not.toEqual(testSessionId);
   });
 
-  test('Should report 401 for invalid session ID when trying to re-use old session ID.',
-    async (context: ApiTestContext) => {
-      const testSessionId: SessionId = generateSessionIdForTest(context);
-      context.sessionOptions.store!.set(testSessionId, mockSession({
+  test('Should report 401 for invalid session ID when trying to re-use old session ID.', async (context: ApiTestContext) => {
+    const testSessionId: SessionId = generateSessionIdForTest(context);
+    context.sessionOptions.store!.set(
+      testSessionId,
+      mockSession(context.userIdNamespace, {
         email: testUserEmail,
-      }));
-      const app = testableApp(context.sessionOptions);
-      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
-      await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.UNAUTHORIZED);
-    });
+      })
+    );
+    const app = testableApp(context.sessionOptions);
+    await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
+    await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.UNAUTHORIZED);
+  });
 
   test('Should return a 404 if logout call is disabled', async (context: ApiTestContext) => {
     context.sessionOptions.disableLoginEndpoints = true;
@@ -68,28 +76,26 @@ describe('api.logout', () => {
     return supertest(app).get('/signout').expect(HttpStatusCode.NOT_FOUND);
   });
 
-  test('Should return a 404 at /logout if logout path is changed to not use default',
-    async (context: ApiTestContext) => {
-      context.sessionOptions.debugCallHandlers = true;
-      context.sessionOptions.logoutPath = '/signout';
+  test('Should return a 404 at /logout if logout path is changed to not use default', async (context: ApiTestContext) => {
+    context.sessionOptions.debugCallHandlers = true;
+    context.sessionOptions.logoutPath = '/signout';
 
-      const app = testableApp(context.sessionOptions);
-      return supertest(app).get('/logout').expect(HttpStatusCode.NOT_FOUND);
+    const app = testableApp(context.sessionOptions);
+    return supertest(app).get('/logout').expect(HttpStatusCode.NOT_FOUND);
+  });
+
+  test('Should find logout at alternative path and return 200.', async (context: ApiTestContext) => {
+    context.sessionOptions.logoutPath = '/signout';
+
+    const testSessionId: SessionId = generateSessionIdForTest(context);
+    context.sessionOptions.store!.set(testSessionId, {
+      cookie: new Cookie(),
+      email: testUserEmail,
+      hasLoggedOut: false,
+      newId: false,
+      userId: createUserIdFromEmail(context.userIdNamespace, testUserEmail),
     });
-
-  test('Should find logout at alternative path and return 200.',
-    async (context: ApiTestContext) => {
-      context.sessionOptions.logoutPath = '/signout';
-
-      const testSessionId: SessionId = generateSessionIdForTest(context);
-      context.sessionOptions.store!.set(testSessionId, {
-        cookie: new Cookie(),
-        email: testUserEmail,
-        hasLoggedOut: false,
-        newId: false,
-        userId: createUserIdFromEmail(testUserEmail),
-      });
-      const app = testableApp(context.sessionOptions);
-      return supertest(app).get('/signout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
-    });
+    const app = testableApp(context.sessionOptions);
+    return supertest(app).get('/signout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
+  });
 });

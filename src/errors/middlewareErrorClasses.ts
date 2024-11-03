@@ -19,3 +19,9 @@ export class NamespaceUUIDFormatError extends UUIDNamespaceSessionMiddlewareErro
     super(namespace, message);
   }
 }
+
+export class NamespaceNotProvidedError extends UUIDNamespaceSessionMiddlewareError {
+  constructor(message = 'Namespace must be provided.') {
+    super(undefined!, message);
+  }
+}

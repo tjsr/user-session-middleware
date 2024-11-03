@@ -1,16 +1,16 @@
-import { getUserIdNamespace, setUserIdNamespace } from './auth/userNamespace.js';
+import { USER_ID_NAMESPACE_KEY, setAppUserIdNamespace, setUserIdNamespace } from './auth/userNamespace.js';
 import {
   postLoginUserSessionMiddleware,
   preLoginUserSessionMiddleware,
-  sessionUserRouteHandlers
+  sessionUserRouteHandlers,
 } from './sessionMiddlewareHandlers.js';
 
-import { IdNamespace } from './types.js';
 import { UserSessionOptions } from './types/sessionOptions.js';
-import express from "express";
+import express from 'express';
+import { requireEnv } from '@tjsr/simple-env-utils';
 
 export const useUserSessionMiddleware = (
-  app: express.Express,
+  app: express.Application,
   sessionOptions?: Partial<UserSessionOptions> | undefined
 ) => {
   if (sessionOptions?.debugCallHandlers) {
@@ -18,19 +18,15 @@ export const useUserSessionMiddleware = (
   }
   if (sessionOptions?.userIdNamespace) {
     setUserIdNamespace(sessionOptions.userIdNamespace);
-    app.set('userIdNamespace', sessionOptions.userIdNamespace);
+    setAppUserIdNamespace(app, sessionOptions.userIdNamespace);
   } else {
-    const idNamespace: IdNamespace = getUserIdNamespace();
-    app.set('userIdNamespace', idNamespace);
+    const envNamespace = requireEnv(USER_ID_NAMESPACE_KEY);
+    setAppUserIdNamespace(app, envNamespace);
   }
 
-  app.use(
-    preLoginUserSessionMiddleware(sessionOptions)
-  );
+  app.use(preLoginUserSessionMiddleware(sessionOptions));
 
   sessionUserRouteHandlers(app, sessionOptions);
 
-  app.use(
-    postLoginUserSessionMiddleware()
-  );
+  app.use(postLoginUserSessionMiddleware());
 };
