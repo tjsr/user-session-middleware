@@ -76,6 +76,7 @@ export const getMockReqResp = <
         return mockApp as Application;
       };
     }
+  }
 
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
