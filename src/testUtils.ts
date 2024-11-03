@@ -152,7 +152,8 @@ export const createTestRequestSessionData = (
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
   setAppUserIdNamespace(mocks.request.app, context.userIdNamespace);
-  console.warn('created mock getMockReqResp using deprecated method.');
+  const fullTest = `${context.task.suite ? context.task.suite?.name + '/' : ''}${context.task.name}`;
+  console.warn(`created mock getMockReqResp using deprecated method in test ${fullTest}`);
 
   const { request, response } = mocks;
   context.testRequestData['newSessionIdGenerated'] = true;
