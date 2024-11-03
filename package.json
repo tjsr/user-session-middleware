@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.11",
-    "@tjsr/simple-env-utils": "^0.1.8",
+    "@tjsr/simple-env-utils": "^0.1.9",
     "email-validator": "^2.0.4",
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.1",
