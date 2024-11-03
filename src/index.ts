@@ -22,14 +22,7 @@ export {
 
 export { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
 
-export type {
-  uuid,
-  uuid4,
-  uuid5,
-  EmailAddress,
-  IPAddress,
-  UserId
-} from './types.js';
+export type { uuid, uuid4, uuid5, EmailAddress, IPAddress, UserId, IdNamespace } from './types.js';
 
 export type { SystemResponseLocals } from './types/locals.js';
 export type { UserSessionData,
