@@ -1,6 +1,7 @@
 import * as expressSession from 'express-session';
 
 import { IncomingHttpHeaders } from 'http';
+import { RequestHandler } from './express/index.js';
 import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
@@ -16,10 +17,10 @@ const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
 export const SESSION_ID_HEADER_KEY = 'x-session-id';
 export const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
 
-const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
+export const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
   const headers: IncomingHttpHeaders = req.headers;
-  const sessionIdHeader: SessionId | string | string[] | undefined =
-    headers[SESSION_ID_HEADER_KEY];
+  const sessionIdHeader: SessionId | string | string[] | undefined = headers[SESSION_ID_HEADER_KEY];
+  console.log(`Searching for session id with header key ${SESSION_ID_HEADER_KEY}`, sessionIdHeader);
 
   if (typeof sessionIdHeader === 'string' && sessionIdHeader !== 'undefined') {
     return sessionIdHeader;
@@ -27,9 +28,14 @@ const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionDat
   return undefined;
 };
 
-const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): SessionId | string | undefined => {
+export const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): SessionId | string | undefined => {
   const cookies = req.cookies;
   const cookieValue = cookies?.sessionId === 'undefined' ? undefined : cookies?.sessionId;
+  if (cookieValue) {
+    console.debug(getSessionIdFromCookie, `Got a cookie session Id with value ${cookieValue}`);
+  } else {
+    console.debug(getSessionIdFromCookie, 'No cookie session Id found on request');
+  }
   return cookieValue;
 };
 
@@ -37,17 +43,20 @@ export const requestHasSessionId = (req: SystemHttpRequestType<UserSessionData>)
   return !!getSessionIdFromRequestHeader(req) || !!getSessionIdFromCookie(req);
 };
 
+// prettier-ignore
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
-  DataType extends UserSessionData = UserSessionData
->(req: RequestType): string => {
+  DataType extends UserSessionData = UserSessionData,
+  >(
+    req: RequestType
+  ): string => {
   if (req.regenerateSessionId) {
     const generatedId = uuidv4();
     req.newSessionIdGenerated = true;
     return generatedId;
   }
 
-  const sessionIdFromRequest: string|undefined = getSessionIdFromRequestHeader(req);
+  const sessionIdFromRequest: string | undefined = getSessionIdFromRequestHeader(req);
   if (sessionIdFromRequest) {
     req.newSessionIdGenerated = false;
     return sessionIdFromRequest;
@@ -83,7 +92,8 @@ export const defaultExpressSessionCookieOptions = (
   };
 };
 
-export const defaultExpressSessionOptions = (options?: Partial<expressSession.SessionOptions> | undefined,
+export const defaultExpressSessionOptions = (
+  options?: Partial<expressSession.SessionOptions> | undefined,
   useSessionStore: expressSession.Store = memoryStore
 ): expressSession.SessionOptions => {
   const defaults: expressSession.SessionOptions = {
@@ -109,8 +119,10 @@ export const defaultUserSessionOptions = (options: UserSessionOptions): expressS
 
 export const expressSessionHandlerMiddleware = (
   options?: Partial<expressSession.SessionOptions> | undefined,
-  useSessionStore: expressSession.Store = memoryStore) => {
+  useSessionStore: expressSession.Store = memoryStore
+): RequestHandler => {
   let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
   sessionOptions = defaultUserSessionOptions(sessionOptions);
+  console.info(`Session header will look for ${sessionOptions.name}`);
   return session(sessionOptions);
 };

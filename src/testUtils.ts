@@ -197,6 +197,7 @@ export const createTestRequestSessionData = (
 
 export interface MockRequestWithSession extends MockRequest {
   newSessionIdGenerated?: boolean | undefined;
+  regenerateSessionId?: boolean | undefined;
   sessionID?: string | undefined;
   sessionStore?: Store | undefined;
 }
