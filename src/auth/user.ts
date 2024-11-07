@@ -48,7 +48,7 @@ export const getUserIdFromRequest = async <SD extends UserSessionData = UserSess
   request: SystemHttpRequestType<SD>,
   noCreate = false
 ): Promise<UserId | undefined> => {
-  const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
+  const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app.locals);
   return getUserIdFromSession(userIdNamespace, request.session, noCreate);
 };
 

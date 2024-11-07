@@ -63,7 +63,6 @@ describe('checkLogout', () => {
     expect(request.session.save).not.toHaveBeenCalled();
   });
 
-  // eslint-disable-next-line max-len
   test('Should refuse to log out again and return 401 if the session is already written with hasLoggedOut=true', async (context: SessionDataTestContext) => {
     const sessionId = generateSessionIdForTest(context);
 

@@ -8,6 +8,9 @@ export const getStoreSessionAsPromise = (store: Store, sessionId: SessionId): Pr
       if (err) {
         reject(err);
       } else {
+        if (!session) {
+          reject(new Error(`No session found for ${sessionId}`));
+        }
         resolve(session as UserSessionData);
       }
     });

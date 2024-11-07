@@ -1,13 +1,9 @@
-import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
-import { addCalledHandler } from "../handlerChainLog.js";
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
+import { addCalledHandler } from '../handlerChainLog.js';
 
 export const LOG_HANDLERS_SETTING = 'debugCallHandlers';
 
-export const handleLocalsCreation: UserSessionMiddlewareRequestHandler = (
-  request,
-  response,
-  next
-):void => {
+export const handleResponseLocalsCreation: UserSessionMiddlewareRequestHandler = (request, response, next): void => {
   if (!response.locals) {
     response.locals = {
       calledHandlers: [],
@@ -21,11 +17,11 @@ export const handleLocalsCreation: UserSessionMiddlewareRequestHandler = (
       response.locals.skipHandlerDependencyChecks = false;
     }
   }
-  if (request.app.get('debugCallHandlers')) {
-    response.locals.debugCallHandlers = true;
+  if (request.app.locals[LOG_HANDLERS_SETTING] !== undefined) {
+    response.locals.debugCallHandlers = request.app.locals[LOG_HANDLERS_SETTING];
   }
 
   // We do this at the end for this handler, but would usually do it first for all other handlers.
-  addCalledHandler(response, handleLocalsCreation);
+  addCalledHandler(response, handleResponseLocalsCreation);
   next();
 };

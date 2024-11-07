@@ -1,5 +1,6 @@
+import { CookieOptions } from 'express';
 import { createTestRequestSessionData } from '../testUtils.js';
-import { expectSetSessionCookieOnResponseMock } from '../utils/testing/cookieTestUtils.js';
+import { expectSetSessionCookieOnResponseMock } from '@tjsr/testutils';
 import { generateNewSessionId } from '../session/sessionId.js';
 import { setSessionCookie } from './setSessionCookie.js';
 
@@ -11,7 +12,10 @@ describe('setSessionCookie', () => {
 
     setSessionCookie(request, response);
 
-    expectSetSessionCookieOnResponseMock(response, expectedSessionId);
+    const expectedCookieOptions: Partial<CookieOptions> = {
+      sameSite: 'strict',
+    };
+    expectSetSessionCookieOnResponseMock('test.sid', response, expectedSessionId, expectedCookieOptions);
   });
 
   test('Should throw an error if the session has not been created', (context) => {

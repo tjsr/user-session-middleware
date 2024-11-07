@@ -6,14 +6,14 @@ import {
   handleSessionDataRetrieval,
 } from './middleware/handlers/index.js';
 
-import { SESSION_ID_HEADER_KEY } from './getSession.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserIdTaskContext } from './api/utils/testcontext.js';
 import { UserSessionData } from './types/session.js';
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
+import { getSetCookieString } from '@tjsr/testutils';
 import { mockSession } from './utils/testing/mocks.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
+import { addUserIdNamespaceToContext } from './utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 
 describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
@@ -24,7 +24,7 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
   });
 
   beforeEach(async (context: UserIdTaskContext) => {
-    setUserIdNamespaceForTest(context);
+    addUserIdNamespaceToContext(context);
   });
 
   afterAll(async () => {
@@ -47,7 +47,7 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
     // return new Promise<void>((done) => {
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Set-Cookie', getSetCookieString('cookie.test.sid', testSessionId))
       .set('Content-Type', 'application/json')
       .expect(401);
 
@@ -61,7 +61,8 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
     };
     const { app, memoryStore } = appWithMiddleware(
       [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
-      [endValidator]
+      [endValidator],
+      { name: 'cookie.test.sid', saveUninitialized: true }
     );
     const testSessionData: UserSessionData = mockSession(context.userIdNamespace);
     const testSessionId = generateSessionIdForTest(context);
@@ -69,7 +70,7 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
 
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Set-Cookie', getSetCookieString('cookie.test.sid', testSessionId))
       .set('Content-Type', 'application/json')
       .expect(200);
     expect(response.statusCode).toEqual(200);
@@ -93,13 +94,14 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
     // of the data from the store to session
     const { app, memoryStore } = appWithMiddleware(
       [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
-      [endValidator]
+      [endValidator],
+      { name: 'cookie.test.sid', saveUninitialized: true }
     );
     memoryStore.set(testSessionId, testSessionData);
 
     return supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set('Set-Cookie', getSetCookieString('cookie.test.sid', testSessionId))
       .set('Content-Type', 'application/json')
       .expect(200);
   });

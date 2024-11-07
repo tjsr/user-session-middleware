@@ -3,21 +3,23 @@ import {
   UUIDNamespaceNotDefinedError
 } from "../errors/middlewareErrorClasses.js";
 
+import { AppLocals } from '../express/index.js';
 import { DeprecatedFunctionError } from '../utils/testing/types.js';
 import { IdNamespace } from '../types.js';
-import express from '../express/index.js';
 import { validate } from 'uuid';
 
 export const USER_ID_NAMESPACE_KEY = 'USERID_UUID_NAMESPACE';
 let USERID_UUID_NAMESPACE: IdNamespace | undefined = process.env[USER_ID_NAMESPACE_KEY];
 // || 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
 
-export const setAppUserIdNamespace = (app: express.Application, namespace: IdNamespace): IdNamespace => {
-  if (app === undefined || namespace === undefined) {
+export const setAppUserIdNamespace = (appLocals: AppLocals, namespace: IdNamespace): IdNamespace => {
+  if (appLocals === undefined || namespace === undefined) {
     throw new Error(
-      'setUserIdNamespace requires an express app and a namespace, with old ' +
+      'setUserIdNamespace requires an express app locals and a namespace, with old ' +
         'call giving just namespace being deprecated.'
     );
+  } else if (!appLocals) {
+    throw new Error('setUserIdNamespace requires an express app with locals.');
   }
 
   if (namespace === undefined) {
@@ -27,7 +29,7 @@ export const setAppUserIdNamespace = (app: express.Application, namespace: IdNam
     throw new NamespaceUUIDFormatError(namespace);
   }
 
-  app.set(USER_ID_NAMESPACE_KEY, namespace);
+  appLocals[USER_ID_NAMESPACE_KEY] = namespace;
   return namespace;
 };
 
@@ -60,13 +62,17 @@ export const setUserIdNamespace = (namespace: IdNamespace): IdNamespace => {
   return USERID_UUID_NAMESPACE;
 };
 
-export const getAppUserIdNamespace = (app: express.Application): IdNamespace => {
-  const namespaceValue = app.get(USER_ID_NAMESPACE_KEY);
+export const getAppUserIdNamespace = (appLocals: AppLocals): IdNamespace => {
+  if (appLocals === undefined) {
+    throw new Error('getAppUserIdNamespace requires an express app locals object.');
+  }
+
+  const namespaceValue = appLocals[USER_ID_NAMESPACE_KEY];
 
   if (!namespaceValue) {
     throw new UUIDNamespaceNotDefinedError();
   }
-  return namespaceValue;
+  return namespaceValue as IdNamespace;
 };
 
 export const getUserIdNamespace = (): IdNamespace => {

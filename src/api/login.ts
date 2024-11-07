@@ -20,7 +20,7 @@ import { SystemHttpRequestType } from '../types/request.js';
 import { SystemResponseLocals } from '../types/locals.js';
 import { UserSessionData } from '../types/session.js';
 import { getAppUserIdNamespace } from '../auth/userNamespace.js';
-import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleResponseLocalsCreation.js';
 import { passAuthOrUnknownError } from '../auth/authErrorUtils.js';
 import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
 import { saveSessionPromise } from '../sessionUser.js';
@@ -31,19 +31,17 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = 
   next: express.NextFunction
 ): void => {
   addCalledHandler(response, checkLogin);
-  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
 
   const email: string = request.body.email;
   if (request.body === undefined) {
     const err: LoginBodyFormatError = new LoginBodyFormatError('No body on login request');
-    console.debug('No body on login request', err);
     next(err);
     return;
   }
 
   if (!EmailValidator.validate(email)) {
     const err: EmailValidationError = new EmailValidationError('Invalid email on login', email);
-    console.debug('Invalid email on login', err);
     next(err);
     return;
   }
@@ -80,12 +78,11 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   next: express.NextFunction
 ) => {
   addCalledHandler(response, login);
-  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
   assertPrerequisiteHandler(response, checkLogin);
   const email: string = request.body.email;
-  console.debug(login, 'Processing login for valid email', email);
   try {
-    const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
+    const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app.locals);
     retrieveUserDataForSession(userIdNamespace, email, request.session, response.locals, next).catch((e: Error) => {
       passAuthOrUnknownError(response.locals, e, next);
     });
@@ -122,11 +119,18 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
       console.error(regenerateAfterLoginError, 'Error regenerating session', err);
       return next(regenError);
     }
-    console.debug(regenerateAfterLoginError, 'Regenerated session');
     if (error) {
+      console.debug(regenerateAfterLoginError, 'Regenerated session with error', error.message);
       next(error);
     } else {
-      console.debug(regenerateAfterLoginError, 'Regenerated session ID', originalSessionId, '=>', request.session.id);
+      console.debug(
+        regenerateAfterLoginError,
+        'Regenerated session ID',
+        originalSessionId,
+        '=>',
+        request.session.id,
+        'Missing error message'
+      );
       Object.assign(request.session, response.locals.userAuthenticationData);
       next();
     }

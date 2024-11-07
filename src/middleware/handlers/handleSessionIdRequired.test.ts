@@ -3,8 +3,8 @@ import { handleSessionCookie, handleSessionCookieOnError } from './handleSession
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
 import { Express } from '../../express/index.js';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
+import { getSetCookieString } from '@tjsr/testutils';
 import { handleSessionIdRequired } from './handleSessionIdRequired.js';
 import supertest from 'supertest';
 
@@ -21,11 +21,11 @@ describe('api.handleSessionIdRequired', () => {
   let memoryStore: MemoryStore;
 
   beforeEach(() => {
-    ({ app, memoryStore } = appWithMiddleware([
-      handleSessionIdRequired,
-      handleSessionCookie,
-      handleSessionCookieOnError,
-    ]));
+    ({ app, memoryStore } = appWithMiddleware(
+      [handleSessionIdRequired, handleSessionCookie, handleSessionCookieOnError],
+      undefined,
+      { saveUninitialized: true }
+    ));
   });
 
   test('Should accept a request with a valid sessionId.', async () => {
@@ -35,10 +35,11 @@ describe('api.handleSessionIdRequired', () => {
 
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
+      .set('Set-Cookie', getSetCookieString('cookie.text.sid', 'abcd-1234'))
       .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(200);
+    expect(response.get('Set-Cookie')).not.toBeUndefined();
   });
 
   test('Should not fail because no sessionId was provided.', async () => {

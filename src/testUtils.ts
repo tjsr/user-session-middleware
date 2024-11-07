@@ -1,7 +1,7 @@
 import { Application, IRouterMatcher } from 'express';
 import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
 import { Mock, MockInstance } from 'vitest';
-import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
+import express, { AppLocals, ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 
 import { MockRequest } from 'vitest-mock-express/dist/src/request';
@@ -9,9 +9,9 @@ import { SessionDataTestContext } from './api/utils/testcontext.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { SystemHttpResponseType } from './types/response.js';
 import { UserSessionData } from './types/session.js';
+import { addUserIdNamespaceToContext } from './utils/testing/testNamespaceUtils.js';
 import { markHandlersCalled } from './utils/testing/markHandlers.js';
 import { setAppUserIdNamespace } from './auth/userNamespace.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -46,7 +46,7 @@ declare module 'vitest' {
  * overrides on the response.
  * @deprecated This method should not be called directly. Use XYZ instead.
  * @return {MockReqRespSet} A set of mocks for request and response objects.
-*/
+ */
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
@@ -57,26 +57,19 @@ export const getMockReqResp = <
   /* eslint-enable indent */
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
-  const request: RequestType & { app: express.Application } = getMockReq(requestProps);
+  //  & { app: express.Application }
+  const filledProps = {
+    ...requestProps,
+  };
+  if (filledProps.app === undefined) {
+    filledProps.app = getMockExpressApp(filledProps.app);
+  }
+  if (filledProps.app.locals === undefined) {
+    filledProps.app.locals = {};
+  }
+  const request: RequestType = getMockRequest(filledProps);
   // const appStorage: Map<string, unknown> = {};
   const appStorage: Record<string, unknown> = {};
-  const mockApp: Partial<Application> | undefined = request.app;
-  if (mockApp) {
-    if (mockApp.get) {
-      console.info('Mock app has get method.', mockApp.get);
-    } else {
-      mockApp.get = ((name: string) => appStorage[name]) as IRouterMatcher<Application>;
-    }
-
-    if (mockApp.set) {
-      console.info('Mock app has set method.', mockApp.set);
-    } else {
-      mockApp.set = (name: string, val: unknown): Application => {
-        appStorage[name] = val;
-        return mockApp as Application;
-      };
-    }
-  }
 
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
@@ -100,8 +93,44 @@ export const getMockRequestResponse: <
   _values?: MockRequest | undefined,
   _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;
-export const getMockRequest = getMockReq;
 export const getMockResponse = getMockRes;
+
+export const getMockExpressApp =
+  // <RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>>
+  (app?: Partial<Application<AppLocals>>): Partial<Application> => {
+    const appStorage: Record<string, unknown> = {};
+    // const mock = vi.fn(app);
+    if (!app) {
+      app = {};
+    }
+    if (app) {
+      if (!app.get) {
+        app.get = ((name: string) => appStorage[name]) as IRouterMatcher<Application>;
+      }
+      if (!app.set) {
+        app.set = (name: string, val: unknown): Application => {
+          appStorage[name] = val;
+          return app as Application;
+        };
+      }
+      if (app.locals === undefined) {
+        app.locals = {
+          mockConfigData: appStorage,
+        };
+      }
+    }
+    return app as Partial<Application>;
+  };
+
+export const getMockRequest = <RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>>(
+  request?: MockRequest | undefined
+): RequestType => {
+  const mockApp: Partial<Application> | undefined = getMockExpressApp(request?.app);
+  if (!mockApp) {
+    console.error('Mock app not provided.');
+  }
+  return getMockReq(request);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
@@ -151,7 +180,12 @@ export const createTestRequestSessionData = (
     ...requestDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
-  setAppUserIdNamespace(mocks.request.app, context.userIdNamespace);
+  setAppUserIdNamespace(mocks.request.app.locals, context.userIdNamespace);
+
+  if (mocks.request.app.locals['sessionIdCookieKey'] === undefined) {
+    mocks.request.app.locals['sessionIdCookieKey'] = 'test.sid';
+  }
+
   const fullTest = `${context.task.suite ? context.task.suite?.name + '/' : ''}${context.task.name}`;
   console.warn(`created mock getMockReqResp using deprecated method in test ${fullTest}`);
 
@@ -196,6 +230,7 @@ export const createTestRequestSessionData = (
 };
 
 export interface MockRequestWithSession extends MockRequest {
+  app?: Partial<express.Request['app']>;
   newSessionIdGenerated?: boolean | undefined;
   regenerateSessionId?: boolean | undefined;
   sessionID?: string | undefined;
@@ -207,7 +242,7 @@ export const createContextForSessionTest = (
   requestDataDefaults: MockRequestWithSession = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
-  setUserIdNamespaceForTest(context);
+  addUserIdNamespaceToContext(context);
 
   const cookie = new Cookie();
   // context.userIdNamespace = createRandomIdNamespace(context.task.name);

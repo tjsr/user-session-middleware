@@ -3,11 +3,11 @@ import { createUserIdFromEmail } from './user.js';
 import { getDbUserByEmail } from './getDbUser.js';
 import { setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
 import { setRetrieveUserDataFunction } from './getDbUser.js';
-import { setUserIdNamespaceForTest } from '../utils/testing/testNamespaceUtils.js';
+import { addUserIdNamespaceToContext } from '../utils/testing/testNamespaceUtils.js';
 
 describe('getDbUserByEmail', () => {
   beforeEach<UserIdTaskContext>((context: UserIdTaskContext) => {
-    setUserIdNamespaceForTest(context);
+    addUserIdNamespaceToContext(context);
     setRetrieveUserDataFunction(undefined!);
   });
 

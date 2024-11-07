@@ -7,3 +7,8 @@ export type IdNamespace = uuid5;
 export type IPAddress = string;
 export type UserId = uuid5;
 export type SessionId = uuid5;
+
+export type Provides<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, never>>;
+export type ProvidesAll<T> = {
+  [_K in keyof T]: never;
+};

@@ -4,9 +4,11 @@ import {
   preLoginUserSessionMiddleware,
   sessionUserRouteHandlers,
 } from './sessionMiddlewareHandlers.js';
+import { setAppSessionIdCookieKey, setAppSessionIdHeaderKey } from './middleware/appSettings.js';
 
+import { SessionOptions } from 'express-session';
 import { UserSessionOptions } from './types/sessionOptions.js';
-import express from 'express';
+import express from './express/index.js';
 import { requireEnv } from '@tjsr/simple-env-utils';
 
 export const useUserSessionMiddleware = (
@@ -16,12 +18,15 @@ export const useUserSessionMiddleware = (
   if (sessionOptions?.debugCallHandlers) {
     app.set('debugCallHandlers', true);
   }
+  setAppSessionIdHeaderKey(app.locals, sessionOptions?.sessionIdHeaderKey);
+  setAppSessionIdCookieKey(app.locals, sessionOptions?.name);
+
   if (sessionOptions?.userIdNamespace) {
     setUserIdNamespace(sessionOptions.userIdNamespace);
-    setAppUserIdNamespace(app, sessionOptions.userIdNamespace);
+    setAppUserIdNamespace(app.locals, sessionOptions.userIdNamespace);
   } else {
     const envNamespace = requireEnv(USER_ID_NAMESPACE_KEY);
-    setAppUserIdNamespace(app, envNamespace);
+    setAppUserIdNamespace(app.locals, envNamespace);
   }
 
   app.use(preLoginUserSessionMiddleware(sessionOptions));
@@ -29,4 +34,6 @@ export const useUserSessionMiddleware = (
   sessionUserRouteHandlers(app, sessionOptions);
 
   app.use(postLoginUserSessionMiddleware());
+
+  app.locals.sessionConfig = sessionOptions as SessionOptions;
 };

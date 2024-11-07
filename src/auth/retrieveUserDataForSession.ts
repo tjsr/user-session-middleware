@@ -7,6 +7,7 @@ import { SystemResponseLocals } from '../types/locals.js';
 import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';
 import { getDbUserByEmail } from './getDbUser.js';
+import { LoginCredentialsError, UnknownAuthenticationError } from '../errors/authenticationErrorClasses.js';
 
 export const retrieveUserDataForSession = (
   userIdNamespace: IdNamespace,
@@ -26,9 +27,11 @@ export const retrieveUserDataForSession = (
       return;
     }
 
+    if (user.userId === undefined) {
+      next(new UnknownAuthenticationError(`User ID is undefined after login for ${email}`));
+    }
     session.userId = user.userId;
     session.email = email;
-    console.debug(login, `User ${email} logged in and has userId`, user.userId);
 
     locals.userAuthenticationData = user;
 

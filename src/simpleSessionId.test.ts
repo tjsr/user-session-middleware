@@ -8,7 +8,7 @@ import { assignUserIdToRequestSession } from './sessionUser.js';
 import { getMockReq } from 'vitest-mock-express';
 import { mockSession } from './utils/testing/mocks.js';
 import { saveSessionDataToSession } from './store/loadData.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
+import { addUserIdNamespaceToContext } from './utils/testing/testNamespaceUtils.js';
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {
@@ -142,7 +142,7 @@ describe<SessionDataTestContext>('saveSessionDataToSession', () => {
   };
 
   beforeEach((context: SessionDataTestContext) => {
-    setUserIdNamespaceForTest(context);
+    addUserIdNamespaceToContext(context);
     testSessionData = mockSession(context.userIdNamespace);
 
     memoryStore = new MemoryStore();

@@ -34,7 +34,7 @@ export const session: UserSessionMiddlewareRequestHandler = (
           response.locals.sendAuthenticationResult = true;
           next();
         } else {
-          const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
+          const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app.locals);
           retrieveUserDataForSession(userIdNamespace, email, request.session, response.locals, next).catch((err) => {
             const regenerateErr = new SessionRegenerationFailedError(err);
             console.error(session, 'Failed retrieving data for user while regenerating session', regenerateErr, err);
@@ -65,10 +65,15 @@ export const assignUserDataToRegeneratedSession: UserSessionMiddlewareRequestHan
 ) => {
   addCalledHandler(response, assignUserDataToRegeneratedSession);
   assertPrerequisiteHandler(response, session);
+  assert(response.locals !== undefined);
+  assert(request.session !== undefined);
 
   assert(request.session.userId !== undefined, 'No userId assigned to session');
-  console.debug(assignUserDataToRegeneratedSession,
-    'Assigning user data to regenerated session:', response.locals.userAuthenticationData);
-  Object.assign(request.session, response.locals.userAuthenticationData);
+  if (!response.locals.userAuthenticationData) {
+    console.debug(assignUserDataToRegeneratedSession, `No user data to assign to session ${request.session.id}`);
+  } else {
+    console.debug(assignUserDataToRegeneratedSession, 'Assigning user data to regenerated session:');
+    Object.assign(request.session, response.locals.userAuthenticationData);
+  }
   next();
 };

@@ -1,7 +1,6 @@
 import { IdNamespace, UserId, uuid5 } from './types.js';
 
 import { NamespaceNotProvidedError } from './errors/middlewareErrorClasses.js';
-import { SaveSessionError } from './errors/errorClasses.js';
 import { Session } from 'express-session';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
@@ -23,13 +22,12 @@ export const createRandomUserId = (namespace?: IdNamespace | undefined): UserId 
 };
 
 export const createAppRandomUserId = (app: express.Application): UserId => {
-  return uuidv5(getSnowflake().toString(), getAppUserIdNamespace(app));
+  return uuidv5(getSnowflake().toString(), getAppUserIdNamespace(app.locals));
 };
 
 export const saveSessionPromise = async (session: Session): Promise<void> => {
+  assert(session !== undefined, 'Tried to save session in promis but was undefined');
   return new Promise((resolve, reject) => {
-    console.trace(saveSessionPromise, `Saving session ${session.id} data to store.`);
-
     session.save((err) => {
       if (err) {
         return reject(err);
@@ -66,13 +64,10 @@ export const assignUserIdToSession = async <ApplicationDataType extends UserSess
   requireSessionId(session);
   if (!session.userId) {
     const userId: uuid5 = createRandomUserId(userIdNamespace);
-    console.log(assignUserIdToSession, `Assigned a new userId ${userId} to session ${session.id}`);
+    console.log(assignUserIdToSession, `Assigned a new userId ${userId} to session ${session.id}.`);
     session.userId = userId;
-    try {
-      return saveSessionPromise(session);
-    } catch (err) {
-      throw new SaveSessionError(`Error saving session ${session.id} data to store.`, err);
-    }
+  } else {
+    console.log(assignUserIdToSession, `Session ${session.id} already has a userId ${session.userId}.`);
   }
 };
 
@@ -85,7 +80,7 @@ export const assignUserIdToRequestSession = async <ApplicationDataType extends U
     requireSessionId(request.session);
     requireSessionIsIsString(request.session);
     requireSessionIDValuesMatch(request.sessionID, request.session.id);
-    const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
+    const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app.locals);
 
     return assignUserIdToSession(userIdNamespace, request.session);
   } catch (err) {

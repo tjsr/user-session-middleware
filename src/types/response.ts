@@ -6,8 +6,8 @@ import express from "express";
 export interface SystemHttpResponseType<
   SD extends UserSessionData = UserSessionData,
   ResBody = any,
-  Locals extends SystemResponseLocals = SystemResponseLocals<SD>
-> extends express.Response<ResBody, Locals> {
-  locals: Locals;
+  ResponseLocals extends SystemResponseLocals = SystemResponseLocals<SD>,
+> extends express.Response<ResBody, ResponseLocals> {
+  locals: ResponseLocals;
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

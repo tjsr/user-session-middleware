@@ -1,14 +1,14 @@
+import { SessionDataTestContext, SessionTestContext } from '../../api/utils/testcontext.js';
 import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
 import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
 import { MemoryStore } from 'express-session';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
-import { SessionDataTestContext } from '../../api/utils/testcontext.js';
 import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
 import { expectResponseSetsSessionIdCookie } from '../../utils/expectations.js';
 import { generateNewSessionId } from '../../session/sessionId.js';
+import { getSetCookieString } from '@tjsr/testutils';
 import { handleSessionStoreRequired } from './handleSessionStoreRequired.js';
 import { sessionlessAppWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
 import supertest from 'supertest';
@@ -50,33 +50,40 @@ describe<SessionDataTestContext>('handler.handleSessionStoreRequired', () => {
   });
 });
 
-describe('api.handleSessionStoreRequired', () => {
+describe<SessionTestContext>('api.handleSessionStoreRequired', () => {
+  beforeEach((context: SessionTestContext) => {
+    context.sessionOptions = {
+      name: 'test.sid',
+      saveUninitialized: true,
+    };
+  });
+
   test('Should error on request when the session store is not configured.', async () => {
     const { app, memoryStore } = sessionlessAppWithMiddleware([handleSessionStoreRequired]);
 
     expect(memoryStore).toBeUndefined();
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
+      .set('Set-Cookie', getSetCookieString('cookie.test.sit', 'abc-1234'))
       .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(501);
   });
 
-  test('Should accept a request when the session store is configured.', async () => {
+  test<SessionTestContext>('Should accept a request when the session store is configured.', async (context: SessionTestContext) => {
     const testSessionId = generateNewSessionId();
-    const { app, memoryStore } = appWithMiddleware([
-      handleSessionStoreRequired,
-      handleSessionCookie,
-      handleSessionCookieOnError,
-    ]);
+    const { app, memoryStore } = appWithMiddleware(
+      [handleSessionStoreRequired, handleSessionCookie, handleSessionCookieOnError],
+      undefined,
+      context.sessionOptions
+    );
     expect(memoryStore).not.toBeUndefined();
     const response = await supertest(app)
       .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
+      .set(context.sessionOptions.name!, testSessionId)
       .set('Content-Type', 'application/json');
 
     expect(response.status).toBe(200);
-    expectResponseSetsSessionIdCookie(response, testSessionId);
+    expectResponseSetsSessionIdCookie(context.sessionOptions.name!, response, testSessionId);
   });
 });

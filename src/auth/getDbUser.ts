@@ -33,6 +33,7 @@ export const getDbUserByEmail = async <T extends UserModel>(
   } as T);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 const isAsyncFunction = (fn: Function): boolean => {
   return fn && fn.constructor.name === 'AsyncFunction';
 };

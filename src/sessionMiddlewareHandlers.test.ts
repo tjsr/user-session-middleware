@@ -321,3 +321,10 @@ describe('retrieveSessionDataFromStore', () => {
   //   expect(storeData!.newId).toBeUndefined();
   // });
 });
+
+describe('expressSessionHandlerMiddleware', () => {
+  test('Should ensure session id comes from header name', () => {
+    // const sessionHandler = expressSessionHandlerMiddleware({ name: 'test.sid' });
+    // const app = supertest(app);
+  });
+});

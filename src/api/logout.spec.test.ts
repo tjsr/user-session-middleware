@@ -2,15 +2,16 @@ import { ApiTestContext, refreshSession, setupApiTest } from "./utils/testcontex
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { Cookie } from "../express-session/index.js";
-import { HttpStatusCode } from "../httpStatusCodes.js";
-import { SESSION_ID_HEADER_KEY } from "../getSession.js";
-import { SessionId } from "../types.js";
-import { createUserIdFromEmail } from "../auth/user.js";
-import { generateSessionIdForTest } from "../utils/testIdUtils.js";
-import { logoutFrom } from "../utils/testing/apiTestUtils.js";
-import { mockSession } from "../utils/testing/mocks.js";
-import supertest from "supertest";
-import { testableApp } from "../utils/testing/middlewareTestUtils.js";
+import { HttpStatusCode } from '../httpStatusCodes.js';
+import { SessionId } from '../types.js';
+import { createUserIdFromEmail } from '../auth/user.js';
+import { generateSessionIdForTest } from '../utils/testIdUtils.js';
+import { getAppSessionIdCookieKey } from '../middleware/appSettings.js';
+import { getSetCookieString } from '@tjsr/testutils';
+import { logoutFrom } from '../utils/testing/apiTestUtils.js';
+import { mockSession } from '../utils/testing/mocks.js';
+import supertest from 'supertest';
+import { testableApp } from '../utils/testing/middlewareTestUtils.js';
 
 describe('api.logout', () => {
   const testUserEmail = 'test-user@example.com';
@@ -53,7 +54,7 @@ describe('api.logout', () => {
 
     const logoutResponse = await logoutFrom(context, testSessionId);
     expect(logoutResponse.statusCode).toEqual(HttpStatusCode.OK);
-    expect(context.currentSessionId).not.toEqual(testSessionId);
+    expect(context.sessionId).not.toEqual(testSessionId);
   });
 
   test('Should report 401 for invalid session ID when trying to re-use old session ID.', async (context: ApiTestContext) => {
@@ -65,8 +66,15 @@ describe('api.logout', () => {
       })
     );
     const app = testableApp(context.sessionOptions);
-    await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
-    await supertest(app).get('/logout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.UNAUTHORIZED);
+    const cookieIdKey = getAppSessionIdCookieKey(app.locals, true);
+    await supertest(app)
+      .get('/logout')
+      .set('Set-Cookie', getSetCookieString(cookieIdKey, testSessionId))
+      .expect(HttpStatusCode.OK);
+    await supertest(app)
+      .get('/logout')
+      .set('Set-Cookie', getSetCookieString(cookieIdKey, testSessionId))
+      .expect(HttpStatusCode.UNAUTHORIZED);
   });
 
   test('Should return a 404 if logout call is disabled', async (context: ApiTestContext) => {
@@ -77,7 +85,6 @@ describe('api.logout', () => {
   });
 
   test('Should return a 404 at /logout if logout path is changed to not use default', async (context: ApiTestContext) => {
-    context.sessionOptions.debugCallHandlers = true;
     context.sessionOptions.logoutPath = '/signout';
 
     const app = testableApp(context.sessionOptions);
@@ -96,6 +103,10 @@ describe('api.logout', () => {
       userId: createUserIdFromEmail(context.userIdNamespace, testUserEmail),
     });
     const app = testableApp(context.sessionOptions);
-    return supertest(app).get('/signout').set(SESSION_ID_HEADER_KEY, testSessionId).expect(HttpStatusCode.OK);
+    const cookieIdKey = getAppSessionIdCookieKey(app.locals, true);
+    return supertest(app)
+      .get('/signout')
+      .set('Set-Cookie', getSetCookieString(cookieIdKey, testSessionId))
+      .expect(HttpStatusCode.OK);
   });
 });

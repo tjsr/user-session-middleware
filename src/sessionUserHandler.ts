@@ -52,8 +52,12 @@ async <
     assert(request.sessionID === request.session.id,
       'Updated sessionID and session.id do not match! This should never happen');
     const idMutation = `${existingRequestSessionId}=>${updatedRequestSessionId}`;
-    console.debug(handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
-      `Finished assigning userId for session ${idMutation} with missing session data.`);
+    if (existingRequestSessionId !== updatedRequestSessionId) {
+      console.debug(
+        handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+        `Finished assigning userId for session ${idMutation} with missing session data.`
+      );
+    }
     next();
   } catch (err) {
     console.error(handleAssignUserIdToRequestSessionWhenNoExistingSessionData,

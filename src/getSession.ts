@@ -1,4 +1,5 @@
-import * as expressSession from 'express-session';
+import { MiddlewareConfigurationError, SessionIdCookieInvalidError } from './errors/errorClasses.js';
+import { getAppSessionIdCookieKey, getAppSessionIdHeaderKey } from './middleware/appSettings.js';
 
 import { IncomingHttpHeaders } from 'http';
 import { RequestHandler } from './express/index.js';
@@ -14,27 +15,58 @@ const memoryStore = new session.MemoryStore();
 const IN_PROD = process.env['NODE_ENV'] === 'production';
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
-export const SESSION_ID_HEADER_KEY = 'x-session-id';
 export const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
+const DEBUG_SID = process.env['DEBUG_SESSION_ID'] === 'true' || undefined;
 
 export const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
+  if (!req.app) {
+    throw new MiddlewareConfigurationError('Request object is not bound to an app');
+  }
+  const headerKey = getAppSessionIdHeaderKey(req.app.locals);
+  if (!headerKey) {
+    return undefined;
+  }
   const headers: IncomingHttpHeaders = req.headers;
-  const sessionIdHeader: SessionId | string | string[] | undefined = headers[SESSION_ID_HEADER_KEY];
-  console.log(`Searching for session id with header key ${SESSION_ID_HEADER_KEY}`, sessionIdHeader);
+  const sessionIdHeader: SessionId | string | string[] | undefined = headers[headerKey];
 
   if (typeof sessionIdHeader === 'string' && sessionIdHeader !== 'undefined') {
+    console.debug(getSessionIdFromRequestHeader, `sessionId found with header key ${headerKey}`, sessionIdHeader);
     return sessionIdHeader;
   }
+  console.debug(getSessionIdFromRequestHeader, 'No sessionId found for header key', headerKey);
   return undefined;
 };
 
 export const getSessionIdFromCookie = (req: SystemHttpRequestType<UserSessionData>): SessionId | string | undefined => {
-  const cookies = req.cookies;
-  const cookieValue = cookies?.sessionId === 'undefined' ? undefined : cookies?.sessionId;
+  if (!req.cookies || req.cookies.length === 0) {
+    return undefined;
+  }
+  const sessionCookie = getAppSessionIdCookieKey(req.app.locals);
+  let lookupKey: string | undefined;
+
+  if (sessionCookie && req.cookies[sessionCookie]) {
+    lookupKey = sessionCookie;
+  } else if (sessionCookie !== 'sessionId' && req.cookies.sessionId) {
+    throw new SessionIdCookieInvalidError(
+      'sessionId is not key for cookie sessions, but was found on request.  This could be an attack.'
+    );
+  } else if (req.cookies && req.cookies.sessionId) {
+    console.warn(
+      getSessionIdFromCookie,
+      "Explicitly looking up sessionId cookie - configure USM to use 'sessionId' as key instead"
+    );
+    lookupKey = 'sessionId';
+  }
+  if (!lookupKey) {
+    return undefined;
+  }
+  const sessionCookieValue: string = req.cookies[lookupKey];
+
+  const cookieValue = sessionCookieValue === 'undefined' ? undefined : sessionCookieValue;
   if (cookieValue) {
-    console.debug(getSessionIdFromCookie, `Got a cookie session Id with value ${cookieValue}`);
+    console.debug(getSessionIdFromCookie, `Got a cookie session Id with value ${lookupKey}=${cookieValue}`);
   } else {
-    console.debug(getSessionIdFromCookie, 'No cookie session Id found on request');
+    console.debug(getSessionIdFromCookie, 'No cookie session Id found on request', req.cookies);
   }
   return cookieValue;
 };
@@ -55,6 +87,14 @@ export const sessionIdFromRequest = <
     req.newSessionIdGenerated = true;
     return generatedId;
   }
+  if (req.sessionID) {
+    // console.log('Request already has a session id from previous request: ', req.sessionID);
+    return req.sessionID;
+  }
+  if (req.session?.id) {
+    req.newSessionIdGenerated = false;
+    return req.session.id;
+  }
 
   const sessionIdFromRequest: string | undefined = getSessionIdFromRequestHeader(req);
   if (sessionIdFromRequest) {
@@ -62,10 +102,6 @@ export const sessionIdFromRequest = <
     return sessionIdFromRequest;
   }
 
-  if (req.session?.id) {
-    req.newSessionIdGenerated = false;
-    return req.session.id;
-  }
   const sessionIdFromCookie: string | undefined = getSessionIdFromCookie(req);
   if (sessionIdFromCookie) {
     req.newSessionIdGenerated = false;
@@ -78,9 +114,9 @@ export const sessionIdFromRequest = <
 };
 
 export const defaultExpressSessionCookieOptions = (
-  cookieOptions?: expressSession.CookieOptions | undefined
-): expressSession.CookieOptions => {
-  const defaultCookie: expressSession.CookieOptions = {
+  cookieOptions?: session.CookieOptions | undefined
+): session.CookieOptions => {
+  const defaultCookie: session.CookieOptions = {
     maxAge: IN_PROD ? TWO_HOURS : TWENTYFOUR_HOURS,
     path: '/',
     sameSite: true,
@@ -93,14 +129,14 @@ export const defaultExpressSessionCookieOptions = (
 };
 
 export const defaultExpressSessionOptions = (
-  options?: Partial<expressSession.SessionOptions> | undefined,
-  useSessionStore: expressSession.Store = memoryStore
-): expressSession.SessionOptions => {
-  const defaults: expressSession.SessionOptions = {
+  options?: Partial<session.SessionOptions> | undefined,
+  useSessionStore: session.Store = memoryStore
+): session.SessionOptions => {
+  const defaults: session.SessionOptions = {
     genid: sessionIdFromRequest,
     resave: false,
     rolling: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     secret: SESSION_SECRET,
     store: useSessionStore,
   };
@@ -111,18 +147,23 @@ export const defaultExpressSessionOptions = (
   };
 };
 
-export const defaultUserSessionOptions = (options: UserSessionOptions): expressSession.SessionOptions => {
+export const defaultUserSessionOptions = (options: UserSessionOptions): session.SessionOptions => {
   return {
     ...options,
   };
 };
 
 export const expressSessionHandlerMiddleware = (
-  options?: Partial<expressSession.SessionOptions> | undefined,
-  useSessionStore: expressSession.Store = memoryStore
+  options?: Partial<session.SessionOptions> | undefined
 ): RequestHandler => {
+  const useSessionStore = options?.store ?? memoryStore;
   let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
   sessionOptions = defaultUserSessionOptions(sessionOptions);
-  console.info(`Session header will look for ${sessionOptions.name}`);
+  if (DEBUG_SID) {
+    console.debug(
+      expressSessionHandlerMiddleware,
+      `Session header will look for ${sessionOptions.name ?? 'default connect.sid'} key`
+    );
+  }
   return session(sessionOptions);
 };

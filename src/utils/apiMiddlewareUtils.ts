@@ -47,7 +47,7 @@ export const validateHasUserId: UserSessionMiddlewareRequestHandler = (
   next: express.NextFunction
 ): void => {
   try {
-    const userIdNamespace = getAppUserIdNamespace(request.app);
+    const userIdNamespace = getAppUserIdNamespace(request.app.locals);
     // TODO: Fix casting here.
     getUserIdFromSession(userIdNamespace, request.session)
       .then((userId: UserId | undefined) => {

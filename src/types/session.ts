@@ -10,6 +10,7 @@ export interface UserSessionDataFields {
 
 // export type SessionStoreDataTypeVariant<DataFieldsType extends UserSessionDataFields> = DataFieldsType;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SessionStoreDataType extends UserSessionDataFields {}
 
 // export interface UserSessionData extends SessionData, SessionDataFields {

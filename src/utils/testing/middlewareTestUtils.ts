@@ -4,13 +4,14 @@ import express, { ErrorRequestHandler, Express, RequestHandler } from "../../exp
 import { HttpStatusCode } from '../../httpStatusCodes.js';
 import { MemoryStore } from "../../express-session/index.js";
 import { MiddlewareTypes } from '../../testUtils.js';
+import { SessionOptions } from 'express-session';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
 import { expressSessionHandlerMiddleware } from '../../getSession.js';
 import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
 import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
 
-export const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
-  app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
+export const addExpressSessionHandler = (app: Express, sessionOptions?: Partial<SessionOptions> | undefined): void => {
+  app.use(expressSessionHandlerMiddleware(sessionOptions));
 };
 
 export const addHandlersToApp = (
@@ -34,8 +35,7 @@ export const addHandlersToApp = (
 export const sessionlessAppWithMiddleware = (
   middleware: MiddlewareTypes,
   endMiddleware?: MiddlewareTypes
-): { app: Express; memoryStore: MemoryStore; } => {
-
+): { app: Express; memoryStore: MemoryStore } => {
   const app: Express = express();
   addHandlersToApp(app, middleware, endMiddleware);
 
@@ -44,12 +44,20 @@ export const sessionlessAppWithMiddleware = (
 
 export const appWithMiddleware = (
   middleware: MiddlewareTypes,
-  endMiddleware?: MiddlewareTypes
-): { app: Express; memoryStore: MemoryStore; } => {
+  endMiddleware?: MiddlewareTypes | undefined,
+  sessionOptions?: Partial<SessionOptions> | undefined
+): { app: Express; memoryStore: MemoryStore } => {
   const memoryStore: MemoryStore = new MemoryStore();
 
   const app: Express = express();
-  addExpressSessionHandler(app, memoryStore);
+  const useOptions = { ...sessionOptions };
+  if (useOptions.store === undefined) {
+    if (process.env['NODE_ENV'] === 'production') {
+      throw new Error('MemoryStore should not be used in production');
+    }
+    useOptions.store = memoryStore;
+  }
+  addExpressSessionHandler(app, useOptions);
   addHandlersToApp(app, middleware, endMiddleware);
 
   return { app, memoryStore };

@@ -4,7 +4,7 @@ export { handleCopySessionStoreDataToSession } from './handleCopySessionStoreDat
 export { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
 export { handleNewSessionWithNoSessionData } from './handleSessionWithNoData.js';
 export { handleSessionDataRetrieval } from "./handleSessionDataRetrieval.js";
-export { handleLocalsCreation } from "./handleLocalsCreation.js";
+export { handleResponseLocalsCreation as handleLocalsCreation } from './handleResponseLocalsCreation.js';
 export { handleSessionIdAfterDataRetrieval } from "./handleSessionIdAfterDataRetrieval.js";
 export { handleSessionIdRequired } from "./handleSessionIdRequired.js";
 export { handleSessionStoreRequired } from "./handleSessionStoreRequired.js";
