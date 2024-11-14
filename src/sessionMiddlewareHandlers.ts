@@ -24,13 +24,12 @@ import { expressSessionHandlerMiddleware } from "./getSession.js";
 import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
 import { sessionErrorHandler } from './middleware/index.js';
 
-export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
-    RequestHandler | ErrorRequestHandler
-)[] => {
+export const preLoginUserSessionMiddlewareV1Handlers = (
+  sessionOptions?: Partial<UserSessionOptions> | undefined
+): (RequestHandler | ErrorRequestHandler)[] => {
   const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
 
   return [
-    // handle /session to generate a new sessionId before anything else.
     expressSessionHandlerMiddleware(expressSessionOptions),
     handleLocalsCreation,
     handleSessionStoreRequired,
@@ -40,6 +39,30 @@ export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessi
     handleNewSessionWithNoSessionData,
     handleExistingSessionWithNoSessionData,
     handleCopySessionStoreDataToSession,
+  ];
+};
+
+export const preLoginUserSessionMiddleware = (
+  sessionOptions?: Partial<UserSessionOptions> | undefined
+): (RequestHandler | ErrorRequestHandler)[] => {
+  if (sessionOptions?.usmVersion === 1) {
+    return preLoginUserSessionMiddlewareV1Handlers(sessionOptions);
+  } else {
+    return preLoginUserSessionMiddlewareV2Handlers(sessionOptions);
+  }
+};
+
+export const preLoginUserSessionMiddlewareV2Handlers = (
+  sessionOptions?: Partial<UserSessionOptions> | undefined
+): (RequestHandler | ErrorRequestHandler)[] => {
+  const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
+
+  return [
+    // handle /session to generate a new sessionId before anything else.
+    expressSessionHandlerMiddleware(expressSessionOptions),
+    handleLocalsCreation,
+    handleSessionStoreRequired,
+    handleSessionIdRequired,
   ];
 };
 
@@ -73,9 +96,23 @@ export const sessionUserRouteHandlers = (
   }
 };
 
-export const postLoginUserSessionMiddleware = (): (
-  RequestHandler | ErrorRequestHandler
-)[] => {
+export const postLoginUserSessionMiddleware = (
+  options?: Partial<UserSessionOptions> | undefined
+): (RequestHandler | ErrorRequestHandler)[] =>
+  options?.usmVersion === 1 ? postLoginUserSessionMiddlewareV1Handlers() : postLoginUserSessionMiddlewareV2Handlers();
+
+export const postLoginUserSessionMiddlewareV1Handlers = (): (RequestHandler | ErrorRequestHandler)[] => {
+  return [
+    handleSessionCookie,
+    handleSessionCookieOnError,
+    handleSessionIdAfterDataRetrieval,
+    handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+    handleSessionUserBodyResults,
+    sessionErrorHandler,
+  ];
+};
+
+export const postLoginUserSessionMiddlewareV2Handlers = (): (RequestHandler | ErrorRequestHandler)[] => {
   return [
     handleSessionCookie,
     handleSessionCookieOnError,

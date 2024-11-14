@@ -20,7 +20,7 @@ export {
   validateHasUserId
 };
 
-export { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
+export { useUserSessionMiddleware } from './useUserSessionMiddlewareV2.js';
 
 export type { uuid, uuid4, uuid5, EmailAddress, IPAddress, UserId, IdNamespace } from './types.js';
 

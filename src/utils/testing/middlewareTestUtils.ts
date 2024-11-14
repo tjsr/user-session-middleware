@@ -7,7 +7,7 @@ import { MiddlewareTypes } from '../../testUtils.js';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
 import { expressSessionHandlerMiddleware } from '../../getSession.js';
 import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
-import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
+import { useUserSessionMiddleware } from '../../useUserSessionMiddlewareV2.js';
 
 export const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
   app.use(expressSessionHandlerMiddleware(undefined, memoryStore));

@@ -9,7 +9,7 @@ import { UserSessionOptions } from './types/sessionOptions.js';
 import express from 'express';
 import { requireEnv } from '@tjsr/simple-env-utils';
 
-export const useUserSessionMiddleware = (
+export const useUserSessionMiddlewareV1 = (
   app: express.Application,
   sessionOptions?: Partial<UserSessionOptions> | undefined
 ) => {

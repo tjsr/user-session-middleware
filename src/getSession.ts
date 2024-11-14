@@ -6,6 +6,7 @@ import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
 import { UserSessionOptions } from './types/sessionOptions.js';
+import { requireEnv } from '@tjsr/simple-env-utils';
 import session from 'express-session';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,7 +16,7 @@ const IN_PROD = process.env['NODE_ENV'] === 'production';
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const TWENTYFOUR_HOURS = 1000 * 60 * 60 * 24;
 export const SESSION_ID_HEADER_KEY = 'x-session-id';
-export const SESSION_SECRET = process.env['SESSION_ID_SECRET'] || uuidv4();
+export const SESSION_SECRET = IN_PROD ? requireEnv('SESSION_ID_SECRET') : process.env['SESSION_ID_SECRET'] || uuidv4();
 
 export const getSessionIdFromRequestHeader = (req: SystemHttpRequestType<UserSessionData>): string | undefined => {
   const headers: IncomingHttpHeaders = req.headers;
@@ -44,7 +45,19 @@ export const requestHasSessionId = (req: SystemHttpRequestType<UserSessionData>)
 };
 
 // prettier-ignore
-export const sessionIdFromRequest = <
+export const sessionV2IdFromRequest = <
+  RequestType extends SystemHttpRequestType<DataType>,
+  DataType extends UserSessionData = UserSessionData,
+  >(
+    req: RequestType
+  ): string => {
+  const generatedId = uuidv4();
+  req.newSessionIdGenerated = true;
+  return generatedId;
+};
+
+// prettier-ignore
+export const sessionV1IdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
   DataType extends UserSessionData = UserSessionData,
   >(
@@ -94,10 +107,11 @@ export const defaultExpressSessionCookieOptions = (
 
 export const defaultExpressSessionOptions = (
   options?: Partial<expressSession.SessionOptions> | undefined,
-  useSessionStore: expressSession.Store = memoryStore
+  useSessionStore: expressSession.Store = memoryStore,
+  genIdFunction: (_req: SystemHttpRequestType<UserSessionData>) => string = sessionV2IdFromRequest
 ): expressSession.SessionOptions => {
   const defaults: expressSession.SessionOptions = {
-    genid: sessionIdFromRequest,
+    genid: genIdFunction,
     resave: false,
     rolling: false,
     saveUninitialized: false,
@@ -118,10 +132,14 @@ export const defaultUserSessionOptions = (options: UserSessionOptions): expressS
 };
 
 export const expressSessionHandlerMiddleware = (
-  options?: Partial<expressSession.SessionOptions> | undefined,
+  options?: Partial<UserSessionOptions> | Partial<expressSession.SessionOptions> | undefined,
   useSessionStore: expressSession.Store = memoryStore
 ): RequestHandler => {
-  let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
+  let genIdFunction = sessionV2IdFromRequest;
+  if ((options as Partial<UserSessionOptions>)?.usmVersion === 1) {
+    genIdFunction = sessionV1IdFromRequest;
+  }
+  let sessionOptions = defaultExpressSessionOptions(options, useSessionStore, genIdFunction);
   sessionOptions = defaultUserSessionOptions(sessionOptions);
   console.info(`Session header will look for ${sessionOptions.name}`);
   return session(sessionOptions);

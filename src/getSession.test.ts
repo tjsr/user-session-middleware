@@ -4,7 +4,7 @@ import {
   defaultExpressSessionOptions,
   getSessionIdFromCookie,
   getSessionIdFromRequestHeader,
-  sessionIdFromRequest,
+  sessionV1IdFromRequest,
 } from './getSession.js';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.js';
 import expressSession, { MemoryStore } from 'express-session';
@@ -86,7 +86,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toEqual('test-session-id');
     expect(sessionId).not.toBeUndefined();
     expect(validate(sessionId)).toBe(true);
@@ -98,7 +98,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toEqual('test-session-id');
     expect(sessionId).not.toBeUndefined();
     expect(validate(sessionId)).toBe(true);
@@ -113,7 +113,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toEqual('cookie-session-id');
     expect(sessionId).not.toBeUndefined();
     expect(validate(sessionId)).toBe(true);
@@ -132,7 +132,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
   });
@@ -144,7 +144,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual(generatedSessionId);
   });
@@ -155,7 +155,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('cookie-session-id');
   });
@@ -180,7 +180,7 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
   });
@@ -194,7 +194,7 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('session-id');
   });
@@ -205,7 +205,7 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
       sessionId: 'cookie-session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('cookie-session-id');
   });
@@ -213,7 +213,7 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
   test('Should use generated sessionId when no other sessonId found', (context) => {
     context.testRequestData.cookies = {};
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
+    const sessionId = sessionV1IdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(validate(sessionId)).toEqual(true);
   });
