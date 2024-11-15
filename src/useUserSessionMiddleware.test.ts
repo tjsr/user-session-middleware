@@ -3,7 +3,7 @@ import express, { Express } from './express/index.js';
 import { ApiTestContext } from './api/utils/testcontext.js';
 import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 import { testableApp } from './utils/testing/middlewareTestUtils.js';
-import { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
+import { useUserSessionMiddleware } from './useUserSessionMiddlewareV2.js';
 
 describe<ApiTestContext>('useUserSessionMiddleware', () => {
   // beforeEach((context: UserIdTaskContext & UserAppTaskContext) => {

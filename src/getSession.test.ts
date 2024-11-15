@@ -5,6 +5,7 @@ import {
   getSessionIdFromCookie,
   getSessionIdFromRequestHeader,
   sessionV1IdFromRequest,
+  sessionV2IdFromRequest,
 } from './getSession.js';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.js';
 import expressSession, { MemoryStore } from 'express-session';
@@ -82,7 +83,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     };
   });
 
-  test('Should not return header SID key value', (context) => {
+  test('V1: Should not return header SID key value', (context) => {
     context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
@@ -92,7 +93,17 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     expect(validate(sessionId)).toBe(true);
   });
 
-  test('Should not return session.id value.', (context) => {
+  test('V2: Should not return header SID key value', (context) => {
+    context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
+
+    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    const sessionId = sessionV2IdFromRequest(testRequest);
+    expect(sessionId).not.toEqual('test-session-id');
+    expect(sessionId).not.toBeUndefined();
+    expect(validate(sessionId)).toBe(true);
+  });
+
+  test('V1: Should not return session.id value.', (context) => {
     context.testRequestData['session'] = {
       id: generateSessionIdForTest(context),
     };
@@ -104,7 +115,19 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     expect(validate(sessionId)).toBe(true);
   });
 
-  test('Should not return cookie value.', (context) => {
+  test('V1: Should not return session.id value.', (context) => {
+    context.testRequestData['session'] = {
+      id: generateSessionIdForTest(context),
+    };
+
+    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    const sessionId = sessionV2IdFromRequest(testRequest);
+    expect(sessionId).not.toEqual('test-session-id');
+    expect(sessionId).not.toBeUndefined();
+    expect(validate(sessionId)).toBe(true);
+  });
+
+  test('V1: Should not return cookie value.', (context) => {
     context.testRequestData['session'] = {
       id: generateSessionIdForTest(context),
     };
@@ -114,6 +137,21 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
     const sessionId = sessionV1IdFromRequest(testRequest);
+    expect(sessionId).not.toEqual('cookie-session-id');
+    expect(sessionId).not.toBeUndefined();
+    expect(validate(sessionId)).toBe(true);
+  });
+
+  test('V2: Should not return cookie value.', (context) => {
+    context.testRequestData['session'] = {
+      id: generateSessionIdForTest(context),
+    };
+    context.testRequestData.cookies = {
+      sessionId: 'cookie-session-id',
+    };
+
+    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    const sessionId = sessionV2IdFromRequest(testRequest);
     expect(sessionId).not.toEqual('cookie-session-id');
     expect(sessionId).not.toBeUndefined();
     expect(validate(sessionId)).toBe(true);

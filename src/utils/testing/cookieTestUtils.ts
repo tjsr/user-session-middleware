@@ -1,7 +1,8 @@
 import { COOKIE_WITH_HEADER } from "../../middleware/setSessionCookie.js";
 import { Response } from '../../express/index.js';
 import { SessionId } from '../../types.js';
-import supertest from "supertest";
+import { getCookieFromSetCookieHeaderString } from '@tjsr/testutils';
+import supertest from 'supertest';
 
 export const expectSetSessionCookieOnResponseMock = (response: Response, sessionID: string) => {
   if (COOKIE_WITH_HEADER) {
@@ -16,14 +17,24 @@ export const getSessionIdFromSetCookieString = (cookieString: string): SessionId
   const cookieMatches = cookieString.match(/sessionId=([a-f0-9\\-]+);(.*)?/);
   expect(cookieMatches, 'At least one sessionId= cookie needs to be present').not.toBeUndefined();
 
-  const firstMatch: string|undefined = cookieMatches![1];
+  const firstMatch: string | undefined = cookieMatches![1];
   expect(firstMatch, 'sessionId= cookie should have a value').not.toBeUndefined();
   return firstMatch!;
 };
 
-export const getSupertestSessionIdCookie = (response: supertest.Response): SessionId|undefined => {
-  const cookieValue: string|undefined = response.get('Set-Cookie')![0];
+export const getSupertestSessionIdCookie = (
+  response: supertest.Response,
+  sessionIdCookieName?: string,
+  cookieSecret?: string
+): SessionId | undefined => {
+  const cookieValue: string | undefined = response.get('Set-Cookie')![0];
   expect(cookieValue, 'Set-Cookie should have at least one value').not.toBeUndefined();
 
+  if (sessionIdCookieName) {
+    if (!cookieSecret) {
+      throw new Error('Secret is required when using V2 cookie header from express-session');
+    }
+    return getCookieFromSetCookieHeaderString(sessionIdCookieName, cookieValue!, cookieSecret);
+  }
   return getSessionIdFromSetCookieString(cookieValue!);
 };

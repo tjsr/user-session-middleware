@@ -137,6 +137,7 @@ export const expressSessionHandlerMiddleware = (
 ): RequestHandler => {
   let genIdFunction = sessionV2IdFromRequest;
   if ((options as Partial<UserSessionOptions>)?.usmVersion === 1) {
+    console.warn('USM Version 1 being used');
     genIdFunction = sessionV1IdFromRequest;
   }
   let sessionOptions = defaultExpressSessionOptions(options, useSessionStore, genIdFunction);

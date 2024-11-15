@@ -56,6 +56,8 @@
   "devDependencies": {
     "@tjsr/eslint-config": "github:tjsr/eslint-config#main",
     "@tjsr/testutils": "^0.0.8",
+    "@types/cookie": "^0.6.0",
+    "@types/cookie-signature": "^1.1.2",
     "@types/express": "^4.17.21",
     "@types/express-mysql-session": "^3.0.6",
     "@types/express-session": "^1.18.0",
@@ -64,6 +66,7 @@
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^2.1.4",
+    "cookie-signature": "^1.2.2",
     "expect-cookies": "^0.2.0",
     "linkteam": "^0.0.18",
     "prettier-plugin-sort-members": "^0.2.1",
@@ -77,6 +80,7 @@
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.11",
     "@tjsr/simple-env-utils": "^0.1.9",
+    "cookie": "^1.0.1",
     "email-validator": "^2.0.4",
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.1",

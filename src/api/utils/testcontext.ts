@@ -1,9 +1,9 @@
 import { EmailAddress, IdNamespace, SessionId } from '../../types.js';
 import { MemoryStore, Store } from '../../express-session/index.js';
+import { v5 as uuidv5, validate } from 'uuid';
 
 import { AuthenticationRestResult } from '../../types/apiResults.js';
 import { MockRequestWithSession } from '../../testUtils.js';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { TaskContext } from 'vitest';
 import { UserModel } from '../../types/model.js';
 import { UserSessionData } from '../../types/session.js';
@@ -11,10 +11,10 @@ import { UserSessionOptions } from '../../types/sessionOptions.js';
 import express from '../../express/index.js';
 import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
 import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
+import { setSupertestCookieHeader } from '../../utils/testing/setSupertestCookieHeader.js';
 import { setUserIdNamespaceForTest } from '../../utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 import { testableApp } from '../../utils/testing/middlewareTestUtils.js';
-import { validate } from 'uuid';
 
 export type UserIdTaskContext = TaskContext & {
   userIdNamespace: IdNamespace;
@@ -35,6 +35,7 @@ export type ApiTestContext = TaskContext &
   SessionTestContext &
   UserAppTaskContext & {
     userData: Map<EmailAddress, UserModel | undefined>;
+    usmVersion?: 1 | 2 | undefined;
   };
 
 export interface SessionTestContext extends TaskContext {
@@ -46,6 +47,8 @@ export const setupApiTest = (context: ApiTestContext) => {
   const namespace: IdNamespace = setUserIdNamespaceForTest(context);
   context.sessionOptions = {
     debugCallHandlers: false,
+    name: 'apitest.sid',
+    secret: uuidv5(context.task.name, namespace),
     store: new MemoryStore(),
     userIdNamespace: namespace,
   };
@@ -65,7 +68,6 @@ export const verifyAuthSessionId = (response: supertest.Response, context: ApiTe
   return context.currentSessionId!;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const verifyAuthResponseBody = (
   body: AuthenticationRestResult,
   email: EmailAddress | undefined,
@@ -80,20 +82,15 @@ export const verifyAuthResponseBody = (
   }
 };
 
-export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId) => {
+export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId): Promise<supertest.Response> => {
   if (!context.app) {
     context.app = testableApp(context.sessionOptions);
   }
 
   let st = supertest(context.app).get('/session');
+  st = st.set('Content-Type', 'application/json').accept('application/json');
+  st = setSupertestCookieHeader(context, st, sessionId);
 
-  st.set('Content-Type', 'application/json').accept('application/json');
-
-  if (sessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
-  } else if (context.currentSessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
-  }
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);
 
