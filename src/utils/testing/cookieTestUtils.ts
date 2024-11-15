@@ -2,6 +2,7 @@ import { getCookieFromSetCookieHeaderString, getSetCookieFromResponse } from '@t
 
 import { COOKIE_WITH_HEADER } from '../../middleware/setSessionCookie.js';
 import { Response } from '../../express/index.js';
+import { SESSION_SECRET } from '../../getSession.js';
 import { SessionId } from '../../types.js';
 import supertest from 'supertest';
 
@@ -16,14 +17,12 @@ export const expectSetSessionCookieOnResponseMock = (response: Response, session
 
 export const getSessionIdFromSetCookieString = (
   cookieString: string,
-  sessionIdString: string = 'sessionId'
+  sessionIdString: string = 'sessionId',
+  secret: string = SESSION_SECRET
 ): SessionId => {
-  const cookieMatches = cookieString.match(new RegExp(`${sessionIdString}=([a-f0-9\\-]+);(.*)?`));
-  expect(cookieMatches, `At least one ${sessionIdString}= cookie needs to be present`).not.toBeUndefined();
-
-  const firstMatch: string | undefined = cookieMatches![1];
-  expect(firstMatch, `${sessionIdString}= cookie should have a value`).not.toBeUndefined();
-  return firstMatch!;
+  const sessionId = getCookieFromSetCookieHeaderString(sessionIdString, cookieString, secret);
+  expect(sessionId, `${sessionIdString}= cookie should have a value`).not.toBeUndefined();
+  return sessionId;
 };
 
 export const getSupertestSessionIdCookie = (

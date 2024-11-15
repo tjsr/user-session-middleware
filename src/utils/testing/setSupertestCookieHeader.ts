@@ -7,14 +7,15 @@ import cookie from 'cookie';
 import signature from 'cookie-signature';
 import supertest from 'supertest';
 
-const setSupertestCookieHeader = (
-  st: supertest.Test,
+const setSupertestCookieHeader = <TestType extends supertest.Test = supertest.Test>(
+  st: TestType,
   sessionId: string,
   sessionCookieName: string = 'test.sid',
   secret: string = 'test.secret'
-) => {
+): TestType => {
   const cookieHeader = signedCookieHeader(sessionCookieName, sessionId, secret);
   st = st.set('Cookie', cookieHeader);
+  return st;
 };
 
 const getContextSessionSecret = (contextOrOpts: SessionTestContext | Partial<SessionOptions>): string => {
