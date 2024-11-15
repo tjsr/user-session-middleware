@@ -1,7 +1,8 @@
-import { COOKIE_WITH_HEADER } from "../../middleware/setSessionCookie.js";
+import { getCookieFromSetCookieHeaderString, getSetCookieFromResponse } from '@tjsr/testutils';
+
+import { COOKIE_WITH_HEADER } from '../../middleware/setSessionCookie.js';
 import { Response } from '../../express/index.js';
 import { SessionId } from '../../types.js';
-import { getCookieFromSetCookieHeaderString } from '@tjsr/testutils';
 import supertest from 'supertest';
 
 export const expectSetSessionCookieOnResponseMock = (response: Response, sessionID: string) => {
@@ -23,14 +24,6 @@ export const getSessionIdFromSetCookieString = (
   const firstMatch: string | undefined = cookieMatches![1];
   expect(firstMatch, `${sessionIdString}= cookie should have a value`).not.toBeUndefined();
   return firstMatch!;
-};
-
-export const getSetCookieFromResponse = (response: supertest.Response): string => {
-  const cookieHeaders = response.get('Set-Cookie');
-  assert(cookieHeaders !== undefined, 'Set-Cookie header should have been set');
-  assert(cookieHeaders.length > 0, 'Set-Cookie header should have at least one value');
-  expect(cookieHeaders[0]).not.toBeUndefined();
-  return cookieHeaders[0]!;
 };
 
 export const getSupertestSessionIdCookie = (
