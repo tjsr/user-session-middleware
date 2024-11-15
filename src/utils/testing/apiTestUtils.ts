@@ -6,7 +6,7 @@ import { ApiTestContext } from '../../api/utils/testcontext.js';
 import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.js';
 import { UserModel } from '../../types/model.js';
 import { getSupertestSessionIdCookie } from './cookieTestUtils.js';
-import { setSupertestCookieHeader } from './setSupertestCookieHeader.js';
+import { setContextSupertestCookieHeader } from './setSupertestCookieHeader.js';
 import { testableApp } from './middlewareTestUtils.js';
 
 export const setLoginUserLookupWithContextUserData = <T extends UserModel>(
@@ -49,7 +49,7 @@ export const loginWith = async (
   }
 
   st = st.set('Content-Type', 'application/json').accept('application/json');
-  st = setSupertestCookieHeader(context, st, sessionId);
+  st = setContextSupertestCookieHeader(context, st, sessionId);
 
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);
@@ -65,7 +65,7 @@ export const logoutFrom = async (context: ApiTestContext, sessionId?: SessionId)
   let st: Test = supertest(context.app).get('/logout');
 
   st = st.set('Content-Type', 'application/json').accept('application/json');
-  st = setSupertestCookieHeader(context, st, sessionId);
+  st = setContextSupertestCookieHeader(context, st, sessionId);
 
   const response: supertest.Response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);

@@ -1,4 +1,5 @@
 import { SessionId } from '../types.js';
+import { getSetCookieFromResponse } from './testing/cookieTestUtils.js';
 import supertest from 'supertest';
 
 export const expectResponseSetsSessionIdCookie = (
@@ -6,7 +7,7 @@ export const expectResponseSetsSessionIdCookie = (
   expectedSessionId: SessionId,
   sessionIdKey: string = 'sessionId'
 ): void => {
-  const cookieValue = response.get('Set-Cookie')![0];
+  const cookieValue = getSetCookieFromResponse(response);
   // expect(cookieValue).toMatch(new RegExp(`sessionId=${expectedSessionId};`));
   expect(cookieValue).toMatch(new RegExp(`${sessionIdKey}=${expectedSessionId}; Path=/; HttpOnly; SameSite=Strict`));
 };

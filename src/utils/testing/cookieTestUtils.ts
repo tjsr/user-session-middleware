@@ -13,13 +13,24 @@ export const expectSetSessionCookieOnResponseMock = (response: Response, session
   }
 };
 
-export const getSessionIdFromSetCookieString = (cookieString: string): SessionId => {
-  const cookieMatches = cookieString.match(/sessionId=([a-f0-9\\-]+);(.*)?/);
-  expect(cookieMatches, 'At least one sessionId= cookie needs to be present').not.toBeUndefined();
+export const getSessionIdFromSetCookieString = (
+  cookieString: string,
+  sessionIdString: string = 'sessionId'
+): SessionId => {
+  const cookieMatches = cookieString.match(new RegExp(`${sessionIdString}=([a-f0-9\\-]+);(.*)?`));
+  expect(cookieMatches, `At least one ${sessionIdString}= cookie needs to be present`).not.toBeUndefined();
 
   const firstMatch: string | undefined = cookieMatches![1];
-  expect(firstMatch, 'sessionId= cookie should have a value').not.toBeUndefined();
+  expect(firstMatch, `${sessionIdString}= cookie should have a value`).not.toBeUndefined();
   return firstMatch!;
+};
+
+export const getSetCookieFromResponse = (response: supertest.Response): string => {
+  const cookieHeaders = response.get('Set-Cookie');
+  assert(cookieHeaders !== undefined, 'Set-Cookie header should have been set');
+  assert(cookieHeaders.length > 0, 'Set-Cookie header should have at least one value');
+  expect(cookieHeaders[0]).not.toBeUndefined();
+  return cookieHeaders[0]!;
 };
 
 export const getSupertestSessionIdCookie = (
@@ -27,8 +38,7 @@ export const getSupertestSessionIdCookie = (
   sessionIdCookieName?: string,
   cookieSecret?: string
 ): SessionId | undefined => {
-  const cookieValue: string | undefined = response.get('Set-Cookie')![0];
-  expect(cookieValue, 'Set-Cookie should have at least one value').not.toBeUndefined();
+  const cookieValue: string = getSetCookieFromResponse(response);
 
   if (sessionIdCookieName) {
     if (!cookieSecret) {

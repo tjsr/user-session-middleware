@@ -10,8 +10,8 @@ import { UserSessionData } from '../../types/session.js';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
 import express from '../../express/index.js';
 import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
+import { setContextSupertestCookieHeader } from '../../utils/testing/setSupertestCookieHeader.js';
 import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
-import { setSupertestCookieHeader } from '../../utils/testing/setSupertestCookieHeader.js';
 import { setUserIdNamespaceForTest } from '../../utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 import { testableApp } from '../../utils/testing/middlewareTestUtils.js';
@@ -89,7 +89,7 @@ export const refreshSession = async (context: ApiTestContext, sessionId?: Sessio
 
   let st = supertest(context.app).get('/session');
   st = st.set('Content-Type', 'application/json').accept('application/json');
-  st = setSupertestCookieHeader(context, st, sessionId);
+  st = setContextSupertestCookieHeader(context, st, sessionId);
 
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);

@@ -1,37 +1,70 @@
-import { ApiTestContext } from '../../api/utils/testcontext.js';
+import { ApiTestContext, SessionTestContext } from '../../api/utils/testcontext.js';
+
 import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { SessionId } from '../../types.js';
+import { SessionOptions } from 'express-session';
 import cookie from 'cookie';
 import signature from 'cookie-signature';
 import supertest from 'supertest';
 
-export const setSupertestCookieHeader = (context: ApiTestContext, st: supertest.Test, sessionId?: SessionId) => {
-  if (context.usmVersion === 1) {
-    if (sessionId) {
-      st = st.set(SESSION_ID_HEADER_KEY, sessionId);
-    } else if (context.currentSessionId) {
-      st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
-    }
-  } else {
-    if (!sessionId && !context.currentSessionId) {
-      return st;
-    }
+const setSupertestCookieHeader = (
+  st: supertest.Test,
+  sessionId: string,
+  sessionCookieName: string = 'test.sid',
+  secret: string = 'test.secret'
+) => {
+  const cookieHeader = signedCookieHeader(sessionCookieName, sessionId, secret);
+  st = st.set('Cookie', cookieHeader);
+};
 
-    const cookieValue: SessionId = sessionId || context.currentSessionId!;
-    const sessionCookieName = context.sessionOptions.name || 'cookie.sid';
-    if (!context.sessionOptions.secret || context.sessionOptions.secret.length === 0) {
-      throw new Error('Secret is required to sign session cookies');
-    }
-    const secret =
-      typeof context.sessionOptions.secret === 'string'
-        ? context.sessionOptions.secret
-        : context.sessionOptions.secret[0];
-    if (!secret) {
-      throw new Error('Secret is required to sign session cookies');
-    }
-    signature.sign(cookieValue, secret!);
-    const cookieHeader = cookie.serialize(sessionCookieName, cookieValue);
-    st = st.set('Cookie', cookieHeader);
+const getContextSessionSecret = (contextOrOpts: SessionTestContext | Partial<SessionOptions>): string => {
+  const opts = getSessionOptsFromOptsOrContext(contextOrOpts);
+  if (!opts.secret) {
+    throw new Error('Secret is required to sign session cookies');
   }
-  return st;
+
+  const secret = typeof opts.secret === 'string' ? opts.secret : opts.secret[0];
+  if (!secret) {
+    throw new Error('Secret is required to sign session cookies');
+  }
+  return secret;
+};
+
+const getSessionOptsFromOptsOrContext = <Opts extends SessionOptions | Partial<SessionOptions> = SessionOptions>(
+  contextOrOpts: SessionTestContext | Partial<SessionOptions>
+): Opts => {
+  const opts = ((contextOrOpts as SessionTestContext).sessionOptions || contextOrOpts) as Opts;
+  if (opts === undefined) {
+    throw new Error('Session options are required');
+  }
+  return opts;
+};
+
+const getContextSessionCookieName = (contextOrOpts: SessionTestContext | Partial<SessionOptions>): string => {
+  const opts = getSessionOptsFromOptsOrContext(contextOrOpts);
+  const sessionCookieName = opts.name || 'cookie.sid';
+  if (!opts.secret || opts.secret.length === 0) {
+    throw new Error('Secret is required to sign session cookies');
+  }
+  return sessionCookieName;
+};
+
+const signedCookieHeader = (cookieName: string, cookieValue: string, secret: string): string => {
+  const signedValue: SessionId = signature.sign(cookieValue, secret!);
+  const cookieHeader = cookie.serialize(cookieName, signedValue);
+  return cookieHeader;
+};
+
+export const setContextSupertestCookieHeader = (context: ApiTestContext, st: supertest.Test, sessionId?: SessionId) => {
+  const id = sessionId || context.currentSessionId;
+  if (!id) {
+    return st;
+  }
+
+  if (context.usmVersion === 1) {
+    return st.set(SESSION_ID_HEADER_KEY, id);
+  }
+  const sessionCookieName = getContextSessionCookieName(context.sessionOptions);
+  const secret = getContextSessionSecret(context.sessionOptions);
+  return setSupertestCookieHeader(st, sessionId || context.currentSessionId!, sessionCookieName, secret);
 };
