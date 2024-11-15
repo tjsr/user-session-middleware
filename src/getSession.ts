@@ -112,6 +112,7 @@ export const defaultExpressSessionOptions = (
 ): expressSession.SessionOptions => {
   const defaults: expressSession.SessionOptions = {
     genid: genIdFunction,
+    name: options?.name ?? 'usm.sid',
     resave: false,
     rolling: false,
     saveUninitialized: false,
