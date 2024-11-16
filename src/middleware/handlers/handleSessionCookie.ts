@@ -49,6 +49,11 @@ export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler = (
     setRequestSessionCookie(request, response);
   }
   if (!request.session) {
+    console.error(
+      handleSessionCookieOnError,
+      'No session on request when setting cookie in cookie error handler.',
+      error
+    );
     throw new SessionNotGeneratedError();
   }
   request.session.save((saveErr) => {

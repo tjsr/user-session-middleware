@@ -14,6 +14,7 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
     },
     env: {
+      DEBUG: 'express-session',
       USERID_UUID_NAMESPACE: '00000000-0000-0000-0000-000000000000',
     },
     globals: true,

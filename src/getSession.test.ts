@@ -17,15 +17,26 @@ import { TestContext } from 'vitest';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
 import { validate } from 'uuid';
 
-const addAppSidKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'test.connect.sid') => {
+const addAppLocalsToRequest = (request: SystemHttpRequestType) => {
   if (!request.app) {
     request.app = {} as (typeof request)['app'];
   }
   if (!request.app.locals) {
     request.app.locals = {};
   }
+};
+
+const addAppSidKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'test.connect.sid') => {
+  addAppLocalsToRequest(request);
   if (!request.app.locals['cookieSessionIdName']) {
     request.app.locals['cookieSessionIdName'] = sidKey;
+  }
+};
+
+const addSidHeaderKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'x-session-id') => {
+  addAppLocalsToRequest(request);
+  if (!request.app.locals['sessionIdHeaderKey']) {
+    request.app.locals['sessionIdHeaderKey'] = sidKey;
   }
 };
 
@@ -163,15 +174,31 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     expect(sessionId).toEqual(generatedSessionId);
   });
 
-  test('Should return cookie value.', (context) => {
+  test('Should return cookie value when matching custom header value set.', (context) => {
+    context.testRequestData.cookies = {
+      sessionId: 'cookie-session-id',
+      'usm.test.sid': 'cookie-usm-id',
+    };
+
+    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addSidHeaderKeyConfigToRequest(testRequest, 'sessionId');
+    addAppSidKeyConfigToRequest(testRequest, 'usm.test.sid');
+    const sessionId = sessionIdFromRequest(testRequest);
+    expect(sessionId).not.toBeUndefined();
+    expect(sessionId).toEqual('cookie-usm-id');
+  });
+
+  test('Should return generated value no header but has cookie with header key value.', (context) => {
     context.testRequestData.cookies = {
       sessionId: 'cookie-session-id',
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addSidHeaderKeyConfigToRequest(testRequest, 'sessionId');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('cookie-session-id');
+    expect(sessionId).not.toEqual('cookie-session-id');
+    expect(validate(sessionId)).toBe(true);
   });
 });
 

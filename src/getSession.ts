@@ -42,7 +42,15 @@ export const getSessionIdFromCookie = (
   req: SystemHttpRequestType<UserSessionData>,
   sessionIdKey: string
 ): SessionId | string | undefined => {
+  const signedCookies = req.signedCookies;
+  console.debug(getSessionIdFromCookie, 'Signed cookies:', signedCookies);
   const cookies = req.cookies;
+  if (!cookies) {
+    const headers: IncomingHttpHeaders = req.headers;
+    const cookieHeader = headers['cookie'] || headers['Cookie'];
+    console.debug(getSessionIdFromCookie, 'No cookies set on request', cookieHeader, req.headers);
+    return undefined;
+  }
   const cookieValue = cookies[sessionIdKey] === 'undefined' ? undefined : cookies[sessionIdKey];
   if (cookieValue) {
     console.debug(getSessionIdFromCookie, `Got a cookie session Id with value ${cookieValue}`);
@@ -73,7 +81,12 @@ export const sessionIdFromRequest = <
     return generatedId;
   }
 
-  const sessionIdFromRequest: string | undefined = getSessionIdFromRequestHeader(req);
+  const appLocals = req.app?.locals;
+  let headerKey = SESSION_ID_HEADER_KEY;
+  if (appLocals !== undefined && appLocals['sessionIdHeaderKey']) {
+    headerKey = appLocals['sessionIdHeaderKey'];
+  }
+  const sessionIdFromRequest: string | undefined = getSessionIdFromRequestHeader(req, headerKey);
   if (sessionIdFromRequest) {
     req.newSessionIdGenerated = false;
     return sessionIdFromRequest;
@@ -83,8 +96,14 @@ export const sessionIdFromRequest = <
     req.newSessionIdGenerated = false;
     return req.session.id;
   }
+
+  if (req.sessionID) {
+    req.newSessionIdGenerated = false;
+    return req.sessionID;
+  }
+
   let cookieKey = SESSION_ID_COOKIE;
-  if (req.app?.locals !== undefined && req.app?.locals['cookieSessionIdName']) {
+  if (appLocals !== undefined && appLocals['cookieSessionIdName']) {
     cookieKey = req.app?.locals['cookieSessionIdName'];
   }
   const sessionIdFromCookie: string | undefined = getSessionIdFromCookie(req, cookieKey);
@@ -146,6 +165,6 @@ export const expressSessionHandlerMiddleware = (
   let sessionOptions = defaultExpressSessionOptions(options, useSessionStore);
   sessionOptions = defaultUserSessionOptions(sessionOptions);
   assert(sessionOptions.name, 'Session name must be defined by this point.');
-  console.info(expressSessionHandlerMiddleware, `Session header will look for ${sessionOptions.name}`);
+  console.debug(expressSessionHandlerMiddleware, 'Session options:', sessionOptions);
   return session(sessionOptions);
 };

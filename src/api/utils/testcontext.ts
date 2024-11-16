@@ -46,6 +46,7 @@ export const setupApiTest = (context: ApiTestContext) => {
   const namespace: IdNamespace = setUserIdNamespaceForTest(context);
   context.sessionOptions = {
     debugCallHandlers: false,
+    saveUninitialized: true,
     store: new MemoryStore(),
     userIdNamespace: namespace,
   };

@@ -35,7 +35,7 @@ export const setRequestSessionCookie = (request: express.Request, response: expr
   assert(sessionCookieKey !== undefined, 'App locals requires cookieSessionIdName to be defined');
 
   assert(request.sessionID !== undefined);
-  assert(request.session !== undefined, 'Session was not created set on request');
+  assert(request.session !== undefined, 'Session was not created on request');
   if (request.session.id === undefined) {
     console.debug(`session.id was undefined but req.sessionID=${request.sessionID}`);
   }

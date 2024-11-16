@@ -72,7 +72,7 @@ describe('api.handleSessionStoreRequired', () => {
     expect(memoryStore).not.toBeUndefined();
 
     let st = supertest(app).get('/').set('Content-Type', 'application/json');
-    console.log('in api.handleSessionStoreRequired: sessionId', testSessionId);
+    console.log('in api.handleSessionStoreRequired: sessionId', SESSION_ID_COOKIE, testSessionId);
     st = setSessionCookie(st, SESSION_ID_COOKIE, testSessionId, SESSION_SECRET);
     const response = await st;
 
