@@ -1,4 +1,5 @@
 import {
+  SESSION_ID_COOKIE,
   SESSION_ID_HEADER_KEY,
   defaultExpressSessionCookieOptions,
   defaultExpressSessionOptions,
@@ -229,7 +230,7 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
 
   test('Should return undefined when cookie is undefined', (context) => {
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = getSessionIdFromCookie(testRequest);
+    const sessionId = getSessionIdFromCookie(testRequest, SESSION_ID_COOKIE);
     expect(sessionId).toBeUndefined();
   });
 
@@ -239,7 +240,7 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
       sessionId: 'cookie-session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = getSessionIdFromCookie(testRequest);
+    const sessionId = getSessionIdFromCookie(testRequest, 'connect.sid');
     expect(sessionId).toEqual('cookie-session-id');
   });
 });
@@ -259,7 +260,7 @@ describe('getSessionIdFromRequestHeader', () => {
     testRequestData.headers[SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     const testRequest: SystemHttpRequestType = getMockRequest(testRequestData);
-    const sessionId = getSessionIdFromRequestHeader(testRequest);
+    const sessionId = getSessionIdFromRequestHeader(testRequest, SESSION_ID_HEADER_KEY);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
   });

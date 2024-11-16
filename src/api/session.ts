@@ -1,4 +1,5 @@
 import { EmailAddress, IdNamespace } from '../types.js';
+import { SESSION_ID_COOKIE, requestHasSessionId } from '../getSession.js';
 import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
 
 import { SessionRegenerationFailedError } from '../errors/authenticationErrorClasses.js';
@@ -8,7 +9,6 @@ import { assert } from 'console';
 import express from '../express/index.js';
 import { getAppUserIdNamespace } from '../auth/userNamespace.js';
 import { regenerateSessionPromise } from '../sessionUser.js';
-import { requestHasSessionId } from '../getSession.js';
 import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
 
 export const session: UserSessionMiddlewareRequestHandler = (
@@ -23,7 +23,7 @@ export const session: UserSessionMiddlewareRequestHandler = (
     request.regenerateSessionId = true;
     response.locals.sendAuthenticationResult = true;
 
-    if (!requestHasSessionId(request)) {
+    if (!requestHasSessionId(request, SESSION_ID_COOKIE)) {
       // Handle requests that provide no sessionId - we can't possibly have a userId from this.
       return next();
     }
