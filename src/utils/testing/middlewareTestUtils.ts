@@ -10,7 +10,7 @@ import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
 import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
 
 export const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
-  app.use(expressSessionHandlerMiddleware(undefined, memoryStore));
+  app.use(expressSessionHandlerMiddleware({ resave: true, saveUninitialized: true }, memoryStore));
 };
 
 export const addHandlersToApp = (
