@@ -17,6 +17,18 @@ import { TestContext } from 'vitest';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
 import { validate } from 'uuid';
 
+const addAppSidKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'test.connect.sid') => {
+  if (!request.app) {
+    request.app = {} as (typeof request)['app'];
+  }
+  if (!request.app.locals) {
+    request.app.locals = {};
+  }
+  if (!request.app.locals['cookieSessionIdName']) {
+    request.app.locals['cookieSessionIdName'] = sidKey;
+  }
+};
+
 describe('expressSessionConfig', () => {
   type ExpressSessionTestContextOptions = TestContext & {
     options: expressSession.SessionOptions;
@@ -145,6 +157,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual(generatedSessionId);
@@ -174,13 +187,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
     context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     context.testRequestData['session'] = {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
@@ -188,13 +202,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
 
   test('Should use id from session on request', (context) => {
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     context.testRequestData['session'] = {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('session-id');
@@ -202,13 +217,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
 
   test('Should use sessionId from cookie', (context) => {
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('cookie-session-id');
+    expect(sessionId).toEqual('connectCookie-session-id');
   });
 
   test('Should use generated sessionId when no other sessonId found', (context) => {
@@ -241,7 +257,7 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
     const sessionId = getSessionIdFromCookie(testRequest, 'connect.sid');
-    expect(sessionId).toEqual('cookie-session-id');
+    expect(sessionId).toEqual('connectCookie-session-id');
   });
 });
 

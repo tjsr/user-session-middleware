@@ -83,7 +83,11 @@ export const sessionIdFromRequest = <
     req.newSessionIdGenerated = false;
     return req.session.id;
   }
-  const sessionIdFromCookie: string | undefined = getSessionIdFromCookie(req, SESSION_ID_COOKIE);
+  let cookieKey = SESSION_ID_COOKIE;
+  if (req.app?.locals !== undefined && req.app?.locals['cookieSessionIdName']) {
+    cookieKey = req.app?.locals['cookieSessionIdName'];
+  }
+  const sessionIdFromCookie: string | undefined = getSessionIdFromCookie(req, cookieKey);
   if (sessionIdFromCookie) {
     req.newSessionIdGenerated = false;
     return sessionIdFromCookie;
