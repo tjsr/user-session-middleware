@@ -31,7 +31,7 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
   } else if (error instanceof AssertionError) {
     console.error(sessionErrorHandler, 'Got assertion error', error);
   } else if (error.name) {
-    console.warn('Got error of type with name', error.name);
+    console.warn('Got error of type with name', error.name, error);
   }
   next(error);
 };
