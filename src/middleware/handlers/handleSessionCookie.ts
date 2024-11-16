@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+import { SessionIDNotGeneratedError, SessionNotGeneratedError } from '../../errors/errorClasses.js';
 import {
   UserSessionMiddlewareErrorHandler,
-  UserSessionMiddlewareRequestHandler
-} from "../../types/middlewareHandlerTypes.js";
+  UserSessionMiddlewareRequestHandler,
+} from '../../types/middlewareHandlerTypes.js';
 
-import { NextFunction } from "../../express/index.js";
-import { SessionIDNotGeneratedError } from '../../errors/errorClasses.js';
-import { SystemHttpRequestType } from "../../types/request.js";
-import { addCalledHandler } from "../handlerChainLog.js";
+import { NextFunction } from '../../express/index.js';
+import { SystemHttpRequestType } from '../../types/request.js';
+import { addCalledHandler } from '../handlerChainLog.js';
 import { setSessionCookie } from '../setSessionCookie.js';
 
 export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
@@ -25,6 +23,9 @@ export const handleSessionCookie: UserSessionMiddlewareRequestHandler =
     return;
   }
   setSessionCookie(request, response);
+  if (!request.session) {
+    throw new SessionNotGeneratedError();
+  }
   request.session.save((err) => {
     if (err) {
       console.error(handleSessionCookie, 'Error saving session in handleSessionCookie', err);
@@ -49,6 +50,9 @@ export const handleSessionCookieOnError: UserSessionMiddlewareErrorHandler =
       'No sessionID on request when setting cookie in cookie error handler.  Something is wrong here.');
   } else {
     setSessionCookie(request, response);
+  }
+  if (!request.session) {
+    throw new SessionNotGeneratedError();
   }
   request.session.save((saveErr) => {
     if (saveErr) {
