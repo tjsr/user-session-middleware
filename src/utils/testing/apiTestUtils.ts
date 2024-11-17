@@ -32,20 +32,23 @@ const createLoginBody = (email: string) => {
   };
 };
 
-export const loginWith = async (context: ApiTestContext, email?: EmailAddress, sessionId?: SessionId) => {
+export const loginWith = async (
+  context: ApiTestContext,
+  email?: EmailAddress,
+  sessionId?: SessionId
+): Promise<supertest.Response> => {
   if (!context.app) {
     context.app = testableApp(context.sessionOptions);
   }
 
   let st = supertest(context.app).post('/login');
-  
+
   if (email) {
     const loginBody = createLoginBody(email);
     st = st.send(loginBody);
   }
-  
-  st.set('Content-Type', 'application/json')
-    .accept('application/json');
+
+  st.set('Content-Type', 'application/json').accept('application/json');
 
   if (sessionId) {
     st = st.set(SESSION_ID_HEADER_KEY, sessionId);
@@ -58,15 +61,14 @@ export const loginWith = async (context: ApiTestContext, email?: EmailAddress, s
   return response;
 };
 
-export const logoutFrom = async (context: ApiTestContext, sessionId?: SessionId) => {
+export const logoutFrom = async (context: ApiTestContext, sessionId?: SessionId): Promise<supertest.Response> => {
   if (!context.app) {
     context.app = testableApp(context.sessionOptions);
   }
 
   let st = supertest(context.app).get('/logout');
-  
-  st.set('Content-Type', 'application/json')
-    .accept('application/json');
+
+  st.set('Content-Type', 'application/json').accept('application/json');
 
   if (sessionId) {
     st = st.set(SESSION_ID_HEADER_KEY, sessionId);

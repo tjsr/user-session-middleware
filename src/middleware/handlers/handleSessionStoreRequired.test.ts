@@ -1,13 +1,13 @@
+import { SESSION_ID_COOKIE, SESSION_ID_HEADER_KEY, SESSION_SECRET } from '../../getSession.js';
 import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
+import { expectResponseSetsSessionIdCookie, setSessionCookie } from '@tjsr/testutils';
 import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
 import { MemoryStore } from 'express-session';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { SessionDataTestContext } from '../../api/utils/testcontext.js';
 import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
-import { expectResponseSetsSessionIdCookie } from '../../utils/expectations.js';
 import { generateNewSessionId } from '../../session/sessionId.js';
 import { handleSessionStoreRequired } from './handleSessionStoreRequired.js';
 import { sessionlessAppWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
@@ -65,18 +65,18 @@ describe('api.handleSessionStoreRequired', () => {
 
   test('Should accept a request when the session store is configured.', async () => {
     const testSessionId = generateNewSessionId();
-    const { app, memoryStore } = appWithMiddleware([
-      handleSessionStoreRequired,
-      handleSessionCookie,
-      handleSessionCookieOnError,
-    ]);
+    const { app, memoryStore } = appWithMiddleware(
+      [handleSessionStoreRequired, handleSessionCookie, handleSessionCookieOnError],
+      undefined
+    );
     expect(memoryStore).not.toBeUndefined();
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json');
+
+    let st = supertest(app).get('/').set('Content-Type', 'application/json');
+    console.log('in api.handleSessionStoreRequired: sessionId', SESSION_ID_COOKIE, testSessionId);
+    st = setSessionCookie(st, SESSION_ID_COOKIE, testSessionId, SESSION_SECRET);
+    const response = await st;
 
     expect(response.status).toBe(200);
-    expectResponseSetsSessionIdCookie(response, testSessionId);
+    expectResponseSetsSessionIdCookie(response, SESSION_ID_COOKIE, testSessionId, SESSION_SECRET);
   });
 });

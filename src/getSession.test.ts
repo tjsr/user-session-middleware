@@ -1,4 +1,5 @@
 import {
+  SESSION_ID_COOKIE,
   SESSION_ID_HEADER_KEY,
   defaultExpressSessionCookieOptions,
   defaultExpressSessionOptions,
@@ -15,6 +16,29 @@ import { SystemHttpRequestType } from './types/request.js';
 import { TestContext } from 'vitest';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
 import { validate } from 'uuid';
+
+const addAppLocalsToRequest = (request: SystemHttpRequestType) => {
+  if (!request.app) {
+    request.app = {} as (typeof request)['app'];
+  }
+  if (!request.app.locals) {
+    request.app.locals = {};
+  }
+};
+
+const addAppSidKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'test.connect.sid') => {
+  addAppLocalsToRequest(request);
+  if (!request.app.locals['cookieSessionIdName']) {
+    request.app.locals['cookieSessionIdName'] = sidKey;
+  }
+};
+
+const addSidHeaderKeyConfigToRequest = (request: SystemHttpRequestType, sidKey: string = 'x-session-id') => {
+  addAppLocalsToRequest(request);
+  if (!request.app.locals['sessionIdHeaderKey']) {
+    request.app.locals['sessionIdHeaderKey'] = sidKey;
+  }
+};
 
 describe('expressSessionConfig', () => {
   type ExpressSessionTestContextOptions = TestContext & {
@@ -144,20 +168,37 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual(generatedSessionId);
   });
 
-  test('Should return cookie value.', (context) => {
+  test('Should return cookie value when matching custom header value set.', (context) => {
+    context.testRequestData.cookies = {
+      sessionId: 'cookie-session-id',
+      'usm.test.sid': 'cookie-usm-id',
+    };
+
+    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addSidHeaderKeyConfigToRequest(testRequest, 'sessionId');
+    addAppSidKeyConfigToRequest(testRequest, 'usm.test.sid');
+    const sessionId = sessionIdFromRequest(testRequest);
+    expect(sessionId).not.toBeUndefined();
+    expect(sessionId).toEqual('cookie-usm-id');
+  });
+
+  test('Should return generated value no header but has cookie with header key value.', (context) => {
     context.testRequestData.cookies = {
       sessionId: 'cookie-session-id',
     };
 
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addSidHeaderKeyConfigToRequest(testRequest, 'sessionId');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('cookie-session-id');
+    expect(sessionId).not.toEqual('cookie-session-id');
+    expect(validate(sessionId)).toBe(true);
   });
 });
 
@@ -173,13 +214,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
     context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     context.testRequestData['session'] = {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
@@ -187,13 +229,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
 
   test('Should use id from session on request', (context) => {
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     context.testRequestData['session'] = {
       id: 'session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('session-id');
@@ -201,13 +244,14 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
 
   test('Should use sessionId from cookie', (context) => {
     context.testRequestData.cookies = {
-      'connect.sid': 'connectCookie-session-id',
       sessionId: 'cookie-session-id',
+      'test.connect.sid': 'connectCookie-session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
+    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
     const sessionId = sessionIdFromRequest(testRequest);
     expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('cookie-session-id');
+    expect(sessionId).toEqual('connectCookie-session-id');
   });
 
   test('Should use generated sessionId when no other sessonId found', (context) => {
@@ -229,7 +273,7 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
 
   test('Should return undefined when cookie is undefined', (context) => {
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = getSessionIdFromCookie(testRequest);
+    const sessionId = getSessionIdFromCookie(testRequest, SESSION_ID_COOKIE);
     expect(sessionId).toBeUndefined();
   });
 
@@ -239,8 +283,8 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
       sessionId: 'cookie-session-id',
     };
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = getSessionIdFromCookie(testRequest);
-    expect(sessionId).toEqual('cookie-session-id');
+    const sessionId = getSessionIdFromCookie(testRequest, 'connect.sid');
+    expect(sessionId).toEqual('connectCookie-session-id');
   });
 });
 
@@ -259,7 +303,7 @@ describe('getSessionIdFromRequestHeader', () => {
     testRequestData.headers[SESSION_ID_HEADER_KEY] = 'test-session-id';
 
     const testRequest: SystemHttpRequestType = getMockRequest(testRequestData);
-    const sessionId = getSessionIdFromRequestHeader(testRequest);
+    const sessionId = getSessionIdFromRequestHeader(testRequest, SESSION_ID_HEADER_KEY);
     expect(sessionId).not.toBeUndefined();
     expect(sessionId).toEqual('test-session-id');
   });

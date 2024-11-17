@@ -46,6 +46,7 @@ export const setupApiTest = (context: ApiTestContext) => {
   const namespace: IdNamespace = setUserIdNamespaceForTest(context);
   context.sessionOptions = {
     debugCallHandlers: false,
+    saveUninitialized: true,
     store: new MemoryStore(),
     userIdNamespace: namespace,
   };
@@ -80,7 +81,7 @@ export const verifyAuthResponseBody = (
   }
 };
 
-export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId) => {
+export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId): Promise<supertest.Response> => {
   if (!context.app) {
     context.app = testableApp(context.sessionOptions);
   }
