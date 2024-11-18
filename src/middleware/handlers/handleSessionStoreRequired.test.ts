@@ -1,4 +1,4 @@
-import { SESSION_ID_COOKIE, SESSION_ID_HEADER_KEY, SESSION_SECRET } from '../../getSession.js';
+import { SESSION_ID_COOKIE, SESSION_SECRET } from '../../getSession.js';
 import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
 import { expectResponseSetsSessionIdCookie, setSessionCookie } from '@tjsr/testutils';
 import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
@@ -55,10 +55,7 @@ describe('api.handleSessionStoreRequired', () => {
     const { app, memoryStore } = sessionlessAppWithMiddleware([handleSessionStoreRequired]);
 
     expect(memoryStore).toBeUndefined();
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
-      .set('Content-Type', 'application/json');
+    const response = await supertest(app).get('/').set('Content-Type', 'application/json');
 
     expect(response.status).toBe(501);
   });

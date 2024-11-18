@@ -8,6 +8,7 @@ import { createTestSessionId, generateUserIdForTest } from '../utils/testIdUtils
 import { v5, validate as validateUuid } from 'uuid';
 
 import { UserSessionData } from '../types/session.js';
+import { generateSessionIdForTest } from '@tjsr/testutils';
 import { setUserIdNamespace } from './userNamespace.js';
 
 describe('createUserIdFromEmail', () => {
@@ -81,7 +82,8 @@ describe('getUserIdFromSession', () => {
   test<SessionDataTestContext>('Should create a new userId from the email and save if session exists with no userId', async (context) => {
     const userIdNamespace = v5(context.task.name, NIL_UUID);
     setUserIdNamespace(userIdNamespace);
-    const testSessionId = createTestSessionId(context.task.name);
+    const tc = context;
+    const testSessionId = generateSessionIdForTest(tc);
 
     const { request, spies } = createTestRequestSessionData(
       context,

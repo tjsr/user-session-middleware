@@ -1,16 +1,13 @@
 import {
   SESSION_ID_COOKIE,
-  SESSION_ID_HEADER_KEY,
   defaultExpressSessionCookieOptions,
   defaultExpressSessionOptions,
   getSessionIdFromCookie,
-  getSessionIdFromRequestHeader,
   sessionIdFromRequest,
 } from './getSession.js';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.js';
 import expressSession, { MemoryStore } from 'express-session';
 
-import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
 import { SessionDataTestContext } from './api/utils/testcontext.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { TestContext } from 'vitest';
@@ -106,16 +103,6 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
     };
   });
 
-  test('Should not return header SID key value', (context) => {
-    context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
-
-    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
-    expect(sessionId).not.toEqual('test-session-id');
-    expect(sessionId).not.toBeUndefined();
-    expect(validate(sessionId)).toBe(true);
-  });
-
   test('Should not return session.id value.', (context) => {
     context.testRequestData['session'] = {
       id: generateSessionIdForTest(context),
@@ -150,15 +137,6 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
       headers: {},
       regenerateSessionId: false,
     };
-  });
-
-  test('Should return header SID key value', (context) => {
-    context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
-
-    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    const sessionId = sessionIdFromRequest(testRequest);
-    expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('test-session-id');
   });
 
   test('Should return session.id.', (context) => {
@@ -208,23 +186,6 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
       headers: {},
       regenerateSessionId: false,
     };
-  });
-
-  test('Should use sessionId from configured header sessionId parameter name', (context) => {
-    context.testRequestData.headers![SESSION_ID_HEADER_KEY] = 'test-session-id';
-
-    context.testRequestData.cookies = {
-      sessionId: 'cookie-session-id',
-      'test.connect.sid': 'connectCookie-session-id',
-    };
-    context.testRequestData['session'] = {
-      id: 'session-id',
-    };
-    const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
-    addAppSidKeyConfigToRequest(testRequest, 'test.connect.sid');
-    const sessionId = sessionIdFromRequest(testRequest);
-    expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('test-session-id');
   });
 
   test('Should use id from session on request', (context) => {
@@ -285,26 +246,5 @@ describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
     const testRequest: SystemHttpRequestType = getMockRequest(context.testRequestData);
     const sessionId = getSessionIdFromCookie(testRequest, 'connect.sid');
     expect(sessionId).toEqual('connectCookie-session-id');
-  });
-});
-
-describe('getSessionIdFromRequestHeader', () => {
-  test('Should return undefined when header is undefined', () => {
-    const testRequest: SystemHttpRequestType = getMockRequest();
-    const sessionId = getSessionIdFromRequestHeader(testRequest);
-    expect(sessionId).toBeUndefined();
-  });
-
-  test('Should return value from header key value', () => {
-    const testRequestData: MockRequest = {};
-    if (!testRequestData.headers) {
-      testRequestData.headers = {};
-    }
-    testRequestData.headers[SESSION_ID_HEADER_KEY] = 'test-session-id';
-
-    const testRequest: SystemHttpRequestType = getMockRequest(testRequestData);
-    const sessionId = getSessionIdFromRequestHeader(testRequest, SESSION_ID_HEADER_KEY);
-    expect(sessionId).not.toBeUndefined();
-    expect(sessionId).toEqual('test-session-id');
   });
 });

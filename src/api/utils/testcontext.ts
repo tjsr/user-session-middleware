@@ -3,7 +3,7 @@ import { MemoryStore, Store } from '../../express-session/index.js';
 
 import { AuthenticationRestResult } from '../../types/apiResults.js';
 import { MockRequestWithSession } from '../../testUtils.js';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
+import { SESSION_ID_COOKIE } from '../../getSession.js';
 import { TaskContext } from 'vitest';
 import { UserModel } from '../../types/model.js';
 import { UserSessionData } from '../../types/session.js';
@@ -11,6 +11,7 @@ import { UserSessionOptions } from '../../types/sessionOptions.js';
 import express from '../../express/index.js';
 import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
 import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
+import { setSessionCookie } from '@tjsr/testutils';
 import { setUserIdNamespaceForTest } from '../../utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 import { testableApp } from '../../utils/testing/middlewareTestUtils.js';
@@ -42,11 +43,15 @@ export interface SessionTestContext extends TaskContext {
   sessionOptions: Partial<UserSessionOptions>;
 }
 
+export type WithSessionTestContext = Omit<SessionTestContext, 'currentSessionId'> & { currentSessionId: SessionId };
+
 export const setupApiTest = (context: ApiTestContext) => {
   const namespace: IdNamespace = setUserIdNamespaceForTest(context);
   context.sessionOptions = {
     debugCallHandlers: false,
+    name: 'usm.sid',
     saveUninitialized: true,
+    secret: 'test-secret',
     store: new MemoryStore(),
     userIdNamespace: namespace,
   };
@@ -81,20 +86,18 @@ export const verifyAuthResponseBody = (
   }
 };
 
-export const refreshSession = async (context: ApiTestContext, sessionId?: SessionId): Promise<supertest.Response> => {
+export const refreshSession = async (context: ApiTestContext, sessionId: SessionId): Promise<supertest.Response> => {
   if (!context.app) {
     context.app = testableApp(context.sessionOptions);
   }
 
   let st = supertest(context.app).get('/session');
 
+  expect(context.sessionOptions?.secret).not.toBeUndefined();
   st.set('Content-Type', 'application/json').accept('application/json');
 
-  if (sessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
-  } else if (context.currentSessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
-  }
+  st = setSessionCookie(st, SESSION_ID_COOKIE, sessionId, context.sessionOptions.secret!);
+
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);
 

@@ -2,12 +2,13 @@ import { EmailAddress, SessionId } from "../../types.js";
 import { RetrieveUserDataFn, setRetrieveUserDataFunction } from "../../auth/getDbUser.js";
 
 import { ApiTestContext } from "../../api/utils/testcontext.js";
-import { LoginCredentialsError } from "../../errors/authenticationErrorClasses.js";
-import { SESSION_ID_HEADER_KEY } from "../../getSession.js";
-import { UserModel } from "../../types/model.js";
-import { getSupertestSessionIdCookie } from "./cookieTestUtils.js";
-import supertest from "supertest";
-import { testableApp } from "./middlewareTestUtils.js";
+import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.js';
+import { SESSION_ID_COOKIE } from '../../getSession.js';
+import { UserModel } from '../../types/model.js';
+import { getSupertestSessionIdCookie } from './cookieTestUtils.js';
+import { setSessionCookie } from '@tjsr/testutils';
+import supertest from 'supertest';
+import { testableApp } from './middlewareTestUtils.js';
 
 export const setLoginUserLookupWithContextUserData = <T extends UserModel>(
   userData: Map<string, unknown>
@@ -48,13 +49,10 @@ export const loginWith = async (
     st = st.send(loginBody);
   }
 
+  expect(context.sessionOptions?.secret).not.toBeUndefined();
   st.set('Content-Type', 'application/json').accept('application/json');
 
-  if (sessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
-  } else if (context.currentSessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
-  }
+  st = setSessionCookie(st, SESSION_ID_COOKIE, sessionId ?? context.currentSessionId!, context.sessionOptions.secret!);
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);
 
@@ -68,12 +66,11 @@ export const logoutFrom = async (context: ApiTestContext, sessionId?: SessionId)
 
   let st = supertest(context.app).get('/logout');
 
+  expect(context.sessionOptions?.secret).not.toBeUndefined();
   st.set('Content-Type', 'application/json').accept('application/json');
 
   if (sessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, sessionId);
-  } else if (context.currentSessionId) {
-    st = st.set(SESSION_ID_HEADER_KEY, context.currentSessionId);
+    st = setSessionCookie(st, SESSION_ID_COOKIE, sessionId, context.sessionOptions.secret!);
   }
   const response = await st;
   context.currentSessionId = getSupertestSessionIdCookie(response);

@@ -1,9 +1,7 @@
-import { Cookie, MemoryStore, Session } from '../../express-session/index.js';
 import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
 import { Express } from '../../express/index.js';
-import { SESSION_ID_HEADER_KEY } from '../../getSession.js';
 import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
 import { handleSessionIdRequired } from './handleSessionIdRequired.js';
 import supertest from 'supertest';
@@ -18,27 +16,9 @@ describe('handler.handleSessionIdRequired', () => {
 
 describe('api.handleSessionIdRequired', () => {
   let app: Express;
-  let memoryStore: MemoryStore;
 
   beforeEach(() => {
-    ({ app, memoryStore } = appWithMiddleware([
-      handleSessionIdRequired,
-      handleSessionCookie,
-      handleSessionCookieOnError,
-    ]));
-  });
-
-  test('Should accept a request with a valid sessionId.', async () => {
-    memoryStore.set('abcd-1234', {
-      cookie: new Cookie(),
-    } as Session);
-
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, 'abcd-1234')
-      .set('Content-Type', 'application/json');
-
-    expect(response.status).toBe(200);
+    ({ app } = appWithMiddleware([handleSessionIdRequired, handleSessionCookie, handleSessionCookieOnError]));
   });
 
   test('Should not fail because no sessionId was provided.', async () => {

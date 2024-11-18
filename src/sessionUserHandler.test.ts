@@ -6,13 +6,14 @@ import {
   handleSessionDataRetrieval,
 } from './middleware/handlers/index.js';
 
-import { SESSION_ID_HEADER_KEY } from './getSession.js';
+import { SESSION_ID_COOKIE } from './getSession.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserIdTaskContext } from './api/utils/testcontext.js';
 import { UserSessionData } from './types/session.js';
 import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
 import { generateSessionIdForTest } from './utils/testIdUtils.js';
 import { mockSession } from './utils/testing/mocks.js';
+import { setSessionCookie } from '@tjsr/testutils';
 import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
 import supertest from 'supertest';
 
@@ -42,14 +43,12 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
       [handleCopySessionStoreDataToSession, handleExistingSessionWithNoSessionData],
       [endValidator]
     );
-    const testSessionId = generateSessionIdForTest(context);
 
-    // return new Promise<void>((done) => {
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(401);
+    const testSessionId = generateSessionIdForTest(context);
+    const testSecret = 'test-secret';
+    let st = supertest(app).get('/').set('Content-Type', 'application/json');
+    st = setSessionCookie(st, SESSION_ID_COOKIE, testSessionId, testSecret).expect(401);
+    const response = await st;
 
     expect(response.statusCode).toEqual(401);
   });
@@ -67,11 +66,7 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
     const testSessionId = generateSessionIdForTest(context);
     memoryStore.set(testSessionId, testSessionData);
 
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(200);
+    const response = await supertest(app).get('/').set('Content-Type', 'application/json').expect(200);
     expect(response.statusCode).toEqual(200);
   });
 
@@ -97,10 +92,10 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
     );
     memoryStore.set(testSessionId, testSessionData);
 
-    return supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(200);
+    const testSecret = 'test-secret';
+    let st = supertest(app).get('/').set('Content-Type', 'application/json');
+    st = setSessionCookie(st, SESSION_ID_COOKIE, testSessionId, testSecret).expect(200);
+    const response = await st;
+    expect(response).toEqual(200);
   });
 });
