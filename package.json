@@ -26,6 +26,7 @@
     "prepack": "npm test && npm run build:dist",
     "prepublishOnly": "npm run clean",
     "test": "vitest --run && npm run lint",
+    "test:first": "vitest --run --bail=1 && npm run lint",
     "test:coverage": "vitest run --coverage"
   },
   "nodemonConfig": {
