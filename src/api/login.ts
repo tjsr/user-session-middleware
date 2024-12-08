@@ -1,10 +1,7 @@
 import * as EmailValidator from 'email-validator';
 import * as express from '../express/index.js';
 
-import {
-  EmailValidationError,
-  LoginBodyFormatError,
-} from '../errors/inputValidationErrorClasses.js';
+import { EmailValidationError, LoginBodyFormatError, NoEmailError } from '../errors/inputValidationErrorClasses.js';
 import { RegeneratingSessionIdError, SaveSessionError } from '../errors/errorClasses.js';
 import {
   UserSessionMiddlewareErrorHandler,
@@ -20,7 +17,7 @@ import { SystemHttpRequestType } from '../types/request.js';
 import { SystemResponseLocals } from '../types/locals.js';
 import { UserSessionData } from '../types/session.js';
 import { getAppUserIdNamespace } from '../auth/userNamespace.js';
-import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
 import { passAuthOrUnknownError } from '../auth/authErrorUtils.js';
 import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
 import { saveSessionPromise } from '../sessionUser.js';
@@ -31,7 +28,7 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = 
   next: express.NextFunction
 ): void => {
   addCalledHandler(response, checkLogin);
-  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
 
   const email: string = request.body.email;
   if (request.body === undefined) {
@@ -41,9 +38,15 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = 
     return;
   }
 
+  if (!email) {
+    const err = new NoEmailError(request.session.id);
+    console.error(`No email on login for session ${request.session.id} while checking login.`);
+    return next(err);
+  }
+
   if (!EmailValidator.validate(email)) {
     const err: EmailValidationError = new EmailValidationError('Invalid email on login', email);
-    console.debug('Invalid email on login', err);
+    console.debug(`Invalid email ${email} on login`, err);
     next(err);
     return;
   }
@@ -80,10 +83,9 @@ export const login: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   next: express.NextFunction
 ) => {
   addCalledHandler(response, login);
-  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
   assertPrerequisiteHandler(response, checkLogin);
   const email: string = request.body.email;
-  console.debug(login, 'Processing login for valid email', email);
   try {
     const userIdNamespace: IdNamespace = getAppUserIdNamespace(request.app);
     retrieveUserDataForSession(userIdNamespace, email, request.session, response.locals, next).catch((e: Error) => {
@@ -116,17 +118,20 @@ export const regenerateAfterLoginError: UserSessionMiddlewareErrorHandler<UserSe
 
   const originalSessionId = request.session.id;
   request.regenerateSessionId = true;
+
   request.session.regenerate((err) => {
     if (err) {
       const regenError = new RegeneratingSessionIdError(err);
       console.error(regenerateAfterLoginError, 'Error regenerating session', err);
       return next(regenError);
     }
-    console.debug(regenerateAfterLoginError, 'Regenerated session');
+
+    const sessionChangeString = originalSessionId + '=>' + request.session.id;
     if (error) {
+      console.error(regenerateAfterLoginError, 'Regenerated session but already had error', sessionChangeString, error);
       next(error);
     } else {
-      console.debug(regenerateAfterLoginError, 'Regenerated session ID', originalSessionId, '=>', request.session.id);
+      console.debug(regenerateAfterLoginError, 'Regenerated session ID', sessionChangeString);
       Object.assign(request.session, response.locals.userAuthenticationData);
       next();
     }

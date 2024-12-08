@@ -4,15 +4,23 @@ import {
   SessionIdRequiredError,
   SessionIdTypeError,
 } from './errors/errorClasses.js';
-import { SessionDataTestContext, UserAppTaskContext } from './api/utils/testcontext.js';
+import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
 import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.js';
 import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from './sessionUser.js';
 import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.js';
 
-describe<SessionDataTestContext>('assignUserIdToSession', () => {
-  beforeEach((context) => createContextForSessionTest(context));
+import { SessionDataTestContext } from './api/utils/testcontext.js';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.js';
+import { TaskContext } from 'vitest';
+import { setupExpressContext } from './utils/testing/context/appLocals.js';
 
-  test('Should assign a new userId to the session if there is not already one set.', async (context) => {
+describe<SessionDataTestContext>('assignUserIdToSession', () => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext) => {
+    setupSessionContext(context);
+    createContextForSessionTest(context);
+  });
+
+  test<SessionEnabledRequestContext>('Should assign a new userId to the session if there is not already one set.', async (context) => {
     addIgnoredLog(
       /Assigned a new userId ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}) to session test-session-id/i
     );
@@ -33,14 +41,14 @@ describe<SessionDataTestContext>('assignUserIdToSession', () => {
     const saveMock = spies?.get(request.session.save);
 
     await expect(
-      (async () => await assignUserIdToSession(context.userIdNamespace, request.session))()
+      (async () => await assignUserIdToSession(context.sessionOptions.userIdNamespace, request.session))()
     ).resolves.not.toThrowError();
 
     expect(request.session.userId).not.toBe(undefined);
     expect(saveMock).toHaveBeenCalled();
   });
 
-  test<UserAppTaskContext>('Should throw an error if the session is not defined on request.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw an error if the session is not defined on request.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {},
@@ -52,11 +60,11 @@ describe<SessionDataTestContext>('assignUserIdToSession', () => {
     expect(request.session).toBeUndefined();
 
     await expect(
-      (async () => await assignUserIdToSession(context.userIdNamespace, request.session))()
+      (async () => await assignUserIdToSession(context.sessionOptions.userIdNamespace, request.session))()
     ).rejects.toThrowError(expect.any(SessionDataNotFoundError));
   });
 
-  test<UserAppTaskContext>('Should throw an error if the session has no id.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw an error if the session has no id.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -70,11 +78,11 @@ describe<SessionDataTestContext>('assignUserIdToSession', () => {
     expect(request.session).toBeDefined();
 
     await expect(
-      (async () => await assignUserIdToSession(context.userIdNamespace, request.session))()
+      (async () => await assignUserIdToSession(context.sessionOptions.userIdNamespace, request.session))()
     ).rejects.toThrowError(expect.any(SessionIdRequiredError));
   });
 
-  test<UserAppTaskContext>('Should reject if the session id is not defined on request.', async (context) => {
+  test<SessionEnabledRequestContext>('Should reject if the session id is not defined on request.', async (context) => {
     expect(context.testRequestData.sessionID).toBe(undefined);
     const { request } = createTestRequestSessionData(
       context,
@@ -85,24 +93,28 @@ describe<SessionDataTestContext>('assignUserIdToSession', () => {
     );
     expect(request.sessionID).toBe(undefined);
 
-    context.memoryStore?.set('test-session-id', context.testSessionStoreData);
+    context.sessionOptions.store?.set('test-session-id', context.testSessionStoreData);
 
     expect(request.session).toBeDefined();
 
     await expect(
-      (async () => await assignUserIdToSession(context.userIdNamespace, request.session))()
+      (async () => await assignUserIdToSession(context.sessionOptions.userIdNamespace, request.session))()
     ).rejects.toThrowError(SessionIdRequiredError);
   });
 });
 
 describe('assignUserIdToRequestSession', () => {
-  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+    setupSessionContext(context);
+    createContextForSessionTest(context);
+    setupExpressContext(context);
+  });
 
   afterEach(() => {
     clearIgnoredFunctions();
   });
 
-  test<UserAppTaskContext>('Should assign a new userId to the session if there is not already one set.', async (context) => {
+  test<SessionEnabledRequestContext>('Should assign a new userId to the session if there is not already one set.', async (context) => {
     const sessionID = 'test-session-id';
     const { request, spies } = createTestRequestSessionData(
       context,
@@ -125,7 +137,7 @@ describe('assignUserIdToRequestSession', () => {
     expect(saveMock).toHaveBeenCalled();
   });
 
-  test<UserAppTaskContext>('Should throw an error if the request sessionID is not defined on request.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw an error if the request sessionID is not defined on request.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -141,7 +153,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Should throw an error if the session is not defined on request.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw an error if the session is not defined on request.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -157,7 +169,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Should throw exception if the session is not defined on request.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw exception if the session is not defined on request.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -173,7 +185,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Should throw an exception if the session has no id.', async (context) => {
+  test<SessionEnabledRequestContext>('Should throw an exception if the session has no id.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -191,7 +203,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Requires a session to be defined on the request.', async (context) => {
+  test<SessionEnabledRequestContext>('Requires a session to be defined on the request.', async (context) => {
     const { request } = createTestRequestSessionData(
       context,
       {
@@ -210,7 +222,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Requires a session id to be defined on the request.', async (context) => {
+  test<SessionEnabledRequestContext>('Requires a session id to be defined on the request.', async (context) => {
     const { request } = createTestRequestSessionData(context, { sessionID: undefined }, {});
 
     expect(request.session).toBeDefined();
@@ -222,7 +234,7 @@ describe('assignUserIdToRequestSession', () => {
     );
   });
 
-  test<UserAppTaskContext>('Requires a session id on the session to be a string.', async (context) => {
+  test<SessionEnabledRequestContext>('Requires a session id on the session to be a string.', async (context) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const forcedNumericSessionID: string = 12345 as any as string;
     const { request } = createTestRequestSessionData(context, { sessionID: forcedNumericSessionID }, {});

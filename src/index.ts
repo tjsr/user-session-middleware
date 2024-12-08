@@ -4,10 +4,10 @@ import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtil
 import { HttpStatusCode } from './httpStatusCodes.js';
 import { createRandomId } from './utils/createRandomId.js';
 import { createRandomUserId } from './sessionUser.js';
-import { setUserIdNamespace } from './auth/userNamespace.js';
 
 export { getMysqlSessionStore } from './sessionStore.js';
 
+// prettier-ignore
 export {
   createRandomId,
   createRandomUserId,
@@ -16,7 +16,6 @@ export {
   getUserIdFromRequest,
   getUserIdFromSession,
   HttpStatusCode,
-  setUserIdNamespace,
   validateHasUserId
 };
 

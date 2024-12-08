@@ -1,22 +1,17 @@
-import { addCalledHandler, assertPrerequisiteHandler } from "./handlerChainLog.js";
-import { handleSessionCookieOnError, sendAuthResultBody } from "./handlers/index.js";
+import { AssertionError } from 'node:assert';
+import { NextFunction } from 'express';
+import { SessionHandlerError } from '../errors/SessionHandlerError.js';
+import { UserSessionMiddlewareErrorHandler } from '../types/middlewareHandlerTypes.js';
+import { addCalledHandler } from './handlerChainLog.js';
+import { sendAuthResultBody } from './handlers/index.js';
 
-import { AssertionError } from "node:assert";
-import { NextFunction } from "express";
-import { SessionHandlerError } from "../errors/SessionHandlerError.js";
-import {
-  UserSessionMiddlewareErrorHandler,
-} from '../types/middlewareHandlerTypes.js';
-
-export const sessionErrorHandler: UserSessionMiddlewareErrorHandler =
-(
+export const sessionErrorHandler: UserSessionMiddlewareErrorHandler = (
   error,
   request,
   response,
   next: NextFunction
 ) => {
   addCalledHandler(response, sessionErrorHandler);
-  assertPrerequisiteHandler(response, handleSessionCookieOnError);
 
   if (SessionHandlerError.isType(error) || error instanceof SessionHandlerError) {
     if (response.locals.sendAuthenticationResult) {

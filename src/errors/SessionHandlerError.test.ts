@@ -1,13 +1,12 @@
+import { HttpStatusCode } from '../httpStatusCodes.js';
 import { NO_SESSION_DATA_FROM_STORE } from './errorCodes.js';
 import { SessionHandlerError } from './SessionHandlerError.js';
 
 describe('SessionHandlerError', () => {
   const testSessionError = new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, undefined, 'Test message');
-  test(
-    'Should get a http status code corresponding to the sessionErrorCode when constructor has undefined value',
-    () => {
-      expect(testSessionError.status).toBe(401);
-    });
+  test('Should get a http status code corresponding to the sessionErrorCode when constructor has undefined value', () => {
+    expect(testSessionError.status).toBe(HttpStatusCode.UNAUTHORIZED);
+  });
 
   test('Name of simple SessionHandlerError should have no extension', () => {
     expect(testSessionError.name).toBe('SessionHandlerError');

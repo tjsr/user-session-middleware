@@ -1,15 +1,21 @@
 import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
 import { checkLogout, logout } from './logout.js';
 import { createContextForSessionTest, createMockPromisePair, createTestRequestSessionData } from '../testUtils.js';
 
 import { SessionDataTestContext } from './utils/testcontext.js';
-import { generateSessionIdForTest } from '../utils/testIdUtils.js';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
+import { TaskContext } from 'vitest';
+import { generateSessionIdForTest } from '../utils/testing/testIdUtils.js';
 
 describe<SessionDataTestContext>('logout', () => {
-  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+    setupSessionContext(context);
+    createContextForSessionTest(context);
+  });
 
-  test('Should call session.save with a HTTP 200 result if we currently have a user.', async (context) => {
-    const sessionId = generateSessionIdForTest(context);
+  test<SessionEnabledRequestContext>('Should call session.save with a HTTP 200 result if we currently have a user.', async (context) => {
+    const sessionId = context.currentSessionId;
     const { next, request, response } = createTestRequestSessionData(
       context,
       {
@@ -32,10 +38,13 @@ describe<SessionDataTestContext>('logout', () => {
   });
 });
 
-describe('checkLogout', () => {
-  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
+describe<SessionDataTestContext>('checkLogout', () => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext) => {
+    setupSessionContext(context);
+    createContextForSessionTest(context);
+  });
 
-  test('Should return a 401 when a user is not currently logged in.', async (context: SessionDataTestContext) => {
+  test<SessionEnabledRequestContext>('Should return a 401 when a user is not currently logged in.', async (context) => {
     const sessionId = generateSessionIdForTest(context);
 
     const { next, request, response } = createTestRequestSessionData(
@@ -63,8 +72,7 @@ describe('checkLogout', () => {
     expect(request.session.save).not.toHaveBeenCalled();
   });
 
-  // eslint-disable-next-line max-len
-  test('Should refuse to log out again and return 401 if the session is already written with hasLoggedOut=true', async (context: SessionDataTestContext) => {
+  test<SessionEnabledRequestContext>('Should refuse to log out again and return 401 if the session is already written with hasLoggedOut=true', async (context) => {
     const sessionId = generateSessionIdForTest(context);
 
     context.testSessionStoreData.hasLoggedOut = true;

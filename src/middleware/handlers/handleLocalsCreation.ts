@@ -1,31 +1,48 @@
-import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
-import { addCalledHandler } from "../handlerChainLog.js";
+import { SystemResponseLocals } from '../../types/locals.js';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
+import { addCalledHandler } from '../handlerChainLog.js';
 
 export const LOG_HANDLERS_SETTING = 'debugCallHandlers';
 
-export const handleLocalsCreation: UserSessionMiddlewareRequestHandler = (
-  request,
-  response,
-  next
-):void => {
-  if (!response.locals) {
-    response.locals = {
+const updateResponseLocals = (
+  locals: SystemResponseLocals,
+  newLocals: Partial<SystemResponseLocals> | undefined
+): void => {
+  locals.calledHandlers = locals.calledHandlers ?? newLocals?.calledHandlers ?? [];
+  if (locals.skipHandlerDependencyChecks === undefined) {
+    locals.skipHandlerDependencyChecks =
+      newLocals?.skipHandlerDependencyChecks !== undefined ? newLocals.skipHandlerDependencyChecks : false;
+  }
+  if (locals.debugCallHandlers !== undefined) {
+    locals.debugCallHandlers = newLocals?.debugCallHandlers !== undefined ? newLocals.debugCallHandlers : false;
+  }
+};
+
+export const createResponseLocals = (
+  locals: SystemResponseLocals,
+  options?: SystemResponseLocals
+): SystemResponseLocals => {
+  if (!locals) {
+    locals = {
       calledHandlers: [],
       skipHandlerDependencyChecks: false,
     };
-  } else {
-    if (!response.locals.calledHandlers) {
-      response.locals.calledHandlers = [];
-    }
-    if (response.locals.skipHandlerDependencyChecks === undefined) {
-      response.locals.skipHandlerDependencyChecks = false;
-    }
   }
+  updateResponseLocals(locals, options);
+  return locals;
+};
+
+export const handleResponseLocalsCreation: UserSessionMiddlewareRequestHandler = (request, response, next): void => {
+  let debug: (typeof request)['app']['locals'] | undefined = undefined;
   if (request.app.get('debugCallHandlers')) {
-    response.locals.debugCallHandlers = true;
+    debug = {
+      debugCallHandlers: true,
+    };
   }
 
+  response.locals = createResponseLocals(response.locals, debug);
+
   // We do this at the end for this handler, but would usually do it first for all other handlers.
-  addCalledHandler(response, handleLocalsCreation);
+  addCalledHandler(response, handleResponseLocalsCreation);
   next();
 };

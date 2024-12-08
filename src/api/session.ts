@@ -16,17 +16,16 @@ export const session: UserSessionMiddlewareRequestHandler = (
   response,
   next: express.NextFunction
 ) => {
-  console.debug(session, 'Regenerating session id:', request.sessionID, request.session.id);
-  const email: EmailAddress = request.session.email;
-
+  if (!requestHasSessionId(request, SESSION_ID_COOKIE)) {
+    // Handle requests that provide no sessionId - we can't possibly have a userId from this.
+    return next();
+  }
   try {
+    console.debug(session, 'Regenerating session id:', request.sessionID, request.session?.id);
+    const email: EmailAddress = request.session?.email;
+
     request.regenerateSessionId = true;
     response.locals.sendAuthenticationResult = true;
-
-    if (!requestHasSessionId(request, SESSION_ID_COOKIE)) {
-      // Handle requests that provide no sessionId - we can't possibly have a userId from this.
-      return next();
-    }
 
     regenerateSessionPromise(request.session)
       .then(() => {

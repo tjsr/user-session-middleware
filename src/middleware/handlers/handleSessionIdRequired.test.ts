@@ -1,10 +1,17 @@
-import { handleSessionCookie, handleSessionCookieOnError } from './handleSessionCookie.js';
+import { ApiTestContext, MiddlewareHandlerTestContext } from '../../api/utils/testcontext.js';
+import {
+  NoSessionTestContext,
+  SessionTestContext,
+  WithSessionTestContext,
+  setupSessionContext,
+} from '../../utils/testing/context/session.js';
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
-import { Express } from '../../express/index.js';
-import { appWithMiddleware } from '../../utils/testing/middlewareTestUtils.js';
+import { HttpStatusCode } from '../../httpStatusCodes.js';
+import { TaskContext } from 'vitest';
+import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.js';
 import { handleSessionIdRequired } from './handleSessionIdRequired.js';
-import supertest from 'supertest';
+import { setupSupertestContext } from '../../utils/testing/supertestUtils.js';
 
 describe('handler.handleSessionIdRequired', () => {
   test('Should fail when no sessionID is provided.', () =>
@@ -15,16 +22,24 @@ describe('handler.handleSessionIdRequired', () => {
 });
 
 describe('api.handleSessionIdRequired', () => {
-  let app: Express;
+  beforeEach(
+    (
+      context: ApiTestContext<WithSessionTestContext> & MiddlewareHandlerTestContext & SessionTestContext & TaskContext
+    ) => {
+      context.preSessionMiddleware = [handleSessionIdRequired];
+      setupSessionContext(context);
+      createHandlerTestContext(context);
+      context.startingUrl = '/';
+      context.currentSessionId = undefined!;
+    }
+  );
 
-  beforeEach(() => {
-    ({ app } = appWithMiddleware([handleSessionIdRequired, handleSessionCookie, handleSessionCookieOnError]));
-  });
-
-  test('Should not fail because no sessionId was provided.', async () => {
+  test('Should not fail because no sessionId was provided.', async (context: ApiTestContext<NoSessionTestContext>) => {
     // We don't expect an error here because the session generator will assign a new session ID.
-    const response = await supertest(app).get('/').set('Content-Type', 'application/json');
+    const st = setupSupertestContext(context);
+    expect(context.currentSessionId).toBeUndefined();
+    const response = await st;
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatusCode.OK);
   });
 });

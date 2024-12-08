@@ -52,7 +52,7 @@ export const assertPrerequisiteHandler = <ResponseType extends SystemHttpRespons
       const lastHandler = response.locals?.calledHandlers[response.locals.calledHandlers.length - 1];
       assert (lastHandler !== undefined, 'calledHandlers stack had no elements!  This should never happen!');
       const err = new RequiredMiddlewareNotCalledError(handler, lastHandler);
-      console.error(assertPrerequisiteHandler, err.message);
+      console.trace(assertPrerequisiteHandler, err.message);
       throw err;
     }
   }

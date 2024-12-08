@@ -1,5 +1,4 @@
 import { EmailAddress, IdNamespace } from '../types.js';
-import { handleLoginAuthenticationFailure, login } from '../api/login.js';
 
 import { NextFunction } from '../express/index.js';
 import { Session } from '../express-session/index.js';
@@ -7,6 +6,7 @@ import { SystemResponseLocals } from '../types/locals.js';
 import { UserModel } from '../types/model.js';
 import { UserSessionData } from '../types/session.js';
 import { getDbUserByEmail } from './getDbUser.js';
+import { handleLoginAuthenticationFailure } from '../api/login.js';
 
 export const retrieveUserDataForSession = (
   userIdNamespace: IdNamespace,
@@ -28,7 +28,7 @@ export const retrieveUserDataForSession = (
 
     session.userId = user.userId;
     session.email = email;
-    console.debug(login, `User ${email} logged in and has userId`, user.userId);
+    console.debug(retrieveUserDataForSession, `User ${email} logged in and has userId`, user.userId);
 
     locals.userAuthenticationData = user;
 

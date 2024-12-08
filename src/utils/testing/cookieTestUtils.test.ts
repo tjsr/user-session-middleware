@@ -12,7 +12,7 @@ describe('getSessionIdFromSetCookieString', () => {
   test('Should throw exception if no secret is provided.', () => {
     const signedTestString = 'sessionId=s:d569a638-3fec-4e29-9b86-52f006ca45e4...; Path=/; HttpOnly; SameSite=Strict';
 
-    expect(() => getSessionIdFromSetCookieString(signedTestString, 'sessionId', undefined)).toThrow(expect.any(Error));
+    expect(() => getSessionIdFromSetCookieString(signedTestString, 'sessionId', undefined!)).toThrow(expect.any(Error));
   });
 
   test('Should throw exception if invalid secret is provided.', () => {
@@ -20,7 +20,7 @@ describe('getSessionIdFromSetCookieString', () => {
       'sessionId=s:d569a638-3fec-4e29-9b86-52f006ca45e4.Ea6SEViRnJZE+HOIcpPE0MLvCI/nU+pCeSSIhJAmrh8; Path=/; HttpOnly; SameSite=Strict';
 
     expect(() => getSessionIdFromSetCookieString(signedTestString, 'sessionId', 'blah')).toThrowError(
-      /Parsed cookie s:.* did not match session secret blah./
+      /Parsed cookie s:.* did not match session secret 'blah'./
     );
   });
 

@@ -1,20 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import * as expressSession from 'express-session';
 
-import { EmailAddress, UserId } from "../types.js";
+import { EmailAddress, UserId } from '../types.js';
 
-import { UserSessionData } from "../types/session.js";
+import { UserSessionData } from '../types/session.js';
 
-declare module "express-session" { 
+declare module 'express-session' {
   interface SessionData {
-    userId: UserId;
     email: EmailAddress;
-    newId: boolean | undefined;
     hasLoggedOut: boolean;
+    newId: boolean | undefined;
+    userId: UserId;
   }
-  
+
   // interface Session extends Partial<SessionData> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Session extends UserSessionData {}
 
   // interface Session {
@@ -27,6 +26,7 @@ declare module "express-session" {
 
 export const session = expressSession;
 
-export { Cookie, MemoryStore, Store } from 'express-session';
+export { Cookie, CookieOptions, MemoryStore, Store, SessionOptions } from 'express-session';
 export type { Session, SessionData } from 'express-session';
 
+export default session;

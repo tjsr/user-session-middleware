@@ -1,14 +1,16 @@
-import { Cookie, MemoryStore, Session, Store } from './express-session/index.js';
-import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from "./setup-tests.js";
+import { Cookie, Session } from './express-session/index.js';
+import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.js';
+import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
+import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from './setup-tests.js';
 
 import { SessionDataTestContext } from './api/utils/testcontext.js';
 import { SystemHttpRequestType } from './types/request.js';
+import { TaskContext } from 'vitest';
 import { UserSessionData } from './types/session.js';
 import { assignUserIdToRequestSession } from './sessionUser.js';
-import { getMockReq } from 'vitest-mock-express';
+import { copySessionDataToSession } from './store/loadData.js';
 import { mockSession } from './utils/testing/mocks.js';
-import { saveSessionDataToSession } from './store/loadData.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
+import { setupExpressContext } from './utils/testing/context/appLocals.js';
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {
@@ -112,53 +114,46 @@ describe('handleSessionFromStore', () => {
   // });
 });
 
-describe<SessionDataTestContext>('saveSessionDataToSession', () => {
-  let memoryStore: Store;
-  let testSessionData: UserSessionData;
-  let req: SystemHttpRequestType<UserSessionData>;
-
+type TypeContext = SessionEnabledRequestContext<SystemHttpRequestType, WithSessionTestContext>;
+describe<TypeContext>('copySessionDataToSession', () => {
   const withTestSession = <SD extends UserSessionData>(
+    context: SessionTestContext &
+      SessionDataTestContext &
+      SessionEnabledRequestContext<SystemHttpRequestType, WithSessionTestContext>,
     partailStoreData: Partial<SD>,
-    existingSessionDataOverrides: Partial<SD>,
-    noSave = false
+    existingSessionDataOverrides: Partial<SD>
   ): Session => {
     const storedSessionData: Partial<SD> = {
       ...partailStoreData,
       cookie: new Cookie(),
     };
-    testSessionData = {
-      ...testSessionData,
+    context.testSessionStoreData = {
+      ...context.testSessionStoreData,
       ...existingSessionDataOverrides,
     };
 
-    const session: Session = memoryStore.createSession(req, testSessionData);
-    if (!noSave) {
-      session.save = vi.fn();
-    }
+    const session: Session = context.sessionOptions.store!.createSession(context.request, context.testSessionStoreData);
     // TODO: Fix this
-    saveSessionDataToSession(storedSessionData as UserSessionData, session);
-    expect(session.save).toBeCalled();
+    copySessionDataToSession(storedSessionData as UserSessionData, session);
     return session;
   };
 
-  beforeEach((context: SessionDataTestContext) => {
-    setUserIdNamespaceForTest(context);
-    testSessionData = mockSession(context.userIdNamespace);
+  beforeEach((context: SessionDataTestContext & TaskContext) => {
+    const sessionContext = setupSessionContext(context);
 
-    memoryStore = new MemoryStore();
-    memoryStore.set('some-session-id', {
-      cookie: new Cookie(),
-    } as UserSessionData);
+    context.testSessionStoreData = mockSession(context.sessionOptions.userIdNamespace);
 
-    req = getMockReq<SystemHttpRequestType<UserSessionData>>({
+    const appContext = setupExpressContext(sessionContext);
+
+    setupRequestContext(appContext, {
       newSessionIdGenerated: false,
       sessionID: 'fake-session-id',
-      sessionStore: memoryStore,
     });
   });
 
-  test('Should take session data userId if no userId is already on session', () => {
+  test<TypeContext>('Should take session data userId if no userId is already on session', (context) => {
     const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
+      context,
       {
         email: 'test-user-email',
         userId: 'test-user-id',
@@ -168,8 +163,12 @@ describe<SessionDataTestContext>('saveSessionDataToSession', () => {
     expect(sessionToVerify.userId).toBe('test-user-id');
   });
 
-  test('Should take existing session data userId if userId is already on session', () => {
+  test('Should take existing session data userId if userId is already on session', (context: SessionEnabledRequestContext<
+    SystemHttpRequestType,
+    WithSessionTestContext
+  >) => {
     const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
+      context,
       {
         email: 'test-user-email',
         userId: 'test-user-id',
@@ -179,37 +178,45 @@ describe<SessionDataTestContext>('saveSessionDataToSession', () => {
     expect(sessionToVerify.userId).toBe('existing-user-id');
   });
 
-  test('Should take session data email if email is already on session', () => {
+  test('Should take session data email if email is already on session', (context: SessionEnabledRequestContext<
+    SystemHttpRequestType,
+    WithSessionTestContext
+  >) => {
     const sessionToVerify: Session & Partial<UserSessionData> = withTestSession(
+      context,
       { email: 'test-user-email' },
       { email: undefined }
     );
     expect(sessionToVerify.email).toBe('test-user-email');
   });
 
-  test('Should take existing session data email if no email is already on session', () => {
-    const sessionToVerify: Session = withTestSession({ email: 'test-user-emnail' }, { email: 'existing-user-email' });
+  test<TypeContext>('Should take existing session data email if no email is already on session', (context) => {
+    const sessionToVerify: Session = withTestSession(
+      context,
+      { email: 'test-user-emnail' },
+      { email: 'existing-user-email' }
+    );
     expect(sessionToVerify.email).toBe('existing-user-email');
   });
 
-  test('Should take newId flag if not already on session', () => {
-    const sessionToVerify: Session = withTestSession({ newId: true }, { newId: undefined });
+  test<TypeContext>('Should take newId flag if not already on session', (context) => {
+    const sessionToVerify: Session = withTestSession(context, { newId: true }, { newId: undefined });
     expect(sessionToVerify.newId).toBe(false);
   });
 
-  test('Should not override newId flag if explicitly set to false session', () => {
-    const sessionToVerify: Session = withTestSession({ newId: true }, { newId: false });
+  test<TypeContext>('Should not override newId flag if explicitly set to false session', (context) => {
+    const sessionToVerify: Session = withTestSession(context, { newId: true }, { newId: false });
     expect(sessionToVerify.newId).toBe(false);
   });
 
-  test('Should not override newId=true flag if explicitly set to false session', () => {
-    const sessionToVerify: Session = withTestSession({ newId: false }, { newId: true });
+  test<TypeContext>('Should not override newId=true flag if explicitly set to false session', (context) => {
+    const sessionToVerify: Session = withTestSession(context, { newId: false }, { newId: true });
     expect(sessionToVerify.newId).toBe(false);
   });
 
-  test('Should take newId value from existing session', () => {
+  test<TypeContext>('Should take newId value from existing session', (context) => {
     [true, false].forEach((storedNewId) => {
-      const sessionToVerify: Session = withTestSession({ newId: storedNewId }, { newId: undefined });
+      const sessionToVerify: Session = withTestSession(context, { newId: storedNewId }, { newId: undefined });
       expect(sessionToVerify.newId).toBe(false);
     });
   });

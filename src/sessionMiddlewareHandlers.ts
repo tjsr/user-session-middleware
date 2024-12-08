@@ -3,43 +3,34 @@ import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } fr
 import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
 import express, { ErrorRequestHandler, RequestHandler } from "./express/index.js";
 import {
-  handleCopySessionStoreDataToSession,
   handleExistingSessionWithNoSessionData,
   handleLocalsCreation,
-  handleNewSessionWithNoSessionData,
-  handleSessionCookie,
-  handleSessionCookieOnError,
-  handleSessionDataRetrieval,
   handleSessionIdAfterDataRetrieval,
   handleSessionIdRequired,
   handleSessionStoreRequired,
   handleSessionUserBodyResults,
-  handleSessionWithNewlyGeneratedId
+  handleSessionWithNewlyGeneratedId,
 } from './middleware/handlers/index.js';
 
-import {
-  UserSessionOptions
-} from "./types/sessionOptions.js";
-import { expressSessionHandlerMiddleware } from "./getSession.js";
-import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from "./sessionUserHandler.js";
+import { UserSessionOptions } from './types/sessionOptions.js';
+import { expressSessionHandlerMiddleware } from './getSession.js';
+import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from './sessionUserHandler.js';
 import { sessionErrorHandler } from './middleware/index.js';
 
-export const preLoginUserSessionMiddleware = (sessionOptions?: Partial<UserSessionOptions> | undefined): (
-    RequestHandler | ErrorRequestHandler
-)[] => {
-  const expressSessionOptions: Partial<UserSessionOptions> = { ...sessionOptions };
-
+export const preLoginUserSessionMiddleware = (
+  sessionOptions: UserSessionOptions
+): (RequestHandler | ErrorRequestHandler)[] => {
   return [
     // handle /session to generate a new sessionId before anything else.
-    expressSessionHandlerMiddleware(expressSessionOptions),
+    expressSessionHandlerMiddleware(sessionOptions),
     handleLocalsCreation,
     handleSessionStoreRequired,
     handleSessionIdRequired,
     handleSessionWithNewlyGeneratedId,
-    handleSessionDataRetrieval,
-    handleNewSessionWithNoSessionData,
+    // handleSessionDataRetrieval,
+    // handleNewSessionWithNoSessionData,
     handleExistingSessionWithNoSessionData,
-    handleCopySessionStoreDataToSession,
+    // handleCopySessionStoreDataToSession,
   ];
 };
 
@@ -73,12 +64,8 @@ export const sessionUserRouteHandlers = (
   }
 };
 
-export const postLoginUserSessionMiddleware = (): (
-  RequestHandler | ErrorRequestHandler
-)[] => {
+export const postLoginUserSessionMiddleware = (): (RequestHandler | ErrorRequestHandler)[] => {
   return [
-    handleSessionCookie,
-    handleSessionCookieOnError,
     handleSessionIdAfterDataRetrieval,
     handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
     handleSessionUserBodyResults,

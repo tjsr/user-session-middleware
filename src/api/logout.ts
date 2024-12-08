@@ -16,80 +16,77 @@ import { SystemHttpRequestType } from '../types/request.js';
 import { UserId } from '../types.js';
 import { UserSessionData } from '../types/session.js';
 import { getUserIdFromRequest } from '../auth/user.js';
-import { handleCopySessionStoreDataToSession } from '../middleware/handlers/handleCopySessionStoreDataToSession.js';
-import { handleLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
 import { saveSessionPromise } from '../sessionUser.js';
 
-export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> =
-  (
-    request,
-    response,
-    next: express.NextFunction
-  ): void => {
-    addCalledHandler(response, checkLogout);
-    assertPrerequisiteHandler(response, handleLocalsCreation);
-    if (!request.session) {
-      const logoutError = new LogoutFailedError(undefined, undefined, new SessionNotGeneratedError());
-      console.error(logout, 'No session on request.');
-      return next(logoutError);
-    }
+export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
+  request,
+  response,
+  next: express.NextFunction
+): void => {
+  addCalledHandler(response, checkLogout);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
+  if (!request.session) {
+    const logoutError = new LogoutFailedError(undefined, undefined, new SessionNotGeneratedError());
+    console.error(logout, 'No session on request.');
+    return next(logoutError);
+  }
 
-    if (request.session.hasLoggedOut) {
-      const err = new AlreadyLoggedOutError();
-      console.debug(logout, 'Session is already logged out', err);
-      return next(err);
-    }
+  if (request.session.hasLoggedOut) {
+    const err = new AlreadyLoggedOutError();
+    return next(err);
+  }
 
-    if (request.session.userId === undefined) {
-      const err = new NotLoggedInError();
-      console.debug(logout, 'Session has no userId', err);
-      return next(err);
-    }
+  if (request.session.userId === undefined) {
+    const err = new NotLoggedInError();
+    return next(err);
+  }
 
-    if (request.session.email === undefined) {
-      const err = new NotLoggedInError();
-      console.debug(logout, 'Session is not logged in', err);
-      return next(err);
-    }
+  if (request.session.email === undefined) {
+    const err = new NotLoggedInError();
+    return next(err);
+  }
 
-    getUserIdFromRequest(request, true).then((userId: UserId|undefined) => {
+  getUserIdFromRequest(request, true)
+    .then((userId: UserId | undefined) => {
       console.debug(logout, `Got logout userId ${userId}`);
       next();
-    }).catch((err) => {
+    })
+    .catch((err) => {
       console.error(logout, 'Error getting userId from request', err);
       next(err);
     });
-  };
+};
 
-export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> =
-  (
-    request,
-    response,
-    next: express.NextFunction
-  ): void => {
-    addCalledHandler(response, logout);
-    assertPrerequisiteHandler(response, checkLogout);
-    assertPrerequisiteHandler(response, handleCopySessionStoreDataToSession);
-    request.session.userId = undefined!;
-    request.session.email = undefined!;
-    request.session.hasLoggedOut = true;
+export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
+  request,
+  response,
+  next: express.NextFunction
+): void => {
+  addCalledHandler(response, logout);
+  assertPrerequisiteHandler(response, checkLogout);
+  request.session.userId = undefined!;
+  request.session.email = undefined!;
+  request.session.hasLoggedOut = true;
 
-    try {
-      // Save immediately when logging out.
-      saveSessionPromise(request.session).then(() => {
+  try {
+    // Save immediately when logging out.
+    saveSessionPromise(request.session)
+      .then(() => {
         console.debug(logout, 'Saved session after logging out.');
         response.locals.sendAuthenticationResult = true;
         return next();
-      }).catch((err) => {
+      })
+      .catch((err) => {
         const logoutErr = new LogoutFailedError(undefined, undefined, new SessionSaveError(err));
         console.error(logout, 'Failed saving session', logoutErr, err);
         return next(logoutErr);
       });
-    } catch (err) {
-      const errLogout = new LogoutFailedError(undefined, undefined, err);
-      return next(errLogout);
-    }
-  };
+  } catch (err) {
+    const errLogout = new LogoutFailedError(undefined, undefined, err);
+    return next(errLogout);
+  }
+};
 
 
 export const regenerateAfterLogout: UserSessionMiddlewareRequestHandler<UserSessionData> = (

@@ -1,0 +1,35 @@
+import { SessionDataTestContext, UserAppTaskContext } from '../../../api/utils/testcontext.js';
+import { SessionTestContext, WithSessionTestContext } from './session.js';
+
+import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
+import { SystemHttpRequestType } from '../../../types/request.js';
+import { TaskContext } from 'vitest';
+import express from '../../../express/index.js';
+import getMockReq from 'vitest-mock-express/dist/src/request/request.js';
+
+export type SessionEnabledRequestContext<
+  Req extends express.Request = SystemHttpRequestType,
+  SessionContext extends SessionTestContext = WithSessionTestContext,
+> = SessionDataTestContext &
+  SessionContext &
+  UserAppTaskContext &
+  TaskContext & {
+    request: Req;
+  };
+
+export const setupRequestContext = <RequestType extends express.Request>(
+  context: UserAppTaskContext,
+  requestData?: MockRequest | undefined
+): SessionEnabledRequestContext<RequestType> => {
+  assert(context.app !== undefined, 'context.app not defined - have you called setupAppContext()?');
+  const outputContext = context as SessionEnabledRequestContext<RequestType>;
+
+  const sessionOptions = context.app.locals['sessionOptions'];
+  outputContext.request = getMockReq<RequestType>({
+    app: context.app,
+    sessionStore: sessionOptions.store,
+    ...requestData,
+  });
+
+  return outputContext;
+};

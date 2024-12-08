@@ -1,26 +1,35 @@
 import { endErrorRequest, endRequest } from '../../middleware/handleTestEndEvents.js';
-import express, { ErrorRequestHandler, Express, RequestHandler } from "../../express/index.js";
+import express, { ErrorRequestHandler, Express, RequestHandler } from '../../express/index.js';
 
-import { HttpStatusCode } from '../../httpStatusCodes.js';
-import { MemoryStore } from "../../express-session/index.js";
+import { MemoryStore } from '../../express-session/index.js';
 import { MiddlewareTypes } from '../../testUtils.js';
 import { UserSessionOptions } from '../../types/sessionOptions.js';
 import { expressSessionHandlerMiddleware } from '../../getSession.js';
 import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
 import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
+import { validateApp } from './apiTestUtils.js';
 
-export const addExpressSessionHandler = (app: Express, memoryStore: MemoryStore): void => {
-  app.use(expressSessionHandlerMiddleware({ resave: true, saveUninitialized: true }, memoryStore));
+const _addExpressSessionHandler = (app: express.Application, sessionOptions: UserSessionOptions): void => {
+  validateApp(app);
+  app.use(
+    expressSessionHandlerMiddleware({
+      ...sessionOptions,
+      resave: sessionOptions?.resave !== undefined ? sessionOptions.resave : true,
+      saveUninitialized: sessionOptions?.saveUninitialized !== undefined ? sessionOptions.saveUninitialized : true,
+    })
+  );
 };
 
 export const addHandlersToApp = (
-  app: Express,
+  app: express.Application,
   middleware: (RequestHandler | ErrorRequestHandler)[],
   endMiddleware?: (RequestHandler | ErrorRequestHandler)[]
 ): void => {
-  app.use(middleware);
-  app.get('/', (_req, res, next) => {
-    res.status(HttpStatusCode.OK);
+  validateApp(app);
+  if (middleware.length > 0) {
+    app.use(middleware);
+  }
+  app.get('/', (_req, _res, next) => {
     next();
   });
   if (endMiddleware) {
@@ -34,8 +43,7 @@ export const addHandlersToApp = (
 export const sessionlessAppWithMiddleware = (
   middleware: MiddlewareTypes,
   endMiddleware?: MiddlewareTypes
-): { app: Express; memoryStore: MemoryStore; } => {
-
+): { app: Express; memoryStore: MemoryStore } => {
   const app: Express = express();
   addHandlersToApp(app, middleware, endMiddleware);
 
@@ -43,22 +51,16 @@ export const sessionlessAppWithMiddleware = (
 };
 
 export const appWithMiddleware = (
+  sessionOptions: UserSessionOptions,
   middleware: MiddlewareTypes,
   endMiddleware?: MiddlewareTypes
-): { app: Express; memoryStore: MemoryStore; } => {
+): { app: Express; memoryStore: MemoryStore } => {
   const memoryStore: MemoryStore = new MemoryStore();
 
   const app: Express = express();
-  addExpressSessionHandler(app, memoryStore);
+  useUserSessionMiddleware(app, sessionOptions);
+  // addExpressSessionHandler(app, sessionOptions);
   addHandlersToApp(app, middleware, endMiddleware);
 
   return { app, memoryStore };
-};
-
-export const testableApp = (
-  options?: Partial<UserSessionOptions>
-) => {
-  const app: Express = express();
-  useUserSessionMiddleware(app, options);
-  return app;
 };
