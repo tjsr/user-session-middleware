@@ -1,17 +1,19 @@
-import { Application, IRouterMatcher } from 'express';
-import { Cookie, MemoryStore, SessionData, Store } from './express-session/index.js';
-import { Mock, MockInstance } from 'vitest';
+import { Cookie, Store } from './express-session/index.js';
+import { Mock, MockInstance, TaskContext } from 'vitest';
+import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.js';
 import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
+import { mockExpress, mockSession } from './utils/testing/mocks.js';
 
 import { MockRequest } from 'vitest-mock-express/dist/src/request';
 import { SessionDataTestContext } from './api/utils/testcontext.js';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { SystemHttpResponseType } from './types/response.js';
 import { UserSessionData } from './types/session.js';
+import { createResponseLocals } from './middleware/handlers/handleLocalsCreation.js';
 import { markHandlersCalled } from './utils/testing/markHandlers.js';
-import { setAppUserIdNamespace } from './auth/userNamespace.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
+import { storeSetAsPromise } from './utils/sessionSetPromise.js';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -19,7 +21,6 @@ export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 > {
-  appStorage: Record<string, unknown>;
   clearMockReq: () => void;
   clearMockRes: () => void;
   mockClear: () => void;
@@ -30,23 +31,15 @@ export interface MockReqRespSet<
   spies?: Map<Function, MockInstance>;
 }
 
-declare module 'vitest' {
-  export interface TestContext {
-    memoryStore?: Store;
-    testRequestData: MockRequestWithSession;
-    testSessionStoreData: UserSessionData;
-  }
-}
-
 /* eslint-disable indent */
 /**
  * @param {MockRequest | undefined} requestProps Values that should be provided as defaults or
  * overrides on the request.
  * @param {Partial<ResponseType>} mockResponseData Values that should be provided as defaults or
  * overrides on the response.
- * @deprecated This method should not be called directly. Use XYZ instead.
+ * @deprecated Use setupRequestContext(AppContext, reqData) instead.
  * @return {MockReqRespSet} A set of mocks for request and response objects.
-*/
+ */
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
@@ -58,25 +51,6 @@ export const getMockReqResp = <
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
   const request: RequestType & { app: express.Application } = getMockReq(requestProps);
-  // const appStorage: Map<string, unknown> = {};
-  const appStorage: Record<string, unknown> = {};
-  const mockApp: Partial<Application> | undefined = request.app;
-  if (mockApp) {
-    if (mockApp.get) {
-      console.info('Mock app has get method.', mockApp.get);
-    } else {
-      mockApp.get = ((name: string) => appStorage[name]) as IRouterMatcher<Application>;
-    }
-
-    if (mockApp.set) {
-      console.info('Mock app has set method.', mockApp.set);
-    } else {
-      mockApp.set = (name: string, val: unknown): Application => {
-        appStorage[name] = val;
-        return mockApp as Application;
-      };
-    }
-  }
 
   const clearMockReq = () => {
     console.debug('TODO: Clearing request mock is not yet implemented.');
@@ -88,7 +62,7 @@ export const getMockReqResp = <
     // TODO: Clear response mocks
   };
 
-  return { appStorage, clearMockReq, clearMockRes, mockClear: clear, next, request, response };
+  return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
 /**
@@ -100,6 +74,10 @@ export const getMockRequestResponse: <
   _values?: MockRequest | undefined,
   _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;
+
+/**
+ * @deprecated This method should not be called directly. User setupRequestContext(AppContext, reqData).
+ */
 export const getMockRequest = getMockReq;
 export const getMockResponse = getMockRes;
 
@@ -137,28 +115,33 @@ interface SessionTestRunOptions {
 }
 
 export const createTestRequestSessionData = (
-  context: SessionDataTestContext,
+  context: SessionEnabledRequestContext,
   requestDataOverrides: MockRequestWithSession = {},
   testRunOptions: SessionTestRunOptions = {
     silentCallHandlers: true,
   }
 ): {} & MockReqRespSet => {
+  assert(context.sessionOptions !== undefined);
+  assert(context.sessionOptions.userIdNamespace !== undefined, 'SessionOptions must have userIdNamespace');
+  assert(context.sessionOptions.store !== undefined, 'SessionOptions must have store');
   if (context.testRequestData === undefined) {
     createContextForSessionTest(context);
   }
   const mockRequestData: MockRequestWithSession = {
     ...context.testRequestData,
+    app: context.app || mockExpress(context.sessionOptions),
     ...requestDataOverrides,
   };
   const mocks: MockReqRespSet = getMockReqResp<SystemHttpRequestType<UserSessionData>>(mockRequestData);
-  setAppUserIdNamespace(mocks.request.app, context.userIdNamespace);
+  mocks.response.locals = createResponseLocals(mocks.request, context);
+
   const fullTest = `${context.task.suite ? context.task.suite?.name + '/' : ''}${context.task.name}`;
   console.warn(`created mock getMockReqResp using deprecated method in test ${fullTest}`);
 
   const { request, response } = mocks;
   context.testRequestData['newSessionIdGenerated'] = true;
   if (mockRequestData.sessionID && !testRunOptions.skipAddToStore) {
-    context.memoryStore?.get(mockRequestData.sessionID, (err, data) => {
+    context.sessionOptions.store?.get(mockRequestData.sessionID, (err, data) => {
       if (err) {
         console.error(err);
       }
@@ -170,7 +153,7 @@ export const createTestRequestSessionData = (
         );
       }
     });
-    context.memoryStore?.set(mockRequestData.sessionID, context.testSessionStoreData);
+    context.sessionOptions.store?.set(mockRequestData.sessionID, context.testSessionStoreData);
   }
   if (!testRunOptions.skipCreateSession) {
     request.sessionStore.createSession(request, context.testSessionStoreData);
@@ -203,35 +186,38 @@ export interface MockRequestWithSession extends MockRequest {
 }
 
 export const createContextForSessionTest = (
-  context: SessionDataTestContext,
+  context: SessionDataTestContext & SessionTestContext & TaskContext,
   requestDataDefaults: MockRequestWithSession = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {
-  setUserIdNamespaceForTest(context);
-
-  const cookie = new Cookie();
-  // context.userIdNamespace = createRandomIdNamespace(context.task.name);
-  if (!context.memoryStore) {
-    context.memoryStore = new MemoryStore();
-  }
-  context.memoryStore?.set('some-session-id', {
-    cookie,
-  } as SessionData);
-
+  assert(context.sessionOptions !== undefined);
+  assert(context.sessionOptions.store !== undefined, 'SessionOptions must have store');
   context.testRequestData = {
     newSessionIdGenerated:
       requestDataDefaults.newSessionIdGenerated !== undefined ? requestDataDefaults.newSessionIdGenerated : false,
     sessionID: requestDataDefaults.sessionID !== undefined ? requestDataDefaults.sessionID : undefined,
-    sessionStore: context.memoryStore,
+    sessionStore: context.sessionOptions.store,
   };
 
   context.testSessionStoreData = {
-    cookie,
+    cookie: new Cookie(),
     email: sessionStoreDefaults.email ?? 'test-email',
     hasLoggedOut: sessionStoreDefaults.hasLoggedOut ?? false,
     newId: undefined,
     userId: sessionStoreDefaults.userId ?? 'test-user-id',
   };
+};
+
+const addSessionToStore = async (context: WithSessionTestContext, sessionData: UserSessionData): Promise<void> => {
+  return storeSetAsPromise(context.sessionOptions.store!, context.currentSessionId, sessionData);
+};
+
+export const addDataToSessionStore = async (
+  context: WithSessionTestContext,
+  sessionData: Partial<UserSessionData>
+): Promise<UserSessionData> => {
+  const fullSession = mockSession(context.sessionOptions.userIdNamespace, sessionData);
+  return addSessionToStore(context, fullSession).then(() => fullSession);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,8 +1,8 @@
-import { handleExistingSessionWithNoSessionData, handleNewSessionWithNoSessionData } from './index.js';
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
 
 import { RequiredMiddlewareNotCalledError } from '../../errors/errorClasses.js';
 import { forceHandlerAssertions } from '../handlerChainLog.js';
+import { handleExistingSessionWithNoSessionData } from './index.js';
 import { handleSessionIdAfterDataRetrieval } from './handleSessionIdAfterDataRetrieval.js';
 
 describe('chain.handleSessionIdAfterDataRetrieval', () => {
@@ -10,7 +10,7 @@ describe('chain.handleSessionIdAfterDataRetrieval', () => {
     const { error } = verifyHandlerFunctionCallsNextWithError(
       handleSessionIdAfterDataRetrieval,
       { sessionID: undefined },
-      { locals: { calledHandlers: [handleNewSessionWithNoSessionData, handleExistingSessionWithNoSessionData] } }
+      { locals: { calledHandlers: [handleExistingSessionWithNoSessionData] } }
     );
     expect(error.status).toBe(500);
   });
@@ -19,7 +19,7 @@ describe('chain.handleSessionIdAfterDataRetrieval', () => {
     verifyHandlerFunctionCallsNext(
       handleSessionIdAfterDataRetrieval,
       { sessionID: 'abc-1243' },
-      { locals: { calledHandlers: [handleNewSessionWithNoSessionData, handleExistingSessionWithNoSessionData] } }
+      { locals: { calledHandlers: [handleExistingSessionWithNoSessionData] } }
     );
   });
 

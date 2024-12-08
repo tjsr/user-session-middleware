@@ -11,7 +11,7 @@ describe('retrieveSessionDataFromStore', () => {
       callback(testError, undefined);
     }) as never;
 
-    expect(retrieveSessionDataFromStore(memoryStore, 'some-session-id')).rejects.toThrowError(
+    await expect(retrieveSessionDataFromStore(memoryStore, 'some-session-id')).rejects.toThrowError(
       'Generic session storage error occurred.'
     );
   });

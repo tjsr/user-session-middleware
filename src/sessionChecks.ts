@@ -24,9 +24,8 @@ export const regenerateSessionIdIfNoSessionData = async (
 
       const barrier = new Barrier<SessionId>();
       try {
-        console.log(regenerateSessionIdIfNoSessionData, 'Regenerating session...');
+        console.log(regenerateSessionIdIfNoSessionData, 'Regenerating session...', request.session.id);
         request.session.regenerate((err) => {
-          console.log(regenerateSessionIdIfNoSessionData, 'Returned from regenerate session', err);
           if (err) {
             const regenerationError = new RegeneratingSessionIdError(err);
             barrier.reject(regenerationError);
@@ -38,9 +37,11 @@ export const regenerateSessionIdIfNoSessionData = async (
             barrier.reject(unreassinedIdError);
             return;
           }
-          console.debug(regenerateSessionIdIfNoSessionData,
+          console.debug(
+            regenerateSessionIdIfNoSessionData,
             `SessionID received for ${currentSessionId} but no session data`,
-            `Regenerated sessionId as ${request.session.id}.`);
+            `Regenerated sessionId as ${request.session.id}.`
+          );
           barrier.release(request.session?.id);
         });
       } catch (err) {

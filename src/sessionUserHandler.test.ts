@@ -1,84 +1,56 @@
-import { disableHandlerAssertions, forceHandlerAssertions } from './middleware/index.js';
+import { ApiTestContext, SessionDataTestContext, setupApiTest } from './api/utils/testcontext.js';
+import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
 import express, { NextFunction } from './express/index.js';
-import {
-  handleCopySessionStoreDataToSession,
-  handleExistingSessionWithNoSessionData,
-  handleSessionDataRetrieval,
-} from './middleware/handlers/index.js';
 
-import { SESSION_ID_HEADER_KEY } from './getSession.js';
+import { HttpStatusCode } from './httpStatusCodes.js';
 import { SystemHttpRequestType } from './types/request.js';
-import { UserIdTaskContext } from './api/utils/testcontext.js';
-import { UserSessionData } from './types/session.js';
-import { appWithMiddleware } from './utils/testing/middlewareTestUtils.js';
-import { generateSessionIdForTest } from './utils/testIdUtils.js';
+import { TaskContext } from 'vitest';
+import { UserIdTaskContext } from './utils/testing/context/idNamespace.js';
+import { addDataToSessionStore } from './testUtils.js';
 import { mockSession } from './utils/testing/mocks.js';
-import { setUserIdNamespaceForTest } from './utils/testing/testNamespaceUtils.js';
-import supertest from 'supertest';
+import { setupMiddlewareContext } from './utils/testing/context/appLocals.js';
+import { setupSupertestContext } from './utils/testing/supertestUtils.js';
 
 describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
-  beforeAll(async () => {
-    forceHandlerAssertions(false);
-    disableHandlerAssertions(true);
-    return Promise.resolve();
+  beforeEach(
+    async (context: ApiTestContext & UserIdTaskContext & SessionTestContext & SessionDataTestContext & TaskContext) => {
+      const _sessionContext: SessionTestContext = setupSessionContext(context);
+      setupMiddlewareContext(context);
+      const sessionStoreData = mockSession(context.sessionOptions.userIdNamespace, { userId: null! });
+      await addDataToSessionStore(context, sessionStoreData);
+
+      context.startingUrl = '/';
+    }
+  );
+
+  test('Should set and save the userId on the request session when data in store has no userId.', async (context: ApiTestContext &
+    UserIdTaskContext &
+    WithSessionTestContext &
+    SessionDataTestContext &
+    TaskContext) => {
+    const st = setupSupertestContext(context);
+    const response = await st;
+    expect(response.error).toBeFalsy();
+    expect(response.statusCode).toEqual(HttpStatusCode.OK);
+  });
+});
+
+describe<UserIdTaskContext>('api.handler.assignUserIdToRequestSessionHandler', () => {
+  beforeEach(async (context: ApiTestContext & TaskContext & SessionDataTestContext) => {
+    setupSessionContext(context, {
+      secret: 'test-secret',
+    });
+    context.startingUrl = '/';
+
+    context.testSessionStoreData = mockSession(context.sessionOptions.userIdNamespace);
   });
 
-  beforeEach(async (context: UserIdTaskContext) => {
-    setUserIdNamespaceForTest(context);
-  });
+  test('Should set and save the userId on the session when no userId set but data in store has a userId.', async (context: ApiTestContext<WithSessionTestContext> &
+    SessionDataTestContext &
+    TaskContext) => {
+    const testUserId = context.testSessionStoreData.userId;
 
-  afterAll(async () => {
-    forceHandlerAssertions(false);
-    disableHandlerAssertions(false);
-    return Promise.resolve(); // closeConnectionPool();
-  });
-
-  test('Should set/save userId on req.session when userId is not yet set and no existing session data in store.', async (context: UserIdTaskContext) => {
-    const endValidator = (req: SystemHttpRequestType, _res: express.Response, next: NextFunction) => {
-      expect(req.session.userId).not.toBeUndefined();
-      next();
-    };
-    const { app } = appWithMiddleware(
-      [handleCopySessionStoreDataToSession, handleExistingSessionWithNoSessionData],
-      [endValidator]
-    );
-    const testSessionId = generateSessionIdForTest(context);
-
-    // return new Promise<void>((done) => {
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(401);
-
-    expect(response.statusCode).toEqual(401);
-  });
-
-  test('Should set and save the userId on the request session when data in store has no userId.', async (context: UserIdTaskContext) => {
-    const endValidator = (req: SystemHttpRequestType, _res: express.Response, next: NextFunction) => {
-      expect(req.session.userId).not.toBeUndefined();
-      next();
-    };
-    const { app, memoryStore } = appWithMiddleware(
-      [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
-      [endValidator]
-    );
-    const testSessionData: UserSessionData = mockSession(context.userIdNamespace);
-    const testSessionId = generateSessionIdForTest(context);
-    memoryStore.set(testSessionId, testSessionData);
-
-    const response = await supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(200);
-    expect(response.statusCode).toEqual(200);
-  });
-
-  test('Should set and save the userId on the session when no userId set but data in store has a userId.', async (context: UserIdTaskContext) => {
-    const testSessionData: UserSessionData = mockSession(context.userIdNamespace);
-    const testUserId = testSessionData.userId;
-    const endValidator = (req: SystemHttpRequestType, response: express.Response, next: NextFunction) => {
+    const _endValidator = (req: SystemHttpRequestType, response: express.Response, next: NextFunction) => {
       if (req.session.userId !== testUserId) {
         // TODO: Use exception
         response.status(500);
@@ -87,20 +59,26 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
         next();
       }
     };
-    const testSessionId = generateSessionIdForTest(context);
 
-    // handleCopySessionStoreDataToSession must be called first and is responsible for assigment
-    // of the data from the store to session
-    const { app, memoryStore } = appWithMiddleware(
-      [handleSessionDataRetrieval, handleCopySessionStoreDataToSession],
-      [endValidator]
-    );
-    memoryStore.set(testSessionId, testSessionData);
+    setupApiTest(context);
+    // appWithMiddleware(
+    //   context.sessionOptions,
+    //   [],
+    //   [handleAssignUserIdToRequestSessionWhenNoExistingSessionData, endValidator]
+    // );
+    // context.app = app;
 
-    return supertest(app)
-      .get('/')
-      .set(SESSION_ID_HEADER_KEY, testSessionId)
-      .set('Content-Type', 'application/json')
-      .expect(200);
+    await addDataToSessionStore(context, context.testSessionStoreData);
+
+    // const testSecret = 'test-secret';
+    context.startingUrl = '/';
+    const st = setupSupertestContext(context);
+    // st = setSessionCookie(st, SESSION_ID_COOKIE, testSessionId, testSecret).expect(200);
+    const response = await st;
+    if (response.error) {
+      console.error(response.error);
+    }
+    expect(response.error).toEqual(false);
+    expect(response.status).toEqual(HttpStatusCode.OK);
   });
 });

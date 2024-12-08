@@ -1,14 +1,19 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
+import { TaskContext, beforeEach, describe, expect, test } from 'vitest';
 import { createContextForSessionTest, createTestRequestSessionData } from '../testUtils.js';
 
 import { SessionDataTestContext } from '../api/utils/testcontext.js';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
 import { SessionHandlerError } from '../errors/SessionHandlerError.js';
 import { checkNewlyGeneratedId } from './handleSessionId.js';
 
 describe<SessionDataTestContext>('checkNewlyGeneratedId', () => {
-  beforeEach((context: SessionDataTestContext) => createContextForSessionTest(context));
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+    setupSessionContext(context);
+    createContextForSessionTest(context);
+  });
 
-  test('Should throw error if sessionID on request is not set for newly generated id', (context) => {
+  test<SessionEnabledRequestContext>('Should throw error if sessionID on request is not set for newly generated id', (context) => {
     const {
       next,
       request,
@@ -28,7 +33,7 @@ describe<SessionDataTestContext>('checkNewlyGeneratedId', () => {
     expect(next).not.toHaveBeenCalledWith();
   });
 
-  test('Should skip to next handler if sessionID is set and is a newly generated id', (context) => {
+  test<SessionEnabledRequestContext>('Should skip to next handler if sessionID is set and is a newly generated id', (context) => {
     const {
       next,
       request,
@@ -47,7 +52,7 @@ describe<SessionDataTestContext>('checkNewlyGeneratedId', () => {
     expect(next).toHaveBeenCalledWith();
   });
 
-  test('Should not skip to error handler or next if sessionID is not set but this is not a newly generated id', (context) => {
+  test<SessionEnabledRequestContext>('Should not skip to error handler or next if sessionID is not set but this is not a newly generated id', (context) => {
     const {
       next,
       request,

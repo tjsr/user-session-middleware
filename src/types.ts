@@ -7,3 +7,5 @@ export type IdNamespace = uuid5;
 export type IPAddress = string;
 export type UserId = uuid5;
 export type SessionId = uuid5;
+
+export type MakeRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;

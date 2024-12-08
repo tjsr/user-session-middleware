@@ -10,7 +10,7 @@ export class UUIDNamespaceSessionMiddlewareError extends SessionMiddlewareError 
 }
 export class UUIDNamespaceNotDefinedError extends UUIDNamespaceSessionMiddlewareError {
   constructor() {
-    super(undefined!, 'USER_UUID_NAMESPACE not set in environment or from application default.');
+    super(undefined!, 'USER_UUID_NAMESPACE not set in environment or on USM options.');
   }
 }
 

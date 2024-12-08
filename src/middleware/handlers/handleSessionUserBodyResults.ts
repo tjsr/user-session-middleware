@@ -5,7 +5,7 @@ import { Session } from "../../express-session/index.js";
 import { SystemHttpResponseType } from "../../types/response.js";
 import { UserSessionData } from "../../types/session.js";
 import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
-import { handleLocalsCreation } from "./handleLocalsCreation.js";
+import { handleResponseLocalsCreation } from './handleLocalsCreation.js';
 
 export const sendAuthResultBody = (
   session: UserSessionData & Session,
@@ -24,7 +24,7 @@ export const sendAuthResultBody = (
 
 export const handleSessionUserBodyResults: UserSessionMiddlewareRequestHandler = (request, response, next) => {
   addCalledHandler(response, handleSessionUserBodyResults);
-  assertPrerequisiteHandler(response, handleLocalsCreation);
+  assertPrerequisiteHandler(response, handleResponseLocalsCreation);
   if (response.locals.sendAuthenticationResult) {
     const result = sendAuthResultBody(request.session, response);
     if (result) {

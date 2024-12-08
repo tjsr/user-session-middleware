@@ -52,6 +52,17 @@ export const getUserIdFromRequest = async <SD extends UserSessionData = UserSess
   return getUserIdFromSession(userIdNamespace, request.session, noCreate);
 };
 
+export const applyUserIdFromSession = (userIdNamespace: IdNamespace, session: Session): void => {
+  if (session.userId) {
+    return;
+  }
+  if (session.email) {
+    session.userId = createUserIdFromEmail(userIdNamespace, session.email);
+    return;
+  }
+  session.userId = createRandomUserId(userIdNamespace);
+};
+
 export const getUserIdFromSession = async <SD extends UserSessionData = UserSessionData>(
   userIdNamespace: IdNamespace,
   session: Session & SD,

@@ -11,9 +11,11 @@ import { Session } from '../express-session/index.js';
 export const requireSessionIsIsString = (session: Session) => {
   if (typeof session.id !== 'string') {
     throw new SessionIdTypeError(
-      `Session ID defined on session is not a uuid (${typeof session.id}) when assigning userId.`);
+      `Session ID defined on session is not a uuid (${typeof session.id}) when assigning userId.`
+    );
   }
-};export const requireSessionId = (session: Session) => {
+};
+export const requireSessionId = (session: Session) => {
   if (!session.id) {
     throw new SessionIdRequiredError('Session ID is not defined on session when assigning userId to session.');
   }
@@ -28,12 +30,8 @@ export const requireSessionInitialized = (session: Session) => {
     throw new SessionDataNotFoundError('Session is not defined when assigning userId to session.');
   }
 };
-export const requireSessionIDValuesMatch = (
-  sessionID: string,
-  sessionIDFromSession: string
-) => {
+export const requireSessionIDValuesMatch = (sessionID: string, sessionIDFromSession: string) => {
   if (sessionID !== sessionIDFromSession) {
     throw new SessionIDValueMismatch(sessionID, sessionIDFromSession);
   }
 };
-

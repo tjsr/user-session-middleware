@@ -11,16 +11,18 @@ import {
   PREREQUISITE_HANDLER_NOT_CALLED,
   REQUIRED_MIDDLEWARE_NOT_CALLED,
   SESSION_ID_NOT_GENERATED,
-  SESSION_ID_TYPE_ERROR
-} from "./errorCodes.js";
+  SESSION_ID_TYPE_ERROR,
+  SET_COOKIE_NOT_PERMITTED,
+} from './errorCodes.js';
 
-import { HttpStatusCode } from "../httpStatusCodes.js";
+import { HttpStatusCode } from '../httpStatusCodes.js';
 
 type SessionErrorValueDefaults = {
-  status: HttpStatusCode,
-  message: string,
+  message: string;
+  status: HttpStatusCode;
 };
 
+// prettier-ignore
 export const DEFAULT_ERROR_CODES: Map<number, SessionErrorValueDefaults> = new Map(
   [
     [INVALID_SESSION_ID_FORMAT, { message: "Invalid session ID format.", status: HttpStatusCode.BAD_REQUEST }],
@@ -52,5 +54,8 @@ export const DEFAULT_ERROR_CODES: Map<number, SessionErrorValueDefaults> = new M
     [REQUIRED_MIDDLEWARE_NOT_CALLED, {
       message: "Prerequisite middleware was not called.",
       status: HttpStatusCode.NOT_IMPLEMENTED }],
+    [SET_COOKIE_NOT_PERMITTED, {
+      message: "Set-Cookie not permitted in request, header should be Cookie.",
+      status: HttpStatusCode.BAD_REQUEST }],
   ]
 );

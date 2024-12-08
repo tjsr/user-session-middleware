@@ -1,12 +1,7 @@
 import { SessionStoreDataType, UserSessionData } from "../types/session.js";
 import session, { Session, SessionData } from "express-session";
 
-import { saveSessionPromise } from '../sessionUser.js';
-
-export const saveSessionDataToSession = async (
-  storedSessionData: SessionStoreDataType,
-  session: Session
-): Promise<void> => {
+export const copySessionDataToSession = (storedSessionData: SessionStoreDataType, session: Session): void => {
   session.newId = undefined;
   if (storedSessionData?.userId && session.userId == undefined) {
     session.userId = storedSessionData.userId;
@@ -18,8 +13,6 @@ export const saveSessionDataToSession = async (
     // Should only ever be new the first time we write a userId received from another auth source.
     session.newId = false;
   }
-
-  return saveSessionPromise(session);
 };
 
 export const retrieveSessionDataFromStore = <ApplicationSessionType extends UserSessionData>(
