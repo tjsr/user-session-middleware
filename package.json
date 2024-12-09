@@ -80,7 +80,7 @@
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.1.11",
     "@tjsr/simple-env-utils": "^0.1.9",
-    "cookie": "^1.0.1",
+    "cookie": "^1.0.2",
     "cookie-signature": "^1.2.2",
     "email-validator": "^2.0.4",
     "express-mysql-session": "^3.0.3",
