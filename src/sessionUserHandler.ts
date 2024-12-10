@@ -21,12 +21,14 @@ export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSe
   addCalledHandler(response, handleAssignUserIdToRequestSessionWhenNoExistingSessionData);
 
   // Use as an assertion
-  if (!getAppUserIdNamespace(request.app, next)) {
+  try {
+    const _namespace = getAppUserIdNamespace(request.app, next);
+  } catch (error: unknown) {
     console.error(
       handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
       'No namespace found for userId; cannot assign userId to session.'
     );
-    return;
+    return next(error);
   }
 
   if (response.locals?.retrievedSessionData) {
