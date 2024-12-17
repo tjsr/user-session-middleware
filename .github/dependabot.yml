@@ -21,6 +21,10 @@ updates:
     ignore:
       - dependency-name: '@types/node'
         update-types: ["version-update:semver-major"]
+      - dependency-name: '@types/express'
+        update-types: ["version-update:semver-major"]
+      - dependency-name: 'express'
+        update-types: ["version-update:semver-major"]
     groups:
       linter:
         applies-to: version-updates
