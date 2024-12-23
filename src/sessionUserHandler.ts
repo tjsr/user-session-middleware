@@ -8,6 +8,8 @@ import { assignUserIdToRequestSession } from './sessionUser.js';
 import express from './express/index.js';
 import { getAppUserIdNamespace } from './auth/userNamespace.js';
 
+const LOG_NO_COPY_USER_ID_TO_SESSION = process.env['LOG_NO_COPY_USER_ID_TO_SESSION'] === 'true';
+
 // TODO: This works??
 // This comes after setting data from the session store.
 export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSessionMiddlewareRequestHandler = async <
@@ -38,11 +40,13 @@ export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSe
   }
 
   if (request.session.userId) {
-    console.debug(
-      handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
-      'userId already exists on session; skipping copy from to session.',
-      request.session.userId
-    );
+    if (LOG_NO_COPY_USER_ID_TO_SESSION) {
+      console.debug(
+        handleAssignUserIdToRequestSessionWhenNoExistingSessionData,
+        'userId already exists on session; skipping copy from to session.',
+        request.session.userId
+      );
+    }
     return next();
   }
 
