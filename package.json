@@ -98,7 +98,7 @@
     "rimraf@<=4": "$rimraf"
   },
   "optionalDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.10"
   },
   "eslintConfig": {
     "extends": [
