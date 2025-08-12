@@ -47,7 +47,7 @@ jobs:
       PACKAGE: ${{ inputs.package == 'other' && inputs.free-package || inputs.package }}
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       # Setup .npmrc file to publish to GitHub Packages
       - uses: actions/setup-node@v4
