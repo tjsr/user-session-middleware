@@ -12,7 +12,7 @@ jobs:
 
     # Setup .npmrc file to publish to GitHub Packages
     - name: Use Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ vars.NODE_VERSION }}
         registry-url: 'https://npm.pkg.github.com'
