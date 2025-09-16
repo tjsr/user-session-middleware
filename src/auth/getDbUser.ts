@@ -1,10 +1,10 @@
-import { EmailAddress, IdNamespace } from '../types.js';
+import { EmailAddress, IdNamespace } from '../types.ts';
 
-import { MiddlewareConfigurationError } from '../errors/errorClasses.js';
-import { NamespaceUUIDFormatError } from '../errors/middlewareErrorClasses.js';
-import { UserModel } from '../types/model.js';
+import { MiddlewareConfigurationError } from '../errors/errorClasses.ts';
+import { NamespaceUUIDFormatError } from '../errors/middlewareErrorClasses.ts';
+import { UserModel } from '../types/model.ts';
 import assert from 'node:assert';
-import { createUserIdFromEmail } from './user.js';
+import { createUserIdFromEmail } from './user.ts';
 import { validate as validateUuid } from 'uuid';
 
 export type RetrieveUserDataFn<T extends UserModel = UserModel> = (_email: EmailAddress) => Promise<T>;

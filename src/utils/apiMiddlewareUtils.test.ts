@@ -1,7 +1,7 @@
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { SystemHttpResponseType } from '../types/response.js';
-import { UserSessionData } from '../types/session.js';
-import { endWithJsonMessage } from './apiMiddlewareUtils.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { SystemHttpResponseType } from '../types/response.ts';
+import { UserSessionData } from '../types/session.ts';
+import { endWithJsonMessage } from './apiMiddlewareUtils.ts';
 import { getMockRes } from 'vitest-mock-express';
 
 describe('endWithJsonMessage', () => {

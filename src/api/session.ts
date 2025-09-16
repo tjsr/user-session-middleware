@@ -1,15 +1,15 @@
-import { EmailAddress, IdNamespace } from '../types.js';
-import { SESSION_ID_COOKIE, requestHasSessionId } from '../getSession.js';
-import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+import { EmailAddress, IdNamespace } from '../types.ts';
+import { SESSION_ID_COOKIE, requestHasSessionId } from '../getSession.ts';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.ts';
 
-import { SessionRegenerationFailedError } from '../errors/authenticationErrorClasses.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
+import { SessionRegenerationFailedError } from '../errors/authenticationErrorClasses.ts';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.ts';
 import { assert } from 'console';
-import express from '../express/index.js';
-import { getAppUserIdNamespace } from '../auth/userNamespace.js';
-import { regenerateSessionPromise } from '../sessionUser.js';
-import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
+import express from '../express/index.ts';
+import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
+import { regenerateSessionPromise } from '../sessionUser.ts';
+import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.ts';
 
 export const session: UserSessionMiddlewareRequestHandler = (
   request: SystemHttpRequestType,
@@ -66,8 +66,11 @@ export const assignUserDataToRegeneratedSession: UserSessionMiddlewareRequestHan
   assertPrerequisiteHandler(response, session);
 
   assert(request.session.userId !== undefined, 'No userId assigned to session');
-  console.debug(assignUserDataToRegeneratedSession,
-    'Assigning user data to regenerated session:', response.locals.userAuthenticationData);
+  console.debug(
+    assignUserDataToRegeneratedSession,
+    'Assigning user data to regenerated session:',
+    response.locals.userAuthenticationData
+  );
   Object.assign(request.session, response.locals.userAuthenticationData);
   next();
 };

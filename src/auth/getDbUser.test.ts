@@ -1,10 +1,10 @@
 import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from '../utils/testing/context/idNamespace.js';
-import { createUserIdFromEmail } from './user.js';
-import { getDbUserByEmail } from './getDbUser.js';
-import { setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
-import { setRetrieveUserDataFunction } from './getDbUser.js';
-import { setupSessionContext } from '../utils/testing/context/session.js';
+import { UserIdTaskContext } from '../utils/testing/context/idNamespace.ts';
+import { createUserIdFromEmail } from './user.ts';
+import { getDbUserByEmail } from './getDbUser.ts';
+import { setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.ts';
+import { setRetrieveUserDataFunction } from './getDbUser.ts';
+import { setupSessionContext } from '../utils/testing/context/session.ts';
 
 describe('getDbUserByEmail', () => {
   beforeEach<UserIdTaskContext>((context: UserIdTaskContext & TaskContext) => {

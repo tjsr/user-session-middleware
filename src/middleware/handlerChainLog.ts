@@ -1,7 +1,7 @@
 import { ErrorRequestHandler, Handler } from "../express/index.js";
 import { MiddlewareCallOrderError, RequiredMiddlewareNotCalledError } from "../errors/errorClasses.js";
 
-import { SystemHttpResponseType } from '../types/response.js';
+import { SystemHttpResponseType } from '../types/response.ts';
 import assert from "node:assert";
 import { isTestMode } from "@tjsr/simple-env-utils";
 

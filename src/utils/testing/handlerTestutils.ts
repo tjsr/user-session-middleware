@@ -1,12 +1,12 @@
-import { MiddlewareHandlerTestContext, UserAppTaskContext } from '../../api/utils/testcontext.js';
-import { SessionTestContext, setupSessionContext } from './context/session.js';
+import { MiddlewareHandlerTestContext, UserAppTaskContext } from '../../api/utils/testcontext.ts';
+import { SessionTestContext, setupSessionContext } from './context/session.ts';
 
 import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from './context/idNamespace.js';
-import { addHandlersToApp } from './middlewareTestUtils.js';
-import express from '../../express/index.js';
-import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
-import { verifyAppConfig } from '../../middleware/requestVerifiers.js';
+import { UserIdTaskContext } from './context/idNamespace.ts';
+import { addHandlersToApp } from './middlewareTestUtils.ts';
+import express from '../../express/index.ts';
+import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.ts';
+import { verifyAppConfig } from '../../middleware/requestVerifiers.ts';
 
 export const createHandlerTestContext = (
   context: (UserAppTaskContext | (MiddlewareHandlerTestContext & SessionTestContext)) & UserIdTaskContext & TaskContext

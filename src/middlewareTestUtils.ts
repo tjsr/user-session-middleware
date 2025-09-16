@@ -1,12 +1,14 @@
+/* eslint-disable indent */
+
 import { Assertion } from 'vitest';
-import { MockRequest } from 'vitest-mock-express/dist/src/request';
-import { SessionHandlerError } from './errors/SessionHandlerError.js';
-import { SystemHttpRequestType } from './types/request.js';
-import { SystemHttpResponseType } from './types/response.js';
-import { UserSessionData } from './types/session.js';
-import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
+import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
+import { SessionHandlerError } from './errors/SessionHandlerError.ts';
+import { SystemHttpRequestType } from './types/request.ts';
+import { SystemHttpResponseType } from './types/response.ts';
+import { UserSessionData } from './types/session.ts';
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.ts';
 import express from 'express';
-import { getMockReqResp } from './testUtils.js';
+import { getMockReqResp } from './testUtils.ts';
 
 // export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
 //   _req: RequestType, _res: express.Response, _next: express.NextFunction
@@ -32,12 +34,12 @@ export type HandlerErrorResult = {
 
 const expectVerifyHandlerFunction = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType<UserSessionData>
-  >(
-    handlerFunction: HandlerFunction,
-    mockRequest = {} as Partial<RequestType>,
-    mockRespose = {} as Partial<ResponseType>
-  ): HandlerExpectionResult => {
+  ResponseType extends SystemHttpResponseType<UserSessionData>,
+>(
+  handlerFunction: HandlerFunction,
+  mockRequest = {} as Partial<RequestType>,
+  mockRespose = {} as Partial<ResponseType>
+): HandlerExpectionResult => {
   const { request, response, next } = getMockReqResp<RequestType>(
     { ...mockRequest } as MockRequest,
     { ...mockRespose } as Partial<ResponseType>
@@ -69,13 +71,16 @@ export const verifyHandlerFunctionCallsNextWithError = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
-    handlerFunction: HandlerFunction,
-    mockRequest = {} as Partial<RequestType>,
-    mockResponse = {} as Partial<ResponseType>,
-    expectNextArgs = expect.any(SessionHandlerError)
-  ): HandlerErrorResult => {
+  handlerFunction: HandlerFunction,
+  mockRequest = {} as Partial<RequestType>,
+  mockResponse = {} as Partial<ResponseType>,
+  expectNextArgs = expect.any(SessionHandlerError)
+): HandlerErrorResult => {
   const { response, expected, next, nextParams } = expectVerifyHandlerFunction(
-    handlerFunction, mockRequest, mockResponse);
+    handlerFunction,
+    mockRequest,
+    mockResponse
+  );
   expected.toBeCalledWith(expectNextArgs);
 
   const error: SessionHandlerError = nextParams.params as unknown as SessionHandlerError;
@@ -87,10 +92,10 @@ export const verifyHandlerFunctionCallsNext = <
   RequestType extends SystemHttpRequestType,
   ResponseType extends SystemHttpResponseType,
 >(
-    handlerFunction: HandlerFunction,
-    mockRequest = {} as Partial<RequestType>,
-    mockResponse = {} as Partial<ResponseType>
-  ): express.Response => {
+  handlerFunction: HandlerFunction,
+  mockRequest = {} as Partial<RequestType>,
+  mockResponse = {} as Partial<ResponseType>
+): express.Response => {
   const { response, expected } = expectVerifyHandlerFunction(handlerFunction, mockRequest, mockResponse);
   expected.toBeCalledWith();
   return response;

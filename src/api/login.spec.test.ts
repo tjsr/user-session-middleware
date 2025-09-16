@@ -1,12 +1,12 @@
-import { ApiTestContext, setupApiTest, verifyAuthResponseBody, verifyAuthSessionId } from './utils/testcontext.js';
-import { hasRetrieveUserDataFunction, setRetrieveUserDataFunction } from '../auth/getDbUser.js';
-import { loginWithContext, setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.js';
+import { ApiTestContext, setupApiTest, verifyAuthResponseBody, verifyAuthSessionId } from './utils/testcontext.ts';
+import { hasRetrieveUserDataFunction, setRetrieveUserDataFunction } from '../auth/getDbUser.ts';
+import { loginWithContext, setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { NoSessionTestContext } from '../utils/testing/context/session.js';
-import { SessionId } from '../types.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { NoSessionTestContext } from '../utils/testing/context/session.ts';
+import { SessionId } from '../types.ts';
 import { TaskContext } from 'vitest';
-import { forceHandlerAssertions } from '../middleware/handlerChainLog.js';
+import { forceHandlerAssertions } from '../middleware/handlerChainLog.ts';
 
 describe('api.login', () => {
   beforeAll(() => {

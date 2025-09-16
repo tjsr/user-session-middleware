@@ -1,12 +1,12 @@
-import { EmailAddress, IdNamespace } from '../types.js';
+import { EmailAddress, IdNamespace } from '../types.ts';
 
-import { NextFunction } from '../express/index.js';
-import { Session } from '../express-session/index.js';
-import { SystemResponseLocals } from '../types/locals.js';
-import { UserModel } from '../types/model.js';
-import { UserSessionData } from '../types/session.js';
-import { getDbUserByEmail } from './getDbUser.js';
-import { handleLoginAuthenticationFailure } from '../api/login.js';
+import { NextFunction } from '../express/index.ts';
+import { Session } from '../express-session/index.ts';
+import { SystemResponseLocals } from '../types/locals.ts';
+import { UserModel } from '../types/model.ts';
+import { UserSessionData } from '../types/session.ts';
+import { getDbUserByEmail } from './getDbUser.ts';
+import { handleLoginAuthenticationFailure } from '../api/login.ts';
 
 export const retrieveUserDataForSession = (
   userIdNamespace: IdNamespace,

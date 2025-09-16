@@ -1,10 +1,10 @@
-import { SessionDataTestContext, UserAppTaskContext } from '../../../api/utils/testcontext.js';
-import { SessionTestContext, WithSessionTestContext } from './session.js';
+import { SessionDataTestContext, UserAppTaskContext } from '../../../api/utils/testcontext.ts';
+import { SessionTestContext, WithSessionTestContext } from './session.ts';
 
 import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
-import { SystemHttpRequestType } from '../../../types/request.js';
+import { SystemHttpRequestType } from '../../../types/request.ts';
 import { TaskContext } from 'vitest';
-import express from '../../../express/index.js';
+import express from '../../../express/index.ts';
 import getMockReq from 'vitest-mock-express/dist/src/request/request.js';
 
 export type SessionEnabledRequestContext<

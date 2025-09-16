@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SystemHttpRequestType } from '../types/request.js';
-import express from "express";
-import {
-  requireSessionIdWhenNewSessionIdGenerated,
-} from '../errors/sessionErrorChecks.js';
+import { SystemHttpRequestType } from '../types/request.ts';
+import express from 'express';
+import { requireSessionIdWhenNewSessionIdGenerated } from '../errors/sessionErrorChecks.ts';
 
 export const checkNewlyGeneratedId = (
   request: SystemHttpRequestType,

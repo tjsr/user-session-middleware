@@ -1,12 +1,12 @@
-import { ApiTestContext, setupApiTest } from './utils/testcontext.js';
-import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/context/session.js';
+import { ApiTestContext, setupApiTest } from './utils/testcontext.ts';
+import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/context/session.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionOptions } from '../types/sessionOptions.js';
-import { addDataToSessionStore } from '../testUtils.js';
-import { loginWithContext } from '../utils/testing/apiTestUtils.js';
-import { setupSupertestContext } from '../utils/testing/supertestUtils.js';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
+import { addDataToSessionStore } from '../testUtils.ts';
+import { loginWithContext } from '../utils/testing/apiTestUtils.ts';
+import { setupSupertestContext } from '../utils/testing/supertestUtils.ts';
 
 describe('api.endpoints', () => {
   const withApi = async <

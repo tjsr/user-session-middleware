@@ -1,6 +1,6 @@
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { NO_SESSION_DATA_FROM_STORE } from './errorCodes.js';
-import { SessionHandlerError } from './SessionHandlerError.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { NO_SESSION_DATA_FROM_STORE } from './errorCodes.ts';
+import { SessionHandlerError } from './SessionHandlerError.ts';
 
 describe('SessionHandlerError', () => {
   const testSessionError = new SessionHandlerError(NO_SESSION_DATA_FROM_STORE, undefined, 'Test message');

@@ -1,4 +1,4 @@
-import { SnowflakeType } from './types.js';
+import { SnowflakeType } from './types.ts';
 import { Worker } from 'snowflake-uuid';
 
 const generator = new Worker(0, 1, {

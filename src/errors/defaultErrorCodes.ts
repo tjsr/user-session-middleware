@@ -13,9 +13,9 @@ import {
   SESSION_ID_NOT_GENERATED,
   SESSION_ID_TYPE_ERROR,
   SET_COOKIE_NOT_PERMITTED,
-} from './errorCodes.js';
+} from './errorCodes.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
 
 type SessionErrorValueDefaults = {
   message: string;

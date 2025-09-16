@@ -1,13 +1,13 @@
-import { endErrorRequest, endRequest } from '../../middleware/handleTestEndEvents.js';
-import express, { ErrorRequestHandler, Express, RequestHandler } from '../../express/index.js';
+import { endErrorRequest, endRequest } from '../../middleware/handleTestEndEvents.ts';
+import express, { ErrorRequestHandler, Express, RequestHandler } from '../../express/index.ts';
 
-import { MemoryStore } from '../../express-session/index.js';
-import { MiddlewareTypes } from '../../testUtils.js';
-import { UserSessionOptions } from '../../types/sessionOptions.js';
-import { expressSessionHandlerMiddleware } from '../../getSession.js';
-import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.js';
-import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.js';
-import { validateApp } from './apiTestUtils.js';
+import { MemoryStore } from '../../express-session/index.ts';
+import { MiddlewareTypes } from '../../testUtils.ts';
+import { UserSessionOptions } from '../../types/sessionOptions.ts';
+import { expressSessionHandlerMiddleware } from '../../getSession.ts';
+import { sessionErrorHandler } from '../../middleware/sessionErrorHandler.ts';
+import { useUserSessionMiddleware } from '../../useUserSessionMiddleware.ts';
+import { validateApp } from './apiTestUtils.ts';
 
 const _addExpressSessionHandler = (app: express.Application, sessionOptions: UserSessionOptions): void => {
   validateApp(app);

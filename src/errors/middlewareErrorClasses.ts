@@ -1,5 +1,5 @@
-import { IdNamespace } from '../types.js';
-import { SessionMiddlewareError } from './SessionMiddlewareError.js';
+import { IdNamespace } from '../types.ts';
+import { SessionMiddlewareError } from './SessionMiddlewareError.ts';
 
 export class UUIDNamespaceSessionMiddlewareError extends SessionMiddlewareError {
   namespaceValue?: IdNamespace;

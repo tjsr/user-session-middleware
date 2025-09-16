@@ -1,6 +1,6 @@
-import { SystemResponseLocals } from '../../types/locals.js';
-import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
-import { addCalledHandler } from '../handlerChainLog.js';
+import { SystemResponseLocals } from '../../types/locals.ts';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.ts';
+import { addCalledHandler } from '../handlerChainLog.ts';
 
 export const LOG_HANDLERS_SETTING = 'debugCallHandlers';
 

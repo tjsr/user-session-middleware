@@ -1,16 +1,16 @@
-import { Cookie, Session } from './express-session/index.js';
-import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.js';
-import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
-import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from './setup-tests.js';
+import { Cookie, Session } from './express-session/index.ts';
+import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
+import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
+import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from './setup-tests.ts';
 
-import { SessionDataTestContext } from './api/utils/testcontext.js';
-import { SystemHttpRequestType } from './types/request.js';
+import { SessionDataTestContext } from './api/utils/testcontext.ts';
+import { SystemHttpRequestType } from './types/request.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionData } from './types/session.js';
-import { assignUserIdToRequestSession } from './sessionUser.js';
-import { copySessionDataToSession } from './store/loadData.js';
-import { mockSession } from './utils/testing/mocks.js';
-import { setupExpressContext } from './utils/testing/context/appLocals.js';
+import { UserSessionData } from './types/session.ts';
+import { assignUserIdToRequestSession } from './sessionUser.ts';
+import { copySessionDataToSession } from './store/loadData.ts';
+import { mockSession } from './utils/testing/mocks.ts';
+import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 
 describe('handleSessionFromStore', () => {
   beforeAll(() => {

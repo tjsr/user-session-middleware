@@ -1,10 +1,10 @@
-import { ExpressAppTaskContext, UserAppTaskContext } from '../../../api/utils/testcontext.js';
-import express, { NextFunction } from '../../../express/index.js';
+import { ExpressAppTaskContext, UserAppTaskContext } from '../../../api/utils/testcontext.ts';
+import express, { NextFunction } from '../../../express/index.ts';
 
-import { HttpStatusCode } from '../../../httpStatusCodes.js';
-import { SessionTestContext } from './session.js';
-import { SystemHttpRequestType } from '../../../types/request.js';
-import { useUserSessionMiddleware } from '../../../useUserSessionMiddleware.js';
+import { HttpStatusCode } from '../../../httpStatusCodes.ts';
+import { SessionTestContext } from './session.ts';
+import { SystemHttpRequestType } from '../../../types/request.ts';
+import { useUserSessionMiddleware } from '../../../useUserSessionMiddleware.ts';
 
 export const setupExpressContext = (context: SessionTestContext): UserAppTaskContext => {
   assert(context.sessionOptions !== undefined, 'sessionOptions must be defined. Call setupSessionContext() first.');

@@ -1,9 +1,9 @@
-import express, { AppLocals } from '../express/index.js';
+import express, { AppLocals } from '../express/index.ts';
 
-import { MiddlewareConfigurationError } from '../errors/errorClasses.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { UserSessionData } from '../types/session.js';
-import { UserSessionOptions } from '../types/sessionOptions.js';
+import { MiddlewareConfigurationError } from '../errors/errorClasses.ts';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { UserSessionData } from '../types/session.ts';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
 
 const TEST_MODE = process.env['VITEST'] === 'true';
 

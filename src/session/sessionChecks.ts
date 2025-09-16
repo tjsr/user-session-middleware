@@ -3,10 +3,10 @@ import {
   SessionDataNotFoundError,
   SessionIDValueMismatch,
   SessionIdRequiredError,
-  SessionIdTypeError
-} from '../errors/errorClasses.js';
+  SessionIdTypeError,
+} from '../errors/errorClasses.ts';
 
-import { Session } from '../express-session/index.js';
+import { Session } from '../express-session/index.ts';
 
 export const requireSessionIsIsString = (session: Session) => {
   if (typeof session.id !== 'string') {

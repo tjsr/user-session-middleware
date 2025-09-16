@@ -1,9 +1,9 @@
 import { SessionSecretSet } from '@tjsr/testutils';
-import { UserSessionOptions } from '../types/sessionOptions.js';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
 import assert from 'assert';
 import cookie from 'cookie';
 import express from 'express';
-import { getSessionOptionsFromRequest } from './requestVerifiers.js';
+import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 import signature from 'cookie-signature';
 
 export const COOKIE_WITH_HEADER = true;

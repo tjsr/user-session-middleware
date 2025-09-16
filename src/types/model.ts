@@ -1,6 +1,6 @@
-import { EmailAddress, UserId } from '../types.js';
+import { EmailAddress, UserId } from '../types.ts';
 
 export type UserModel = {
-  userId: UserId;
   email: EmailAddress;
+  userId: UserId;
 };

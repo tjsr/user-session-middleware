@@ -1,15 +1,15 @@
-import { EmailAddress, IdNamespace, UserId, uuid5 } from '../types.js';
-import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
+import { EmailAddress, IdNamespace, UserId, uuid5 } from '../types.ts';
+import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.ts';
 import { v5 as uuidv5, validate as validateUuid } from 'uuid';
 
-import { DeprecatedFunctionError } from '../utils/testing/types.js';
-import { Session } from '../express-session/index.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { UserSessionData } from '../types/session.js';
+import { DeprecatedFunctionError } from '../utils/testing/types.ts';
+import { Session } from '../express-session/index.ts';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { UserSessionData } from '../types/session.ts';
 import assert from 'node:assert';
-import { createRandomId } from '../utils/createRandomId.js';
-import { getAppUserIdNamespace } from './userNamespace.js';
-import { saveSessionPromise } from '../sessionUser.js';
+import { createRandomId } from '../utils/createRandomId.ts';
+import { getAppUserIdNamespace } from './userNamespace.ts';
+import { saveSessionPromise } from '../sessionUser.ts';
 
 export const createUserIdFromEmail = (userIdNamespace: IdNamespace, email: EmailAddress): uuid5 => {
   assert(email !== undefined);

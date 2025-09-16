@@ -1,11 +1,11 @@
-import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
 import { TaskContext, beforeEach, describe, expect, test } from 'vitest';
-import { createContextForSessionTest, createTestRequestSessionData } from '../testUtils.js';
+import { createContextForSessionTest, createTestRequestSessionData } from '../testUtils.ts';
 
-import { SessionDataTestContext } from '../api/utils/testcontext.js';
-import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
-import { SessionHandlerError } from '../errors/SessionHandlerError.js';
-import { checkNewlyGeneratedId } from './handleSessionId.js';
+import { SessionDataTestContext } from '../api/utils/testcontext.ts';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
+import { SessionHandlerError } from '../errors/SessionHandlerError.ts';
+import { checkNewlyGeneratedId } from './handleSessionId.ts';
 
 describe<SessionDataTestContext>('checkNewlyGeneratedId', () => {
   beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {

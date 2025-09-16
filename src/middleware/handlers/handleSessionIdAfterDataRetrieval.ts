@@ -1,9 +1,9 @@
 import { addCalledHandler, assertPrerequisiteHandler } from "../handlerChainLog.js";
 
-import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
-import express from "express";
-import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
-import { requireSessionIdGenerated } from '../../errors/sessionErrorChecks.js';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.ts';
+import express from 'express';
+import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.ts';
+import { requireSessionIdGenerated } from '../../errors/sessionErrorChecks.ts';
 
 export const handleSessionIdAfterDataRetrieval: UserSessionMiddlewareRequestHandler = (
   request,

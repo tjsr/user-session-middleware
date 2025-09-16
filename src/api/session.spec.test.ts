@@ -1,14 +1,14 @@
-import { ApiTestContext, setupApiTest } from './utils/testcontext.js';
-import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/context/session.js';
+import { ApiTestContext, setupApiTest } from './utils/testcontext.ts';
+import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/context/session.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { SessionData } from '../express-session/index.js';
-import { SessionId } from '../types.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { SessionData } from '../express-session/index.ts';
+import { SessionId } from '../types.ts';
 import { TaskContext } from 'vitest';
-import { addDataToSessionStore } from '../testUtils.js';
-import { getStoreSessionAsPromise } from './utils/sessionStoreUtils.js';
-import { loginWithContext } from '../utils/testing/apiTestUtils.js';
-import { refreshSession } from './utils/refreshSession.js';
+import { addDataToSessionStore } from '../testUtils.ts';
+import { getStoreSessionAsPromise } from './utils/sessionStoreUtils.ts';
+import { loginWithContext } from '../utils/testing/apiTestUtils.ts';
+import { refreshSession } from './utils/refreshSession.ts';
 
 describe<WithSessionTestContext>('api.session', () => {
   // A new session ID should be generated for any authentication event

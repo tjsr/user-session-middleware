@@ -1,13 +1,13 @@
-import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
-import { getSignedCookieValue, setRequestSessionCookie } from './setSessionCookie.js';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
+import { getSignedCookieValue, setRequestSessionCookie } from './setSessionCookie.ts';
 
-import { SESSION_SECRET } from '../getSession.js';
-import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
-import { SessionId } from '../types.js';
+import { SESSION_SECRET } from '../getSession.ts';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
+import { SessionId } from '../types.ts';
 import { TaskContext } from 'vitest';
-import { createTestRequestSessionData } from '../testUtils.js';
-import { expectSetSessionCookieOnResponseMock } from '../utils/testing/cookieTestUtils.js';
-import { setupExpressContext } from '../utils/testing/context/appLocals.js';
+import { createTestRequestSessionData } from '../testUtils.ts';
+import { expectSetSessionCookieOnResponseMock } from '../utils/testing/cookieTestUtils.ts';
+import { setupExpressContext } from '../utils/testing/context/appLocals.ts';
 
 describe('setSessionCookie', () => {
   beforeEach((context: TaskContext) => {

@@ -1,6 +1,6 @@
-import { ApiTestContext } from './testcontext.js';
-import { SessionId } from '../../types.js';
-import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.js';
+import { ApiTestContext } from './testcontext.ts';
+import { SessionId } from '../../types.ts';
+import { getSupertestSessionIdCookie } from '../../utils/testing/cookieTestUtils.ts';
 import { setSessionCookie } from '@tjsr/testutils';
 import supertest from 'supertest';
 
