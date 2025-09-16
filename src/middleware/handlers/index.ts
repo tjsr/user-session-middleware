@@ -1,9 +1,9 @@
-export { sendAuthResultBody } from './handleSessionUserBodyResults.js';
-export { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
-export { handleNewSessionWithNoSessionData } from './handleSessionWithNoData.js';
-export { handleResponseLocalsCreation as handleLocalsCreation } from './handleLocalsCreation.js';
-export { handleSessionIdAfterDataRetrieval } from './handleSessionIdAfterDataRetrieval.js';
-export { handleSessionIdRequired } from './handleSessionIdRequired.js';
-export { handleSessionStoreRequired } from './handleSessionStoreRequired.js';
-export { handleSessionUserBodyResults } from './handleSessionUserBodyResults.js';
-export { handleSessionWithNewlyGeneratedId } from './handleSessionWithNewlyGeneratedId.js';
+export { sendAuthResultBody } from './handleSessionUserBodyResults.ts';
+export { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.ts';
+export { handleNewSessionWithNoSessionData } from './handleSessionWithNoData.ts';
+export { handleResponseLocalsCreation as handleLocalsCreation } from './handleLocalsCreation.ts';
+export { handleSessionIdAfterDataRetrieval } from './handleSessionIdAfterDataRetrieval.ts';
+export { handleSessionIdRequired } from './handleSessionIdRequired.ts';
+export { handleSessionStoreRequired } from './handleSessionStoreRequired.ts';
+export { handleSessionUserBodyResults } from './handleSessionUserBodyResults.ts';
+export { handleSessionWithNewlyGeneratedId } from './handleSessionWithNewlyGeneratedId.ts';

@@ -1,26 +1,26 @@
 import * as EmailValidator from 'email-validator';
-import * as express from '../express/index.js';
+import * as express from '../express/index.ts';
 
-import { EmailValidationError, LoginBodyFormatError, NoEmailError } from '../errors/inputValidationErrorClasses.js';
-import { RegeneratingSessionIdError, SaveSessionError } from '../errors/errorClasses.js';
+import { EmailValidationError, LoginBodyFormatError, NoEmailError } from '../errors/inputValidationErrorClasses.ts';
+import { RegeneratingSessionIdError, SaveSessionError } from '../errors/errorClasses.ts';
 import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler,
-} from '../types/middlewareHandlerTypes.js';
-import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
+} from '../types/middlewareHandlerTypes.ts';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.ts';
 
-import { IdNamespace } from '../types.js';
-import { LoginCredentialsError } from '../errors/authenticationErrorClasses.js';
-import { NextFunction } from '../express/index.js';
-import { Session } from '../express-session/index.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { SystemResponseLocals } from '../types/locals.js';
-import { UserSessionData } from '../types/session.js';
-import { getAppUserIdNamespace } from '../auth/userNamespace.js';
-import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
-import { passAuthOrUnknownError } from '../auth/authErrorUtils.js';
-import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.js';
-import { saveSessionPromise } from '../sessionUser.js';
+import { IdNamespace } from '../types.ts';
+import { LoginCredentialsError } from '../errors/authenticationErrorClasses.ts';
+import { NextFunction } from '../express/index.ts';
+import { Session } from '../express-session/index.ts';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { SystemResponseLocals } from '../types/locals.ts';
+import { UserSessionData } from '../types/session.ts';
+import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.ts';
+import { passAuthOrUnknownError } from '../auth/authErrorUtils.ts';
+import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.ts';
+import { saveSessionPromise } from '../sessionUser.ts';
 
 export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   request,

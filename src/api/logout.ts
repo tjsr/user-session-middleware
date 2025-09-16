@@ -1,23 +1,19 @@
-import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
-import {
-  RegeneratingSessionIdError,
-  SessionNotGeneratedError,
-  SessionSaveError
-} from '../errors/errorClasses.js';
+import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.ts';
+import { RegeneratingSessionIdError, SessionNotGeneratedError, SessionSaveError } from '../errors/errorClasses.ts';
 import {
   UserSessionMiddlewareErrorHandler,
-  UserSessionMiddlewareRequestHandler
-} from '../types/middlewareHandlerTypes.js';
-import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.js';
-import express, { NextFunction } from '../express/index.js';
+  UserSessionMiddlewareRequestHandler,
+} from '../types/middlewareHandlerTypes.ts';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.ts';
+import express, { NextFunction } from '../express/index.ts';
 
-import { LogoutFailedError } from '../errors/inputValidationErrorClasses.js';
-import { SystemHttpRequestType } from '../types/request.js';
-import { UserId } from '../types.js';
-import { UserSessionData } from '../types/session.js';
-import { getUserIdFromRequest } from '../auth/user.js';
-import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.js';
-import { saveSessionPromise } from '../sessionUser.js';
+import { LogoutFailedError } from '../errors/inputValidationErrorClasses.ts';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { UserId } from '../types.ts';
+import { UserSessionData } from '../types/session.ts';
+import { getUserIdFromRequest } from '../auth/user.ts';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.ts';
+import { saveSessionPromise } from '../sessionUser.ts';
 
 export const checkLogout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   request,
@@ -87,7 +83,6 @@ export const logout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
     return next(errLogout);
   }
 };
-
 
 export const regenerateAfterLogout: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   request: SystemHttpRequestType,

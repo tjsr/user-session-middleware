@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as core from "express-serve-static-core";
-import * as express from '../express/index.js';
+import * as express from '../express/index.ts';
 
-import { SystemHttpRequestType } from "./request.js";
-import { SystemHttpResponseType } from "./response.js";
-import { SystemResponseLocals } from "./locals.js";
-import { UserSessionData } from './session.js';
+import { SystemHttpRequestType } from './request.js';
+import { SystemHttpResponseType } from './response.js';
+import { SystemResponseLocals } from './locals.js';
+import { UserSessionData } from './session.ts';
 
 export interface UserSessionMiddlewareRequestHandler<
   SD extends UserSessionData = UserSessionData,

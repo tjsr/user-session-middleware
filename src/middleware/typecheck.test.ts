@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import express, { Handler } from '../express/index.js';
+import express, { Handler } from '../express/index.ts';
 
-import { SystemHttpRequestType } from '../types/request.js';
-import { SystemResponseLocals } from '../types/locals.js';
-import { UserSessionData } from '../types/session.js';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.js';
+import { SystemHttpRequestType } from '../types/request.ts';
+import { SystemResponseLocals } from '../types/locals.ts';
+import { UserSessionData } from '../types/session.ts';
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.ts';
 
 export const testRequestHandler: UserSessionMiddlewareRequestHandler = (
   _request: express.Request,

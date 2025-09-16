@@ -1,5 +1,5 @@
-import { SESSION_ID_COOKIE } from '../getSession.js';
-import { SessionId } from '../types.js';
+import { SESSION_ID_COOKIE } from '../getSession.ts';
+import { SessionId } from '../types.ts';
 import supertest from 'supertest';
 
 export const expectDifferentSetCookieSessionId = (

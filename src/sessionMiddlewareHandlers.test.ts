@@ -1,4 +1,4 @@
-import { clearIgnoredFunctions } from './setup-tests.js';
+import { clearIgnoredFunctions } from './setup-tests.ts';
 
 describe('handleSessionWithNewlyGeneratedId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));

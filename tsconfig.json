@@ -10,8 +10,10 @@
     "types": [
       "vitest/globals"
     ] /* Specify type package names to be included without being referenced in a source file. */,
+    "allowImportingTsExtensions": true /* Allow importing .ts files with explicit .ts extension. */,
 
     /* Emit */
+    "noEmit": true /* Disable emitting files from a compilation. */,
     "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
     "declarationMap": true /* Create sourcemaps for d.ts files. */,
     "rootDir": "./src" /* Specify the root folder within your source files. */,

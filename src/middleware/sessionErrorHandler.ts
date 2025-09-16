@@ -1,9 +1,9 @@
 import { AssertionError } from 'node:assert';
 import { NextFunction } from 'express';
-import { SessionHandlerError } from '../errors/SessionHandlerError.js';
-import { UserSessionMiddlewareErrorHandler } from '../types/middlewareHandlerTypes.js';
-import { addCalledHandler } from './handlerChainLog.js';
-import { sendAuthResultBody } from './handlers/index.js';
+import { SessionHandlerError } from '../errors/SessionHandlerError.ts';
+import { UserSessionMiddlewareErrorHandler } from '../types/middlewareHandlerTypes.ts';
+import { addCalledHandler } from './handlerChainLog.ts';
+import { sendAuthResultBody } from './handlers/index.ts';
 
 export const sessionErrorHandler: UserSessionMiddlewareErrorHandler = (
   error,

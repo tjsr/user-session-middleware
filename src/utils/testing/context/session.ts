@@ -1,12 +1,12 @@
-import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../getSession.js';
+import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../getSession.ts';
 
-import { MemoryStore } from '../../../express-session/index.js';
-import { SessionId } from '../../../types.js';
+import { MemoryStore } from '../../../express-session/index.ts';
+import { SessionId } from '../../../types.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionData } from '../../../types/session.js';
-import { UserSessionOptions } from '../../../types/sessionOptions.js';
+import { UserSessionData } from '../../../types/session.ts';
+import { UserSessionOptions } from '../../../types/sessionOptions.ts';
 import { generateSessionIdForTestName } from '@tjsr/testutils';
-import { getTaskContextUserIdNamespace } from './idNamespace.js';
+import { getTaskContextUserIdNamespace } from './idNamespace.ts';
 
 export type SessionTestContext = TaskContext & {
   currentSessionId?: SessionId;

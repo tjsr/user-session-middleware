@@ -15,13 +15,13 @@ import {
   SESSION_ID_TYPE_ERROR,
   SESSION_STORE_NOT_CONFIGURED,
   SET_COOKIE_NOT_PERMITTED,
-} from './errorCodes.js';
-import { ErrorRequestHandler, Handler } from '../express/index.js';
+} from './errorCodes.ts';
+import { ErrorRequestHandler, Handler } from '../express/index.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { SessionHandlerError } from './SessionHandlerError.js';
-import { SessionId } from '../types.js';
-import { UserSessionOptions } from '../types/sessionOptions.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { SessionHandlerError } from './SessionHandlerError.ts';
+import { SessionId } from '../types.ts';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
 
 export class SaveSessionError extends SessionHandlerError {
   constructor(message = 'Error writing session data to store.', cause?: unknown) {

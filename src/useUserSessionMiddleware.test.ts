@@ -1,12 +1,12 @@
-import express, { Express } from './express/index.js';
+import express, { Express } from './express/index.ts';
 
-import { ApiTestContext } from './api/utils/testcontext.js';
+import { ApiTestContext } from './api/utils/testcontext.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionOptions } from './types/sessionOptions.js';
-import { setupExpressContext } from './utils/testing/context/appLocals.js';
-import { setupSessionContext } from './utils/testing/context/session.js';
-import { setupUserIdContext } from './utils/testing/context/idNamespace.js';
-import { useUserSessionMiddleware } from './useUserSessionMiddleware.js';
+import { UserSessionOptions } from './types/sessionOptions.ts';
+import { setupExpressContext } from './utils/testing/context/appLocals.ts';
+import { setupSessionContext } from './utils/testing/context/session.ts';
+import { setupUserIdContext } from './utils/testing/context/idNamespace.ts';
+import { useUserSessionMiddleware } from './useUserSessionMiddleware.ts';
 
 describe<ApiTestContext>('useUserSessionMiddleware', () => {
   beforeEach((context: ApiTestContext & TaskContext) => {

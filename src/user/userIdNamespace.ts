@@ -1,6 +1,6 @@
-import { IdNamespace } from '../types.js';
-import { UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.js';
-import { UserSessionOptions } from '../types/sessionOptions.js';
+import { IdNamespace } from '../types.ts';
+import { UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.ts';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
 
 export const getDefaultUserIdNamespace = (sessionOptions: Partial<UserSessionOptions>): IdNamespace | undefined => {
   const usmOptions = sessionOptions as UserSessionOptions;

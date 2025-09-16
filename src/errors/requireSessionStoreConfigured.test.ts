@@ -1,7 +1,7 @@
-import { MemoryStore, Store } from '../express-session/index.js';
+import { MemoryStore, Store } from '../express-session/index.ts';
 
-import { SessionStoreNotConfiguredError } from './errorClasses.js';
-import { requireSessionStoreConfigured } from './sessionErrorChecks.js';
+import { SessionStoreNotConfiguredError } from './errorClasses.ts';
+import { requireSessionStoreConfigured } from './sessionErrorChecks.ts';
 
 describe('requireSessionStoreConfigured', () => {
   const testHandler = () => {};

@@ -1,6 +1,6 @@
 import session, { SessionData } from 'express-session';
 
-import { retrieveSessionDataFromStore } from './loadData.js';
+import { retrieveSessionDataFromStore } from './loadData.ts';
 
 describe('retrieveSessionDataFromStore', () => {
   test('Throw a generic error as a rejected promise when a load failure occurs.', async () => {

@@ -1,6 +1,6 @@
-import { ErrorRequestHandler, Handler } from '../express/index.js';
-import { DEFAULT_ERROR_CODES } from './defaultErrorCodes.js';
-import { SessionMiddlewareError } from './SessionMiddlewareError.js';
+import { ErrorRequestHandler, Handler } from '../express/index.ts';
+import { DEFAULT_ERROR_CODES } from './defaultErrorCodes.ts';
+import { SessionMiddlewareError } from './SessionMiddlewareError.ts';
 
 export class SessionHandlerError extends SessionMiddlewareError {
   private _clientMessage?: string;

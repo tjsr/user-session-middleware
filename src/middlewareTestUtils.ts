@@ -1,12 +1,14 @@
+/* eslint-disable indent */
+
 import { Assertion } from 'vitest';
 import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
-import { SessionHandlerError } from './errors/SessionHandlerError.js';
-import { SystemHttpRequestType } from './types/request.js';
-import { SystemHttpResponseType } from './types/response.js';
-import { UserSessionData } from './types/session.js';
-import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
+import { SessionHandlerError } from './errors/SessionHandlerError.ts';
+import { SystemHttpRequestType } from './types/request.ts';
+import { SystemHttpResponseType } from './types/response.ts';
+import { UserSessionData } from './types/session.ts';
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.ts';
 import express from 'express';
-import { getMockReqResp } from './testUtils.js';
+import { getMockReqResp } from './testUtils.ts';
 
 // export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
 //   _req: RequestType, _res: express.Response, _next: express.NextFunction

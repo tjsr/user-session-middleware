@@ -1,12 +1,12 @@
-import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.js';
-import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
-import { checkLogout, logout } from './logout.js';
-import { createContextForSessionTest, createMockPromisePair, createTestRequestSessionData } from '../testUtils.js';
+import { AlreadyLoggedOutError, NotLoggedInError } from '../errors/authenticationErrorClasses.ts';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
+import { checkLogout, logout } from './logout.ts';
+import { createContextForSessionTest, createMockPromisePair, createTestRequestSessionData } from '../testUtils.ts';
 
-import { SessionDataTestContext } from './utils/testcontext.js';
-import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
+import { SessionDataTestContext } from './utils/testcontext.ts';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
 import { TaskContext } from 'vitest';
-import { generateSessionIdForTest } from '../utils/testing/testIdUtils.js';
+import { generateSessionIdForTest } from '../utils/testing/testIdUtils.ts';
 
 describe<SessionDataTestContext>('logout', () => {
   beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {

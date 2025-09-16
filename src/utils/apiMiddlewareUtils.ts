@@ -1,17 +1,13 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as express from '../express/index.js';
+import * as express from '../express/index.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import {
-  UserId,
-} from '../types.js';
-import {
-  UserSessionMiddlewareRequestHandler
-} from '../types/middlewareHandlerTypes.js';
-import { getAppUserIdNamespace } from '../auth/userNamespace.js';
-import { getUserIdFromSession } from '../auth/user.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { UserId } from '../types.ts';
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.ts';
+import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
+import { getUserIdFromSession } from '../auth/user.ts';
 
 // import express as origExpressfrom 'express';
 

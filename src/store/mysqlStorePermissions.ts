@@ -1,6 +1,6 @@
 import { Connection, FieldPacket, Pool, QueryError, QueryResult } from 'mysql2';
 
-import { SessionDatabaseTableAccessDenied } from '../errors/database/databaseErrors.js';
+import { SessionDatabaseTableAccessDenied } from '../errors/database/databaseErrors.ts';
 
 // type MysqlCallbackHandlerParams = (err: QueryError | null, result: QueryResult, fields: FieldPacket[]) => any;
 

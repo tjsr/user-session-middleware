@@ -3,16 +3,16 @@ import {
   SessionDataNotFoundError,
   SessionIdRequiredError,
   SessionIdTypeError,
-} from './errors/errorClasses.js';
-import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
-import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.js';
-import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from './sessionUser.js';
-import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.js';
+} from './errors/errorClasses.ts';
+import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
+import { addIgnoredLog, clearIgnoredFunctions } from './setup-tests.ts';
+import { assignUserIdToRequestSession, assignUserIdToSession, saveSessionPromise } from './sessionUser.ts';
+import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.ts';
 
-import { SessionDataTestContext } from './api/utils/testcontext.js';
-import { SessionEnabledRequestContext } from './utils/testing/context/request.js';
+import { SessionDataTestContext } from './api/utils/testcontext.ts';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
 import { TaskContext } from 'vitest';
-import { setupExpressContext } from './utils/testing/context/appLocals.js';
+import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 
 describe<SessionDataTestContext>('assignUserIdToSession', () => {
   beforeEach((context: SessionDataTestContext & SessionTestContext) => {

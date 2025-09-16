@@ -1,12 +1,12 @@
-import { EmailAddress, SessionId } from '../types.js';
+import { EmailAddress, SessionId } from '../types.ts';
 import {
   LOGOUT_FAILED_ERROR,
   USER_INPUT_EMAIL_VALIDATION_ERROR,
   USER_INPUT_VALIDATION_ERROR,
-} from '../errors/errorCodes.js';
+} from '../errors/errorCodes.ts';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { SessionHandlerError } from '../errors/SessionHandlerError.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { SessionHandlerError } from '../errors/SessionHandlerError.ts';
 
 class UserInputValidationError extends SessionHandlerError {
   constructor(sesisonErrorCode = USER_INPUT_VALIDATION_ERROR, status = HttpStatusCode.BAD_REQUEST, message?: string) {
