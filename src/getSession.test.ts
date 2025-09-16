@@ -209,7 +209,6 @@ describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
 describe<SessionDataTestContext>('getSessionIdFromCookie', () => {
   beforeEach((context: SessionDataTestContext) => {
     context.testRequestData = {
-      headers: {},
       regenerateSessionId: false,
     };
   });

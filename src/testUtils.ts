@@ -5,7 +5,7 @@ import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } f
 import { getMockReq, getMockRes } from 'vitest-mock-express';
 import { mockExpress, mockSession } from './utils/testing/mocks.js';
 
-import { MockRequest } from 'vitest-mock-express/dist/src/request';
+import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
 import { SessionDataTestContext } from './api/utils/testcontext.js';
 import { SessionEnabledRequestContext } from './utils/testing/context/request.js';
 import { SystemHttpRequestType } from './types/request.js';
@@ -71,7 +71,7 @@ export const getMockReqResp = <
 export const getMockRequestResponse: <
   ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 >(
-  _values?: MockRequest | undefined,
+  _values?: any | undefined,
   _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;
 
