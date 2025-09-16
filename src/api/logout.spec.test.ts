@@ -1,17 +1,17 @@
-import { ApiTestContext, setupApiTest } from './utils/testcontext.js';
-import { NoSessionTestContext, WithSessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
+import { ApiTestContext, setupApiTest } from './utils/testcontext.ts';
+import { NoSessionTestContext, WithSessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
 import { TaskContext, beforeEach, describe, expect, test } from 'vitest';
-import { beginSession, refreshSession } from './utils/refreshSession.js';
+import { beginSession, refreshSession } from './utils/refreshSession.ts';
 import { generateSessionSecretForTestName, setSessionCookie } from '@tjsr/testutils';
 
-import { HttpStatusCode } from '../httpStatusCodes.js';
-import { SESSION_ID_COOKIE } from '../getSession.js';
-import { SessionId } from '../types.js';
-import { addDataToSessionStore } from '../testUtils.js';
-import { createUserIdFromEmail } from '../auth/user.js';
-import { generateSessionIdForTest } from '../utils/testing/testIdUtils.js';
-import { logoutWithContext } from '../utils/testing/apiTestUtils.js';
-import { mockSession } from '../utils/testing/mocks.js';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { SESSION_ID_COOKIE } from '../getSession.ts';
+import { SessionId } from '../types.ts';
+import { addDataToSessionStore } from '../testUtils.ts';
+import { createUserIdFromEmail } from '../auth/user.ts';
+import { generateSessionIdForTest } from '../utils/testing/testIdUtils.ts';
+import { logoutWithContext } from '../utils/testing/apiTestUtils.ts';
+import { mockSession } from '../utils/testing/mocks.ts';
 import supertest from 'supertest';
 
 describe<ApiTestContext<NoSessionTestContext> & TaskContext>('api.nosession.logout', () => {

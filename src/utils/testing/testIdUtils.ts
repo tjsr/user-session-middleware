@@ -1,4 +1,4 @@
-import { SessionId, UserId } from '../../types.js';
+import { SessionId, UserId } from '../../types.ts';
 import { generateSessionIdForTestName, generateUserIdForTestName } from '@tjsr/testutils';
 
 import { TaskContext } from 'vitest';

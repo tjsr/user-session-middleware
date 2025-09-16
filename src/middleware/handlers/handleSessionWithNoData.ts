@@ -1,14 +1,14 @@
-import * as express from '../../express/index.js';
+import * as express from '../../express/index.ts';
 
-import { addCalledHandler, assertCorequisiteHandler } from '../handlerChainLog.js';
+import { addCalledHandler, assertCorequisiteHandler } from '../handlerChainLog.ts';
 
-import { IdNamespace } from '../../types.js';
-import { SystemHttpRequestType } from '../../types/request.js';
-import { SystemHttpResponseType } from '../../types/response.js';
-import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
-import { applyUserIdFromSession } from '../../auth/user.js';
-import { getAppUserIdNamespace } from '../../auth/userNamespace.js';
-import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.js';
+import { IdNamespace } from '../../types.ts';
+import { SystemHttpRequestType } from '../../types/request.ts';
+import { SystemHttpResponseType } from '../../types/response.ts';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.ts';
+import { applyUserIdFromSession } from '../../auth/user.ts';
+import { getAppUserIdNamespace } from '../../auth/userNamespace.ts';
+import { handleExistingSessionWithNoSessionData } from './handleExistingSessionWithNoSessionData.ts';
 
 // prettier-ignore
 export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHandler = <
@@ -45,4 +45,3 @@ export const handleNewSessionWithNoSessionData: UserSessionMiddlewareRequestHand
     return;
   }
 };
-

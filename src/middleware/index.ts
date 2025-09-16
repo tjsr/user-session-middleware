@@ -1,2 +1,2 @@
-export { sessionErrorHandler } from './sessionErrorHandler.js';
-export { disableHandlerAssertions, forceHandlerAssertions } from "./handlerChainLog.js";
+export { sessionErrorHandler } from './sessionErrorHandler.ts';
+export { disableHandlerAssertions, forceHandlerAssertions } from './handlerChainLog.js';

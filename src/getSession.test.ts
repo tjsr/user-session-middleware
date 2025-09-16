@@ -4,18 +4,18 @@ import {
   defaultExpressSessionOptions,
   getSessionIdFromCookie,
   sessionIdFromRequest,
-} from './getSession.js';
-import { SessionDataTestContext, UserAppTaskContext } from './api/utils/testcontext.js';
-import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.js';
-import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
+} from './getSession.ts';
+import { SessionDataTestContext, UserAppTaskContext } from './api/utils/testcontext.ts';
+import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
+import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
 import { TaskContext, TestContext } from 'vitest';
-import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.js';
-import express, { Application } from './express/index.js';
+import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.ts';
+import express, { Application } from './express/index.ts';
 import expressSession, { MemoryStore } from 'express-session';
 
-import { SystemHttpRequestType } from './types/request.js';
-import { generateSessionIdForTest } from './utils/testing/testIdUtils.js';
-import { setupExpressContext } from './utils/testing/context/appLocals.js';
+import { SystemHttpRequestType } from './types/request.ts';
+import { generateSessionIdForTest } from './utils/testing/testIdUtils.ts';
+import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 import { validate } from 'uuid';
 
 type RequestAppLocals = SystemHttpRequestType['app']['locals'];

@@ -2,7 +2,7 @@ import * as core from 'express-serve-static-core';
 import * as express from "../express/index.js";
 
 import { SessionId } from "../types.js";
-import { SystemResponseLocals } from './locals.js';
+import { SystemResponseLocals } from './locals.ts';
 import { UserSessionData } from "./session.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

@@ -1,19 +1,19 @@
-import { ApiTestContext, ExpressAppWithLocals } from '../../api/utils/testcontext.js';
-import { EmailAddress, SessionId } from '../../types.js';
+import { ApiTestContext, ExpressAppWithLocals } from '../../api/utils/testcontext.ts';
+import { EmailAddress, SessionId } from '../../types.ts';
 import {
   MiddlewareTestContextError,
   TestContextMissingAppError,
   TestContextMissingAppLocalsError,
-} from '../../errors/SessionMiddlewareError.js';
-import { RetrieveUserDataFn, setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
-import { StrictUserSessionOptions, UserSessionOptions } from '../../types/sessionOptions.js';
+} from '../../errors/SessionMiddlewareError.ts';
+import { RetrieveUserDataFn, setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
+import { StrictUserSessionOptions, UserSessionOptions } from '../../types/sessionOptions.ts';
 
-import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.js';
-import { MiddlewareConfigurationError } from '../../errors/errorClasses.js';
-import { SessionTestContext } from './context/session.js';
-import { UserModel } from '../../types/model.js';
-import { doSessionCall } from './supertestUtils.js';
-import express from '../../express/index.js';
+import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.ts';
+import { MiddlewareConfigurationError } from '../../errors/errorClasses.ts';
+import { SessionTestContext } from './context/session.ts';
+import { UserModel } from '../../types/model.ts';
+import { doSessionCall } from './supertestUtils.ts';
+import express from '../../express/index.ts';
 import supertest from 'supertest';
 
 export const setLoginUserLookupWithContextUserData = <T extends UserModel>(

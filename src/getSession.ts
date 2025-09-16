@@ -1,21 +1,21 @@
-import * as expressSession from './express-session/index.js';
+import * as expressSession from './express-session/index.ts';
 
 import {
   ConfigurationOptionRequiredError,
   MiddlewareConfigurationError,
   SetCookieHeaderNotPermittedError,
-} from './errors/errorClasses.js';
+} from './errors/errorClasses.ts';
 
 import { IncomingHttpHeaders } from 'http';
-import { RequestHandler } from './express/index.js';
-import { SessionId } from './types.js';
-import { SessionMiddlewareError } from './errors/SessionMiddlewareError.js';
-import { SystemHttpRequestType } from './types/request.js';
-import { UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.js';
-import { UserSessionData } from './types/session.js';
-import { UserSessionOptions } from './types/sessionOptions.js';
-import { getCookieKeyFromRequest } from './session/sessionCookie.js';
-import { getDefaultUserIdNamespace } from './user/userIdNamespace.js';
+import { RequestHandler } from './express/index.ts';
+import { SessionId } from './types.ts';
+import { SessionMiddlewareError } from './errors/SessionMiddlewareError.ts';
+import { SystemHttpRequestType } from './types/request.ts';
+import { UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.ts';
+import { UserSessionData } from './types/session.ts';
+import { UserSessionOptions } from './types/sessionOptions.ts';
+import { getCookieKeyFromRequest } from './session/sessionCookie.ts';
+import { getDefaultUserIdNamespace } from './user/userIdNamespace.ts';
 import { isProductionMode } from '@tjsr/simple-env-utils';
 import session from 'express-session';
 import { v4 as uuidv4 } from 'uuid';

@@ -1,21 +1,21 @@
-import { EmailAddress, SessionId } from '../../types.js';
+import { EmailAddress, SessionId } from '../../types.ts';
 import {
   NoSessionTestContext,
   SessionTestContext,
   WithSessionTestContext,
   setupSessionContext,
-} from '../../utils/testing/context/session.js';
-import express, { AppLocals } from '../../express/index.js';
+} from '../../utils/testing/context/session.ts';
+import express, { AppLocals } from '../../express/index.ts';
 
-import { AuthenticationRestResult } from '../../types/apiResults.js';
-import { MockRequestWithSession } from '../../testUtils.js';
+import { AuthenticationRestResult } from '../../types/apiResults.ts';
+import { MockRequestWithSession } from '../../testUtils.ts';
 import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from '../../utils/testing/context/idNamespace.js';
-import { UserModel } from '../../types/model.js';
-import { UserSessionData } from '../../types/session.js';
-import { UserSessionOptions } from '../../types/sessionOptions.js';
-import { setRetrieveUserDataFunction } from '../../auth/getDbUser.js';
-import { setupMiddlewareContext } from '../../utils/testing/context/appLocals.js';
+import { UserIdTaskContext } from '../../utils/testing/context/idNamespace.ts';
+import { UserModel } from '../../types/model.ts';
+import { UserSessionData } from '../../types/session.ts';
+import { UserSessionOptions } from '../../types/sessionOptions.ts';
+import { setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
+import { setupMiddlewareContext } from '../../utils/testing/context/appLocals.ts';
 import supertest from 'supertest';
 
 export interface SessionDataTestContext extends UserIdTaskContext {

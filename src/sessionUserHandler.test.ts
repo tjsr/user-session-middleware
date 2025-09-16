@@ -1,15 +1,15 @@
-import { ApiTestContext, SessionDataTestContext, setupApiTest } from './api/utils/testcontext.js';
-import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.js';
-import express, { NextFunction } from './express/index.js';
+import { ApiTestContext, SessionDataTestContext, setupApiTest } from './api/utils/testcontext.ts';
+import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
+import express, { NextFunction } from './express/index.ts';
 
-import { HttpStatusCode } from './httpStatusCodes.js';
-import { SystemHttpRequestType } from './types/request.js';
+import { HttpStatusCode } from './httpStatusCodes.ts';
+import { SystemHttpRequestType } from './types/request.ts';
 import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from './utils/testing/context/idNamespace.js';
-import { addDataToSessionStore } from './testUtils.js';
-import { mockSession } from './utils/testing/mocks.js';
-import { setupMiddlewareContext } from './utils/testing/context/appLocals.js';
-import { setupSupertestContext } from './utils/testing/supertestUtils.js';
+import { UserIdTaskContext } from './utils/testing/context/idNamespace.ts';
+import { addDataToSessionStore } from './testUtils.ts';
+import { mockSession } from './utils/testing/mocks.ts';
+import { setupMiddlewareContext } from './utils/testing/context/appLocals.ts';
+import { setupSupertestContext } from './utils/testing/supertestUtils.ts';
 
 describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
   beforeEach(

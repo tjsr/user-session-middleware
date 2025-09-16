@@ -1,8 +1,8 @@
-import express, { NextFunction } from '../express/index.js';
+import express, { NextFunction } from '../express/index.ts';
 
-import { IdNamespace } from '../types.js';
-import { UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.js';
-import { verifyAppLocalsSession } from '../middleware/requestVerifiers.js';
+import { IdNamespace } from '../types.ts';
+import { UUIDNamespaceNotDefinedError } from '../errors/middlewareErrorClasses.ts';
+import { verifyAppLocalsSession } from '../middleware/requestVerifiers.ts';
 
 export const USER_ID_NAMESPACE_KEY = 'USERID_UUID_NAMESPACE'; // || 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
 

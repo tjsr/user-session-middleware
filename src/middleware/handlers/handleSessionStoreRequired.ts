@@ -1,9 +1,9 @@
-import { addCalledHandler, assertPrerequisiteHandler } from '../handlerChainLog.js';
-import { requireHandlerChainCreated, requireSessionStoreConfigured } from "../../errors/sessionErrorChecks.js";
+import { addCalledHandler, assertPrerequisiteHandler } from '../handlerChainLog.ts';
+import { requireHandlerChainCreated, requireSessionStoreConfigured } from '../../errors/sessionErrorChecks.js';
 
-import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
-import express from "express";
-import { handleResponseLocalsCreation } from './handleLocalsCreation.js';
+import { UserSessionMiddlewareRequestHandler } from '../../types/middlewareHandlerTypes.js';
+import express from 'express';
+import { handleResponseLocalsCreation } from './handleLocalsCreation.ts';
 
 export const handleSessionStoreRequired: UserSessionMiddlewareRequestHandler = (
   request,

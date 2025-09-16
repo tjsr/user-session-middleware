@@ -5,7 +5,7 @@ import { Session } from "../../express-session/index.js";
 import { SystemHttpResponseType } from "../../types/response.js";
 import { UserSessionData } from "../../types/session.js";
 import { UserSessionMiddlewareRequestHandler } from "../../types/middlewareHandlerTypes.js";
-import { handleResponseLocalsCreation } from './handleLocalsCreation.js';
+import { handleResponseLocalsCreation } from './handleLocalsCreation.ts';
 
 export const sendAuthResultBody = (
   session: UserSessionData & Session,

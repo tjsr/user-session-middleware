@@ -1,17 +1,17 @@
-import { Cookie, Session } from '../express-session/index.js';
-import { EmailAddress, UserId } from '../types.js';
-import { NIL_UUID, createContextForSessionTest, createTestRequestSessionData } from '../testUtils.js';
-import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.js';
-import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
-import { createRandomIdAndSave, createUserIdFromEmail, getUserIdFromSession } from './user.js';
-import { generateSessionIdForTest, generateUserIdForTest } from '../utils/testing/testIdUtils.js';
+import { Cookie, Session } from '../express-session/index.ts';
+import { EmailAddress, UserId } from '../types.ts';
+import { NIL_UUID, createContextForSessionTest, createTestRequestSessionData } from '../testUtils.ts';
+import { SessionNotGeneratedError, SessionUserInfoError } from '../errors/errorClasses.ts';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
+import { createRandomIdAndSave, createUserIdFromEmail, getUserIdFromSession } from './user.ts';
+import { generateSessionIdForTest, generateUserIdForTest } from '../utils/testing/testIdUtils.ts';
 import { v5, validate as validateUuid } from 'uuid';
 
-import { SessionDataTestContext } from '../api/utils/testcontext.js';
-import { SessionEnabledRequestContext } from '../utils/testing/context/request.js';
+import { SessionDataTestContext } from '../api/utils/testcontext.ts';
+import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
 import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from '../utils/testing/context/idNamespace.js';
-import { UserSessionData } from '../types/session.js';
+import { UserIdTaskContext } from '../utils/testing/context/idNamespace.ts';
+import { UserSessionData } from '../types/session.ts';
 import { generateSessionIdForTestName } from '@tjsr/testutils';
 
 describe('createUserIdFromEmail', () => {

@@ -1,7 +1,7 @@
-import { IdNamespace } from '../../../types.js';
-import { NIL_UUID } from '../../../testUtils.js';
+import { IdNamespace } from '../../../types.ts';
+import { NIL_UUID } from '../../../testUtils.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionOptions } from '../../../types/sessionOptions.js';
+import { UserSessionOptions } from '../../../types/sessionOptions.ts';
 import { v5 } from 'uuid';
 
 export interface UserIdTaskContext extends TaskContext {

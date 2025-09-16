@@ -1,9 +1,9 @@
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.ts';
 
-import { RequiredMiddlewareNotCalledError } from '../../errors/errorClasses.js';
-import { forceHandlerAssertions } from '../handlerChainLog.js';
-import { handleExistingSessionWithNoSessionData } from './index.js';
-import { handleSessionIdAfterDataRetrieval } from './handleSessionIdAfterDataRetrieval.js';
+import { RequiredMiddlewareNotCalledError } from '../../errors/errorClasses.ts';
+import { forceHandlerAssertions } from '../handlerChainLog.ts';
+import { handleExistingSessionWithNoSessionData } from './index.ts';
+import { handleSessionIdAfterDataRetrieval } from './handleSessionIdAfterDataRetrieval.ts';
 
 describe('chain.handleSessionIdAfterDataRetrieval', () => {
   test('Should call to error handler when sessionID is not set.', () => {

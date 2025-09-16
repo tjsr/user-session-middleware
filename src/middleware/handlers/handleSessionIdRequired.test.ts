@@ -1,17 +1,17 @@
-import { ApiTestContext, MiddlewareHandlerTestContext } from '../../api/utils/testcontext.js';
+import { ApiTestContext, MiddlewareHandlerTestContext } from '../../api/utils/testcontext.ts';
 import {
   NoSessionTestContext,
   SessionTestContext,
   WithSessionTestContext,
   setupSessionContext,
-} from '../../utils/testing/context/session.js';
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
+} from '../../utils/testing/context/session.ts';
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.ts';
 
-import { HttpStatusCode } from '../../httpStatusCodes.js';
+import { HttpStatusCode } from '../../httpStatusCodes.ts';
 import { TaskContext } from 'vitest';
-import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.js';
-import { handleSessionIdRequired } from './handleSessionIdRequired.js';
-import { setupSupertestContext } from '../../utils/testing/supertestUtils.js';
+import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.ts';
+import { handleSessionIdRequired } from './handleSessionIdRequired.ts';
+import { setupSupertestContext } from '../../utils/testing/supertestUtils.ts';
 
 describe('handler.handleSessionIdRequired', () => {
   test('Should fail when no sessionID is provided.', () =>

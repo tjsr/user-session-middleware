@@ -1,8 +1,8 @@
 import * as expressSession from 'express-session';
 
-import { EmailAddress, UserId } from '../types.js';
+import { EmailAddress, UserId } from '../types.ts';
 
-import { UserSessionData } from '../types/session.js';
+import { UserSessionData } from '../types/session.ts';
 
 declare module 'express-session' {
   interface SessionData {

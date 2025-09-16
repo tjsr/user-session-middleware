@@ -1,9 +1,9 @@
-import { Cookie, SessionData, SessionOptions } from '../../express-session/index.js';
+import { Cookie, SessionData, SessionOptions } from '../../express-session/index.ts';
 
-import { IdNamespace } from '../../types.js';
-import { createResponseLocals } from '../../middleware/handlers/handleLocalsCreation.js';
-import { createUserIdFromEmail } from '../../auth/user.js';
-import express from '../../express/index.js';
+import { IdNamespace } from '../../types.ts';
+import { createResponseLocals } from '../../middleware/handlers/handleLocalsCreation.ts';
+import { createUserIdFromEmail } from '../../auth/user.ts';
+import express from '../../express/index.ts';
 
 export const mockSession = (userIdNamespace: IdNamespace, overrides?: Partial<SessionData>): SessionData => {
   assert(userIdNamespace !== undefined);

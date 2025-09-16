@@ -1,4 +1,4 @@
-import { getSessionIdFromSetCookieString } from './cookieTestUtils.js';
+import { getSessionIdFromSetCookieString } from './cookieTestUtils.ts';
 
 describe('getSessionIdFromSetCookieString', () => {
   test('Should return a sessionId value in a string with path.', () => {

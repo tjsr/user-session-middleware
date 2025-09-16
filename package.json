@@ -62,23 +62,23 @@
     "@types/express": "^4.17.23",
     "@types/express-mysql-session": "^3.0.6",
     "@types/express-session": "^1.18.0",
-    "@types/node": "^20.19.10",
+    "@types/node": "^22.18.5",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "expect-cookies": "^0.3.0",
     "linkteam": "^0.0.18",
-    "prettier-plugin-sort-members": "^0.2.3",
+    "prettier-plugin-sort-members": "^0.2.4",
     "rimraf": "^6.0.1",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.3",
     "vitest-mock-express": "^2.2.0"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.2.0",
+    "@tjsr/mysql-pool-utils": "^0.2.1",
     "@tjsr/simple-env-utils": "^0.1.10",
     "cookie": "^1.0.2",
     "cookie-signature": "^1.2.2",
@@ -86,7 +86,7 @@
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.1",
     "snowflake-uuid": "^1.0.0",
-    "uuid": "^11.1.0"
+    "uuid": "^13.0.0"
   },
   "peerDependencies": {
     "express": "^4.21.2"
@@ -98,7 +98,7 @@
     "rimraf@<=4": "$rimraf"
   },
   "optionalDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.10"
   },
   "eslintConfig": {
     "extends": [

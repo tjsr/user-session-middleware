@@ -1,12 +1,10 @@
-import { SessionMiddlewareError } from './SessionMiddlewareError.js';
+import { SessionMiddlewareError } from './SessionMiddlewareError.ts';
 
 describe('SessionMiddlewareError', () => {
   const testSessionError = new SessionMiddlewareError('Test message');
-  test(
-    'Should get a http status code corresponding to the sessionErrorCode when constructor has undefined value',
-    () => {
-      expect(testSessionError.message).toEqual('Test message');
-    });
+  test('Should get a http status code corresponding to the sessionErrorCode when constructor has undefined value', () => {
+    expect(testSessionError.message).toEqual('Test message');
+  });
 
   test('Name of simple SessionMiddlewareError should have no extension', () => {
     expect(testSessionError.name).toBe('SessionMiddlewareError');

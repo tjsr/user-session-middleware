@@ -1,19 +1,19 @@
-import { Cookie, Store } from './express-session/index.js';
+import { Cookie, Store } from './express-session/index.ts';
 import { Mock, MockInstance, TaskContext } from 'vitest';
-import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.js';
-import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.js';
+import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.ts';
+import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.ts';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
-import { mockExpress, mockSession } from './utils/testing/mocks.js';
+import { mockExpress, mockSession } from './utils/testing/mocks.ts';
 
-import { MockRequest } from 'vitest-mock-express/dist/src/request';
-import { SessionDataTestContext } from './api/utils/testcontext.js';
-import { SessionEnabledRequestContext } from './utils/testing/context/request.js';
-import { SystemHttpRequestType } from './types/request.js';
-import { SystemHttpResponseType } from './types/response.js';
-import { UserSessionData } from './types/session.js';
-import { createResponseLocals } from './middleware/handlers/handleLocalsCreation.js';
-import { markHandlersCalled } from './utils/testing/markHandlers.js';
-import { storeSetAsPromise } from './utils/sessionSetPromise.js';
+import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
+import { SessionDataTestContext } from './api/utils/testcontext.ts';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
+import { SystemHttpRequestType } from './types/request.ts';
+import { SystemHttpResponseType } from './types/response.ts';
+import { UserSessionData } from './types/session.ts';
+import { createResponseLocals } from './middleware/handlers/handleLocalsCreation.ts';
+import { markHandlersCalled } from './utils/testing/markHandlers.ts';
+import { storeSetAsPromise } from './utils/sessionSetPromise.ts';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -65,12 +65,11 @@ export const getMockReqResp = <
   return { clearMockReq, clearMockRes, mockClear: clear, next, request, response };
 };
 
+type UserHttpResp = SystemHttpResponseType<UserSessionData>;
 /**
  * @deprecated This method should not be called directly. Use XYZ instead.
  */
-export const getMockRequestResponse: <
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
->(
+export const getMockRequestResponse: <ResponseType extends SystemHttpResponseType = UserHttpResp>(
   _values?: MockRequest | undefined,
   _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;

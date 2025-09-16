@@ -1,16 +1,16 @@
-import { ApiTestContext, MiddlewareHandlerTestContext, SessionDataTestContext } from '../../api/utils/testcontext.js';
-import { SessionTestContext, setupSessionContext } from '../../utils/testing/context/session.js';
-import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.js';
-import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.js';
+import { ApiTestContext, MiddlewareHandlerTestContext, SessionDataTestContext } from '../../api/utils/testcontext.ts';
+import { SessionTestContext, setupSessionContext } from '../../utils/testing/context/session.ts';
+import { createContextForSessionTest, createTestRequestSessionData } from '../../testUtils.ts';
+import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.ts';
 
 import { MemoryStore } from 'express-session';
-import { SessionEnabledRequestContext } from '../../utils/testing/context/request.js';
-import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.js';
+import { SessionEnabledRequestContext } from '../../utils/testing/context/request.ts';
+import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.ts';
 import { TaskContext } from 'vitest';
-import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.js';
+import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.ts';
 import { expectResponseSetsSessionIdCookie } from '@tjsr/testutils';
-import { handleSessionStoreRequired } from './handleSessionStoreRequired.js';
-import { setupSupertestContext } from '../../utils/testing/supertestUtils.js';
+import { handleSessionStoreRequired } from './handleSessionStoreRequired.ts';
+import { setupSupertestContext } from '../../utils/testing/supertestUtils.ts';
 
 describe('next.handleSessionStoreRequired', () => {
   test('Should fail when no sessionStore is available.', () => {

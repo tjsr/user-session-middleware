@@ -4,7 +4,7 @@ import { Connection, Pool } from 'mysql2';
 import { PoolOptions, elideValues, getPoolConfig } from '@tjsr/mysql-pool-utils';
 import mySQLStore, { MySQLStore } from 'express-mysql-session';
 
-import { checkDeletePrivileges } from './store/mysqlStorePermissions.js';
+import { checkDeletePrivileges } from './store/mysqlStorePermissions.ts';
 
 let POOL_OPTIONS: PoolOptions;
 

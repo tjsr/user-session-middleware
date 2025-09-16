@@ -1,4 +1,4 @@
-import { IdNamespace, MakeRequired } from '../types.js';
+import { IdNamespace, MakeRequired } from '../types.ts';
 
 import expressSession from 'express-session';
 

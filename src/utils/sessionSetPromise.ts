@@ -1,4 +1,4 @@
-import { SessionData, Store } from '../express-session/index.js';
+import { SessionData, Store } from '../express-session/index.ts';
 
 export const storeSetAsPromise = async (store: Store, sid: string, data: SessionData): Promise<void> => {
   if (!process.env['VITEST']) {

@@ -1,12 +1,12 @@
-import { ResponseContext, setupResponseContext } from '../utils/testing/context/response.js';
-import { SessionEnabledRequestContext, setupRequestContext } from '../utils/testing/context/request.js';
-import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.js';
+import { ResponseContext, setupResponseContext } from '../utils/testing/context/response.ts';
+import { SessionEnabledRequestContext, setupRequestContext } from '../utils/testing/context/request.ts';
+import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
 
-import { SystemHttpRequestType } from '../types/request.js';
+import { SystemHttpRequestType } from '../types/request.ts';
 import { TaskContext } from 'vitest';
-import { UserAppTaskContext } from './utils/testcontext.js';
-import { session } from './session.js';
-import { setupExpressContext } from '../utils/testing/context/appLocals.js';
+import { UserAppTaskContext } from './utils/testcontext.ts';
+import { session } from './session.ts';
+import { setupExpressContext } from '../utils/testing/context/appLocals.ts';
 
 describe('session', () => {
   // test.todo('Should generate a new session ID if no existing one is given.', () => {

@@ -1,13 +1,13 @@
-import { NamespaceUUIDFormatError, UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.js';
+import { NamespaceUUIDFormatError, UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.ts';
 import {
   postLoginUserSessionMiddleware,
   preLoginUserSessionMiddleware,
   sessionUserRouteHandlers,
-} from './sessionMiddlewareHandlers.js';
+} from './sessionMiddlewareHandlers.ts';
 
-import { USER_ID_NAMESPACE_KEY } from './auth/userNamespace.js';
-import { UserSessionOptions } from './types/sessionOptions.js';
-import express from './express/index.js';
+import { USER_ID_NAMESPACE_KEY } from './auth/userNamespace.ts';
+import { UserSessionOptions } from './types/sessionOptions.ts';
+import express from './express/index.ts';
 import { requireEnv } from '@tjsr/simple-env-utils';
 import { validate } from 'uuid';
 

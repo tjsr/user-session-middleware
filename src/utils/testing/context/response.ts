@@ -1,9 +1,9 @@
-import express, { NextFunction } from '../../../express/index.js';
+import express, { NextFunction } from '../../../express/index.ts';
 
 import { MockResponse } from 'vitest-mock-express/dist/src/response/index.js';
-import { SystemHttpResponseType } from '../../../types/response.js';
+import { SystemHttpResponseType } from '../../../types/response.ts';
 import { TaskContext } from 'vitest';
-import { UserSessionData } from '../../../types/session.js';
+import { UserSessionData } from '../../../types/session.ts';
 import { getMockRes } from 'vitest-mock-express';
 
 export type ResponseContext<Response extends express.Response = SystemHttpResponseType<UserSessionData>> =

@@ -1,10 +1,10 @@
-import { ApiTestContext, SupetestTaskContext } from '../../api/utils/testcontext.js';
-import { validateContextApp, validateSessionOptions } from './apiTestUtils.js';
+import { ApiTestContext, SupetestTaskContext } from '../../api/utils/testcontext.ts';
+import { validateContextApp, validateSessionOptions } from './apiTestUtils.ts';
 
-import { SessionId } from '../../types.js';
-import { SessionTestContext } from './context/session.js';
-import { StrictUserSessionOptions } from '../../types/sessionOptions.js';
-import { getSupertestSessionIdCookie } from './cookieTestUtils.js';
+import { SessionId } from '../../types.ts';
+import { SessionTestContext } from './context/session.ts';
+import { StrictUserSessionOptions } from '../../types/sessionOptions.ts';
+import { getSupertestSessionIdCookie } from './cookieTestUtils.ts';
 import { setSessionCookie } from '@tjsr/testutils';
 import supertest from 'supertest';
 

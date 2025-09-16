@@ -1,12 +1,12 @@
-import { SystemHttpRequestType } from './types/request.js';
-import { SystemHttpResponseType } from './types/response.js';
-import { UserSessionData } from './types/session.js';
-import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.js';
-import { addCalledHandler } from './middleware/handlerChainLog.js';
+import { SystemHttpRequestType } from './types/request.ts';
+import { SystemHttpResponseType } from './types/response.ts';
+import { UserSessionData } from './types/session.ts';
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.ts';
+import { addCalledHandler } from './middleware/handlerChainLog.ts';
 import assert from 'node:assert';
-import { assignUserIdToRequestSession } from './sessionUser.js';
-import express from './express/index.js';
-import { getAppUserIdNamespace } from './auth/userNamespace.js';
+import { assignUserIdToRequestSession } from './sessionUser.ts';
+import express from './express/index.ts';
+import { getAppUserIdNamespace } from './auth/userNamespace.ts';
 
 const LOG_NO_COPY_USER_ID_TO_SESSION = process.env['LOG_NO_COPY_USER_ID_TO_SESSION'] === 'true';
 

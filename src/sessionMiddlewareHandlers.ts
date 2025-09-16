@@ -1,7 +1,7 @@
-import { assignUserDataToRegeneratedSession, session } from './api/session.js';
-import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } from "./api/login.js";
-import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from "./api/logout.js";
-import express, { ErrorRequestHandler, RequestHandler } from "./express/index.js";
+import { assignUserDataToRegeneratedSession, session } from './api/session.ts';
+import { checkLogin, login, regenerateAfterLogin, regenerateAfterLoginError } from './api/login.js';
+import { checkLogout, logout, regenerateAfterLogout, regenerateAfterLogoutError } from './api/logout.js';
+import express, { ErrorRequestHandler, RequestHandler } from './express/index.js';
 import {
   handleExistingSessionWithNoSessionData,
   handleLocalsCreation,
@@ -10,12 +10,12 @@ import {
   handleSessionStoreRequired,
   handleSessionUserBodyResults,
   handleSessionWithNewlyGeneratedId,
-} from './middleware/handlers/index.js';
+} from './middleware/handlers/index.ts';
 
-import { UserSessionOptions } from './types/sessionOptions.js';
-import { expressSessionHandlerMiddleware } from './getSession.js';
-import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from './sessionUserHandler.js';
-import { sessionErrorHandler } from './middleware/index.js';
+import { UserSessionOptions } from './types/sessionOptions.ts';
+import { expressSessionHandlerMiddleware } from './getSession.ts';
+import { handleAssignUserIdToRequestSessionWhenNoExistingSessionData } from './sessionUserHandler.ts';
+import { sessionErrorHandler } from './middleware/index.ts';
 
 export const preLoginUserSessionMiddleware = (
   sessionOptions: UserSessionOptions

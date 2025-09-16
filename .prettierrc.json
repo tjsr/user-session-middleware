@@ -1,8 +1,15 @@
 {
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "parser": "typescript",
   "printWidth": 120,
   "plugins": ["prettier-plugin-sort-members"],
+  "semi": true,
   "singleQuote": true,
   "sortMembersAlphabetically": true,
   "tabWidth": 2,
-  "trailingComma": "es5"
+  "tabs": false,
+  "trailingComma": "es5",
+  "newLineBeforeEndOfFile": true
 }
