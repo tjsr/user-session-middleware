@@ -6,7 +6,7 @@
     "module": "NodeNext" /* Specify what module code is generated. */,
     "moduleResolution": "NodeNext" /* Specify how TypeScript looks up a file from a given module specifier. */,
     "resolveJsonModule": true /* Enable importing .json files. */,
-    "lib": ["ES2022"],
+    "lib": ["ES2023"],
     "types": [
       "vitest/globals"
     ] /* Specify type package names to be included without being referenced in a source file. */,

@@ -50,6 +50,16 @@ USM currently has the following config options:
 - loginPath - default `/login` - the GET/POST URL available to authenticate the user.
 - sessionPath - default `/session` - the GET/POST URL available to forcibly regenerate and assign a new session ID.
 
+## Repo configuration
+
+The workflow files for this repo require the NODE_VERSION and NPM_VERSION var to be specified.
+
+```bash
+  gh auth login
+  gh variable set NODE_VERSION -b "22.19.0"
+  gh variable set NPM_VERSION -b "11.6.0"
+```
+
 ## Dependabot
 
 The repo will requires an NPM_TOKEN to update npm dependencies using dependabot.  
@@ -58,3 +68,7 @@ The repo will requires an NPM_TOKEN to update npm dependencies using dependabot.
 ### Building
 
 First, `npm install` for dependencies.  To verify everything is okay, `npm build` and `npm test`.
+
+## Contact
+
+For details, questions, or requests, contact Tim Rowe <tim@tjsr.id.au>
