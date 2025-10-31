@@ -1,5 +1,5 @@
-import { SystemResponseLocals } from "../types/locals.js";
-import { UserSessionData } from "../types/session.js";
+import { SystemResponseLocals } from '../types/locals.ts';
+import { UserSessionData } from '../types/session.ts';
 import express from 'express';
 import session from 'express-session';
 
