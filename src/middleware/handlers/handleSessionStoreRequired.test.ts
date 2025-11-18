@@ -6,7 +6,7 @@ import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError
 import { MemoryStore } from 'express-session';
 import { SessionEnabledRequestContext } from '../../utils/testing/context/request.ts';
 import { SessionStoreNotConfiguredError } from '../../errors/errorClasses.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.ts';
 import { expectResponseSetsSessionIdCookie } from '@tjsr/testutils';
 import { handleSessionStoreRequired } from './handleSessionStoreRequired.ts';
@@ -56,7 +56,7 @@ describe('api.middleware.handleSessionStoreRequired', () => {
   test.skip('Should error on request when the session store is not configured.', async (context: ApiTestContext &
     MiddlewareHandlerTestContext &
     SessionTestContext &
-    TaskContext) => {
+    TestContext) => {
     context.preSessionMiddleware = [handleSessionStoreRequired];
     setupSessionContext(context, { store: null as unknown as MemoryStore });
     createHandlerTestContext(context);
@@ -75,7 +75,7 @@ describe('api.middleware.handleSessionStoreRequired', () => {
   test('Should accept a request when the session store is configured.', async (context: ApiTestContext &
     MiddlewareHandlerTestContext &
     SessionTestContext &
-    TaskContext) => {
+    TestContext) => {
     context.preSessionMiddleware = [handleSessionStoreRequired];
     setupSessionContext(context, { saveUninitialized: true });
     createHandlerTestContext(context);

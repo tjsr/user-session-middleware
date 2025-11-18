@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum HttpStatusCode {
   OK = 200,
   CREATED = 201,
@@ -22,5 +21,5 @@ export enum HttpStatusCode {
   NOT_IMPLEMENTED = 501,
   BAD_GATEWAY = 502,
   SERVICE_UNAVAILABLE = 503,
-  GATEWAY_TIMEOUT = 504,
+  GATEWAY_TIMEOUT = 504
 }

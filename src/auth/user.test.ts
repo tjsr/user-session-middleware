@@ -9,8 +9,8 @@ import { v5, validate as validateUuid } from 'uuid';
 
 import { SessionDataTestContext } from '../api/utils/testcontext.ts';
 import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
-import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from '../utils/testing/context/idNamespace.ts';
+import { TestContext } from 'vitest';
+import { UserIdTestContext } from '../utils/testing/context/idNamespace.ts';
 import { UserSessionData } from '../types/session.ts';
 import { generateSessionIdForTestName } from '@tjsr/testutils';
 
@@ -39,18 +39,18 @@ describe('createUserIdFromEmail', () => {
 });
 
 describe('getUserIdFromSession', () => {
-  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TestContext) => {
     setupSessionContext(context);
     createContextForSessionTest(context);
   });
 
-  test<UserIdTaskContext>('Should reject with an error if no session is defined', async ({ sessionOptions }) => {
+  test<UserIdTestContext>('Should reject with an error if no session is defined', async ({ sessionOptions }) => {
     expect(() => getUserIdFromSession(sessionOptions.userIdNamespace, undefined!, true)).rejects.toThrowError(
       expect.any(SessionNotGeneratedError)
     );
   });
 
-  test<UserIdTaskContext>('Should reject with an error if has session is but has no user', async ({
+  test<UserIdTestContext>('Should reject with an error if has session is but has no user', async ({
     task,
     sessionOptions,
   }) => {
@@ -113,7 +113,7 @@ describe('getUserIdFromSession', () => {
 });
 
 describe('createRandomIdAndSave', () => {
-  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TestContext) => {
     setupSessionContext(context);
     createContextForSessionTest(context);
   });

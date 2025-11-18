@@ -4,16 +4,16 @@ import express, { NextFunction } from './express/index.ts';
 
 import { HttpStatusCode } from './httpStatusCodes.ts';
 import { SystemHttpRequestType } from './types/request.ts';
-import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from './utils/testing/context/idNamespace.ts';
+import { TestContext } from 'vitest';
+import { UserIdTestContext } from './utils/testing/context/idNamespace.ts';
 import { addDataToSessionStore } from './testUtils.ts';
 import { mockSession } from './utils/testing/mocks.ts';
 import { setupMiddlewareContext } from './utils/testing/context/appLocals.ts';
 import { setupSupertestContext } from './utils/testing/supertestUtils.ts';
 
-describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
+describe<UserIdTestContext>('assignUserIdToRequestSessionHandler', () => {
   beforeEach(
-    async (context: ApiTestContext & UserIdTaskContext & SessionTestContext & SessionDataTestContext & TaskContext) => {
+    async (context: ApiTestContext & UserIdTestContext & SessionTestContext & SessionDataTestContext & TestContext) => {
       const _sessionContext: SessionTestContext = setupSessionContext(context);
       setupMiddlewareContext(context);
       const sessionStoreData = mockSession(context.sessionOptions.userIdNamespace, { userId: null! });
@@ -24,10 +24,10 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
   );
 
   test('Should set and save the userId on the request session when data in store has no userId.', async (context: ApiTestContext &
-    UserIdTaskContext &
+    UserIdTestContext &
     WithSessionTestContext &
     SessionDataTestContext &
-    TaskContext) => {
+    TestContext) => {
     const st = setupSupertestContext(context);
     const response = await st;
     expect(response.error).toBeFalsy();
@@ -35,8 +35,8 @@ describe<UserIdTaskContext>('assignUserIdToRequestSessionHandler', () => {
   });
 });
 
-describe<UserIdTaskContext>('api.handler.assignUserIdToRequestSessionHandler', () => {
-  beforeEach(async (context: ApiTestContext & TaskContext & SessionDataTestContext) => {
+describe<UserIdTestContext>('api.handler.assignUserIdToRequestSessionHandler', () => {
+  beforeEach(async (context: ApiTestContext & TestContext & SessionDataTestContext) => {
     setupSessionContext(context, {
       secret: 'test-secret',
     });
@@ -47,7 +47,7 @@ describe<UserIdTaskContext>('api.handler.assignUserIdToRequestSessionHandler', (
 
   test('Should set and save the userId on the session when no userId set but data in store has a userId.', async (context: ApiTestContext<WithSessionTestContext> &
     SessionDataTestContext &
-    TaskContext) => {
+    TestContext) => {
     const testUserId = context.testSessionStoreData.userId;
 
     const _endValidator = (req: SystemHttpRequestType, response: express.Response, next: NextFunction) => {

@@ -5,7 +5,7 @@ import { loginWithContext, setLoginUserLookupWithContextUserData } from '../util
 import { HttpStatusCode } from '../httpStatusCodes.ts';
 import { NoSessionTestContext } from '../utils/testing/context/session.ts';
 import { SessionId } from '../types.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { forceHandlerAssertions } from '../middleware/handlerChainLog.ts';
 
 describe('api.login', () => {
@@ -14,7 +14,7 @@ describe('api.login', () => {
   });
 
   // A new session ID should be generated for any authentication event
-  beforeEach((context: ApiTestContext<NoSessionTestContext> & TaskContext) => {
+  beforeEach((context: ApiTestContext<NoSessionTestContext> & TestContext) => {
     setupApiTest(context);
   });
 

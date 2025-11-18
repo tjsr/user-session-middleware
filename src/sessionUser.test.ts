@@ -11,7 +11,7 @@ import { createContextForSessionTest, createTestRequestSessionData } from './tes
 
 import { SessionDataTestContext } from './api/utils/testcontext.ts';
 import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 
 describe<SessionDataTestContext>('assignUserIdToSession', () => {
@@ -104,7 +104,7 @@ describe<SessionDataTestContext>('assignUserIdToSession', () => {
 });
 
 describe('assignUserIdToRequestSession', () => {
-  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TestContext) => {
     setupSessionContext(context);
     createContextForSessionTest(context);
     setupExpressContext(context);

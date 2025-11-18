@@ -34,6 +34,7 @@ export type HandlerErrorResult = {
 
 const expectVerifyHandlerFunction = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
+  // eslint-disable-next-line @stylistic/js/comma-dangle
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -69,6 +70,7 @@ const expectVerifyHandlerFunction = <
 
 export const verifyHandlerFunctionCallsNextWithError = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
+  // eslint-disable-next-line @stylistic/js/comma-dangle
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -90,6 +92,7 @@ export const verifyHandlerFunctionCallsNextWithError = <
 
 export const verifyHandlerFunctionCallsNext = <
   RequestType extends SystemHttpRequestType,
+  // eslint-disable-next-line @stylistic/js/comma-dangle
   ResponseType extends SystemHttpResponseType,
 >(
   handlerFunction: HandlerFunction,

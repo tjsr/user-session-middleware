@@ -4,7 +4,7 @@ import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/c
 import { HttpStatusCode } from '../httpStatusCodes.ts';
 import { SessionData } from '../express-session/index.ts';
 import { SessionId } from '../types.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { addDataToSessionStore } from '../testUtils.ts';
 import { getStoreSessionAsPromise } from './utils/sessionStoreUtils.ts';
 import { loginWithContext } from '../utils/testing/apiTestUtils.ts';
@@ -12,7 +12,7 @@ import { refreshSession } from './utils/refreshSession.ts';
 
 describe<WithSessionTestContext>('api.session', () => {
   // A new session ID should be generated for any authentication event
-  beforeEach((context: ApiTestContext<NoSessionTestContext> & TaskContext) => {
+  beforeEach((context: ApiTestContext<NoSessionTestContext> & TestContext) => {
     setupApiTest(context);
   });
 
@@ -44,7 +44,7 @@ describe<WithSessionTestContext>('api.session', () => {
   };
 
   test<
-    ApiTestContext<WithSessionTestContext & TaskContext>
+    ApiTestContext<WithSessionTestContext & TestContext>
   >('Should regenerate a new sessionId for a connection that provides an existing session ID.', async (context) => {
     const sessionData: Partial<SessionData> = {};
     await addDataToSessionStore(context, sessionData);

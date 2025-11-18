@@ -5,11 +5,11 @@ import { createContextForSessionTest, createMockPromisePair, createTestRequestSe
 
 import { SessionDataTestContext } from './utils/testcontext.ts';
 import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { generateSessionIdForTest } from '../utils/testing/testIdUtils.ts';
 
 describe<SessionDataTestContext>('logout', () => {
-  beforeEach((context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext & TestContext) => {
     setupSessionContext(context);
     createContextForSessionTest(context);
   });

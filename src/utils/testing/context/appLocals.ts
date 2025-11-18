@@ -1,4 +1,4 @@
-import { ExpressAppTaskContext, UserAppTaskContext } from '../../../api/utils/testcontext.ts';
+import { ExpressAppTestContext, UserAppTestContext } from '../../../api/utils/testcontext.ts';
 import express, { NextFunction } from '../../../express/index.ts';
 
 import { HttpStatusCode } from '../../../httpStatusCodes.ts';
@@ -6,9 +6,9 @@ import { SessionTestContext } from './session.ts';
 import { SystemHttpRequestType } from '../../../types/request.ts';
 import { useUserSessionMiddleware } from '../../../useUserSessionMiddleware.ts';
 
-export const setupExpressContext = (context: SessionTestContext): UserAppTaskContext => {
+export const setupExpressContext = (context: SessionTestContext): UserAppTestContext => {
   assert(context.sessionOptions !== undefined, 'sessionOptions must be defined. Call setupSessionContext() first.');
-  const appContext = context as unknown as UserAppTaskContext;
+  const appContext = context as unknown as UserAppTestContext;
   if (appContext.app !== undefined) {
     throw new Error(`app is already defined on context for test ${context.task.suite?.name}/${context.task.name}`);
   }
@@ -22,8 +22,8 @@ export const setupExpressContext = (context: SessionTestContext): UserAppTaskCon
 
 export const setupMiddlewareContext = (
   context: SessionTestContext & { noCreateDefaultRoute?: boolean }
-): UserAppTaskContext => {
-  const appContext: ExpressAppTaskContext = setupExpressContext(context);
+): UserAppTestContext => {
+  const appContext: ExpressAppTestContext = setupExpressContext(context);
   useUserSessionMiddleware(appContext.app, context.sessionOptions);
 
   if (context.noCreateDefaultRoute !== true) {
@@ -42,5 +42,5 @@ export const setupMiddlewareContext = (
     appContext.app.use(endValidator);
   }
 
-  return appContext as UserAppTaskContext;
+  return appContext as UserAppTestContext;
 };

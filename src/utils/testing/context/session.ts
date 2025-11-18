@@ -2,13 +2,13 @@ import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../get
 
 import { MemoryStore } from '../../../express-session/index.ts';
 import { SessionId } from '../../../types.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { UserSessionData } from '../../../types/session.ts';
 import { UserSessionOptions } from '../../../types/sessionOptions.ts';
 import { generateSessionIdForTestName } from '@tjsr/testutils';
-import { getTaskContextUserIdNamespace } from './idNamespace.ts';
+import { getTestContextUserIdNamespace } from './idNamespace.ts';
 
-export type SessionTestContext = TaskContext & {
+export type SessionTestContext = TestContext & {
   currentSessionId?: SessionId;
   sessionOptions: UserSessionOptions;
 };
@@ -16,7 +16,7 @@ export type SessionTestContext = TaskContext & {
 export type WithSessionTestContext = Omit<SessionTestContext, 'currentSessionId'> & { currentSessionId: SessionId };
 export type NoSessionTestContext = Omit<SessionTestContext, 'currentSessionId'> & { currentSessionId: never };
 
-export type SessionDataTaskContext = SessionTestContext & {
+export type SessionDataTestContext = SessionTestContext & {
   sessionData: Map<string, UserSessionData>;
 };
 
@@ -55,7 +55,7 @@ const addSessionOptionsToContext = (
   context.sessionOptions.cookie = options?.cookie || context.sessionOptions.cookie;
   context.sessionOptions.rolling = booleanFallThrough(false, options?.rolling, context.sessionOptions.rolling);
   context.sessionOptions.userIdNamespace =
-    options?.userIdNamespace || context.sessionOptions.userIdNamespace || getTaskContextUserIdNamespace(context);
+    options?.userIdNamespace || context.sessionOptions.userIdNamespace || getTestContextUserIdNamespace(context);
   context.sessionOptions.debugSessionOptions = booleanFallThrough(
     false,
     options?.debugSessionOptions,
@@ -74,7 +74,7 @@ const addSessionOptionsToContext = (
 };
 
 export const setupSessionContext = (
-  context: TaskContext,
+  context: TestContext,
   options?: Partial<UserSessionOptions> | null
 ): SessionTestContext => {
   const sessionContext: SessionTestContext = context as unknown as SessionTestContext;

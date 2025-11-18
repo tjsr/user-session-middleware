@@ -2,7 +2,7 @@ import { ApiTestContext, setupApiTest } from './utils/testcontext.ts';
 import { NoSessionTestContext, WithSessionTestContext } from '../utils/testing/context/session.ts';
 
 import { HttpStatusCode } from '../httpStatusCodes.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { UserSessionOptions } from '../types/sessionOptions.ts';
 import { addDataToSessionStore } from '../testUtils.ts';
 import { loginWithContext } from '../utils/testing/apiTestUtils.ts';
@@ -10,7 +10,7 @@ import { setupSupertestContext } from '../utils/testing/supertestUtils.ts';
 
 describe('api.endpoints', () => {
   const withApi = async <
-    ContextType extends TaskContext,
+    ContextType extends TestContext,
     SessionType extends WithSessionTestContext | NoSessionTestContext,
   >(
     context: ContextType,
@@ -32,8 +32,8 @@ describe('api.endpoints', () => {
     return response;
   };
 
-  test('Should find login at default endpoint with implicit setting', async (context: TaskContext) => {
-    const apiContext = await withApi<TaskContext, WithSessionTestContext>(context, { loginPath: undefined });
+  test('Should find login at default endpoint with implicit setting', async (context: TestContext) => {
+    const apiContext = await withApi<TestContext, WithSessionTestContext>(context, { loginPath: undefined });
     apiContext.loginEmail = 'test@example.com';
     const sessionOpts: UserSessionOptions = apiContext.app.locals['sessionOptions'];
     expect(sessionOpts.loginPath).toBeUndefined();
@@ -42,8 +42,8 @@ describe('api.endpoints', () => {
     expect(loginResponse.statusCode).toEqual(HttpStatusCode.OK);
   });
 
-  test('Should find login with path explicitly specified same as default', async (context: TaskContext) => {
-    const apiContext = await withApi<TaskContext, WithSessionTestContext>(context, { loginPath: '/login' });
+  test('Should find login with path explicitly specified same as default', async (context: TestContext) => {
+    const apiContext = await withApi<TestContext, WithSessionTestContext>(context, { loginPath: '/login' });
     apiContext.loginEmail = 'test@example.com';
     const sessionOpts: UserSessionOptions = apiContext.app.locals['sessionOptions'];
     expect(sessionOpts.loginPath).toEqual('/login');
@@ -52,8 +52,8 @@ describe('api.endpoints', () => {
     expect(loginResponse.statusCode).toEqual(HttpStatusCode.OK);
   });
 
-  test('Should not find login with path changed from default', async (context: TaskContext) => {
-    const apiContext = await withApi<TaskContext, WithSessionTestContext>(context, { loginPath: '/auth' });
+  test('Should not find login with path changed from default', async (context: TestContext) => {
+    const apiContext = await withApi<TestContext, WithSessionTestContext>(context, { loginPath: '/auth' });
     apiContext.loginEmail = 'test@example.com';
     const sessionOpts: UserSessionOptions = apiContext.app.locals['sessionOptions'];
     expect(sessionOpts.loginPath).toEqual('/auth');

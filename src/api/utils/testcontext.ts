@@ -9,8 +9,8 @@ import express, { AppLocals } from '../../express/index.ts';
 
 import { AuthenticationRestResult } from '../../types/apiResults.ts';
 import { MockRequestWithSession } from '../../testUtils.ts';
-import { TaskContext } from 'vitest';
-import { UserIdTaskContext } from '../../utils/testing/context/idNamespace.ts';
+import { TestContext } from 'vitest';
+import { UserIdTestContext } from '../../utils/testing/context/idNamespace.ts';
 import { UserModel } from '../../types/model.ts';
 import { UserSessionData } from '../../types/session.ts';
 import { UserSessionOptions } from '../../types/sessionOptions.ts';
@@ -18,7 +18,7 @@ import { setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
 import { setupMiddlewareContext } from '../../utils/testing/context/appLocals.ts';
 import supertest from 'supertest';
 
-export interface SessionDataTestContext extends UserIdTaskContext {
+export interface SessionDataTestContext extends UserIdTestContext {
   testRequestData: MockRequestWithSession;
   testSessionStoreData: UserSessionData;
 }
@@ -27,13 +27,13 @@ export type ExpressAppWithLocals = express.Application & {
   locals: AppLocals;
 };
 
-export type ExpressAppTaskContext = {
+export type ExpressAppTestContext = {
   app: ExpressAppWithLocals;
 };
 
-export type UserAppTaskContext = UserIdTaskContext & ExpressAppTaskContext;
+export type UserAppTestContext = UserIdTestContext & ExpressAppTestContext;
 
-export type SupetestOptionsTaskContext<SessionType extends SessionTestContext = WithSessionTestContext> = TaskContext &
+export type SupetestOptionsTestContext<SessionType extends SessionTestContext = WithSessionTestContext> = TestContext &
   SessionType & {
     accepts?: string;
     applicationType?: string;
@@ -42,15 +42,15 @@ export type SupetestOptionsTaskContext<SessionType extends SessionTestContext = 
     startingUrl?: string;
   };
 
-export type SupetestTaskContext<SessionType extends SessionTestContext = WithSessionTestContext> =
-  SupetestOptionsTaskContext<SessionType> & {
+export type SupetestTestContext<SessionType extends SessionTestContext = WithSessionTestContext> =
+  SupetestOptionsTestContext<SessionType> & {
     st: supertest.Test;
   };
 
-export type ApiTestContext<STC extends SessionTestContext = SessionTestContext> = UserIdTaskContext &
+export type ApiTestContext<STC extends SessionTestContext = SessionTestContext> = UserIdTestContext &
   STC &
-  UserAppTaskContext &
-  SupetestOptionsTaskContext & {
+  UserAppTestContext &
+  SupetestOptionsTestContext & {
     userData: Map<EmailAddress, UserModel | undefined>;
   };
 
@@ -61,7 +61,7 @@ export interface MiddlewareHandlerTestContext {
 }
 
 export const setupApiTest = <SessionType extends WithSessionTestContext | NoSessionTestContext>(
-  context: TaskContext & { noCreateDefaultRoute?: boolean },
+  context: TestContext & { noCreateDefaultRoute?: boolean },
   sessionOptions?: Partial<UserSessionOptions> | undefined
 ): ApiTestContext<SessionType> => {
   const sessionContext = setupSessionContext(context, sessionOptions);
