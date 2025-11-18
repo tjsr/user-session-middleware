@@ -89,7 +89,7 @@ export const requestHasSessionId = (
 // prettier-ignore
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
-  DataType extends UserSessionData = UserSessionData,
+  DataType extends UserSessionData = UserSessionData
   >(
     req: RequestType
   ): string => {

@@ -19,7 +19,7 @@ export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -42,7 +42,7 @@ export interface MockReqRespSet<
  */
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
 >(
   requestProps?: MockRequest | undefined,
   mockResponseData?: Partial<ResponseType>

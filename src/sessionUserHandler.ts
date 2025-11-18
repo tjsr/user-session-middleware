@@ -14,7 +14,7 @@ const LOG_NO_COPY_USER_ID_TO_SESSION = process.env['LOG_NO_COPY_USER_ID_TO_SESSI
 // This comes after setting data from the session store.
 export const handleAssignUserIdToRequestSessionWhenNoExistingSessionData: UserSessionMiddlewareRequestHandler = async <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType<UserSessionData>,
+  ResponseType extends SystemHttpResponseType<UserSessionData>
 >(
   request: RequestType,
   response: ResponseType,
