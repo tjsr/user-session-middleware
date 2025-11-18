@@ -8,12 +8,12 @@ import {
 import { SessionDataTestContext, UserAppTestContext } from './api/utils/testcontext.ts';
 import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
 import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
-import { TestContext, TestContext } from 'vitest';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.ts';
 import express, { Application } from './express/index.ts';
 import expressSession, { MemoryStore } from 'express-session';
 
 import { SystemHttpRequestType } from './types/request.ts';
+import { TestContext } from 'vitest';
 import { generateSessionIdForTest } from './utils/testing/testIdUtils.ts';
 import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 import { validate } from 'uuid';
