@@ -5,10 +5,10 @@ import {
   getSessionIdFromCookie,
   sessionIdFromRequest,
 } from './getSession.ts';
-import { SessionDataTestContext, UserAppTaskContext } from './api/utils/testcontext.ts';
+import { SessionDataTestContext, UserAppTestContext } from './api/utils/testcontext.ts';
 import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
 import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
-import { TaskContext, TestContext } from 'vitest';
+import { TestContext, TestContext } from 'vitest';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.ts';
 import express, { Application } from './express/index.ts';
 import expressSession, { MemoryStore } from 'express-session';
@@ -136,7 +136,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
 describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false', () => {
   beforeEach((context: SessionDataTestContext & SessionTestContext) => {
     const sessionContext: SessionTestContext = setupSessionContext(context);
-    const appContext: UserAppTaskContext = setupExpressContext(sessionContext);
+    const appContext: UserAppTestContext = setupExpressContext(sessionContext);
     setupRequestContext(appContext);
     context.testRequestData = {
       app: appContext.app,
@@ -145,7 +145,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
     };
   });
 
-  test('Should return session.id.', (context: SessionDataTestContext & SessionTestContext & TaskContext) => {
+  test('Should return session.id.', (context: SessionDataTestContext & SessionTestContext & TestContext) => {
     const generatedSessionId = generateSessionIdForTest(context);
     context.sessionOptions.name = 'test.connect.sid';
     context.testRequestData['session'] = {
@@ -160,7 +160,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
 });
 
 describe<SessionDataTestContext>('integration.sessionIdFromRequest', () => {
-  beforeEach((context: SessionDataTestContext & SessionTestContext & UserAppTaskContext) => {
+  beforeEach((context: SessionDataTestContext & SessionTestContext & UserAppTestContext) => {
     setupSessionContext(context, {
       name: 'test.connect.sid',
     });

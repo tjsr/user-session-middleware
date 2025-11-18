@@ -1,6 +1,6 @@
 import { ApiTestContext, setupApiTest } from './utils/testcontext.ts';
 import { NoSessionTestContext, WithSessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
-import { TaskContext, beforeEach, describe, expect, test } from 'vitest';
+import { TestContext, beforeEach, describe, expect, test } from 'vitest';
 import { beginSession, refreshSession } from './utils/refreshSession.ts';
 import { generateSessionSecretForTestName, setSessionCookie } from '@tjsr/testutils';
 
@@ -14,8 +14,8 @@ import { logoutWithContext } from '../utils/testing/apiTestUtils.ts';
 import { mockSession } from '../utils/testing/mocks.ts';
 import supertest from 'supertest';
 
-describe<ApiTestContext<NoSessionTestContext> & TaskContext>('api.nosession.logout', () => {
-  beforeEach((context: ApiTestContext<WithSessionTestContext> & TaskContext) => {
+describe<ApiTestContext<NoSessionTestContext> & TestContext>('api.nosession.logout', () => {
+  beforeEach((context: ApiTestContext<WithSessionTestContext> & TestContext) => {
     setupApiTest(context);
   });
 
@@ -29,10 +29,10 @@ describe<ApiTestContext<NoSessionTestContext> & TaskContext>('api.nosession.logo
   });
 });
 
-describe<ApiTestContext<WithSessionTestContext> & TaskContext>('api.withsession.logout', () => {
+describe<ApiTestContext<WithSessionTestContext> & TestContext>('api.withsession.logout', () => {
   const testUserEmail = 'test-user@example.com';
 
-  beforeEach((context: ApiTestContext<WithSessionTestContext> & TaskContext) => {
+  beforeEach((context: ApiTestContext<WithSessionTestContext> & TestContext) => {
     setupApiTest(context, {
       debugCallHandlers: process.env['DEBUG'] ? true : false,
       secret: generateSessionSecretForTestName(context.task.name),

@@ -8,7 +8,8 @@
     "resolveJsonModule": true /* Enable importing .json files. */,
     "lib": ["ES2023"],
     "types": [
-      "vitest/globals"
+      "vitest/globals",
+      "node"
     ] /* Specify type package names to be included without being referenced in a source file. */,
     "allowImportingTsExtensions": true /* Allow importing .ts files with explicit .ts extension. */,
 

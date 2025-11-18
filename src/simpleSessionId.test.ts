@@ -5,7 +5,7 @@ import { addIgnoredLogsFromFunction, clearIgnoredFunctions } from './setup-tests
 
 import { SessionDataTestContext } from './api/utils/testcontext.ts';
 import { SystemHttpRequestType } from './types/request.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { UserSessionData } from './types/session.ts';
 import { assignUserIdToRequestSession } from './sessionUser.ts';
 import { copySessionDataToSession } from './store/loadData.ts';
@@ -138,7 +138,7 @@ describe<TypeContext>('copySessionDataToSession', () => {
     return session;
   };
 
-  beforeEach((context: SessionDataTestContext & TaskContext) => {
+  beforeEach((context: SessionDataTestContext & TestContext) => {
     const sessionContext = setupSessionContext(context);
 
     context.testSessionStoreData = mockSession(context.sessionOptions.userIdNamespace);

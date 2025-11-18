@@ -1,4 +1,4 @@
-import { ApiTestContext, SupetestTaskContext } from '../../api/utils/testcontext.ts';
+import { ApiTestContext, SupetestTestContext } from '../../api/utils/testcontext.ts';
 import { validateContextApp, validateSessionOptions } from './apiTestUtils.ts';
 
 import { SessionId } from '../../types.ts';
@@ -25,7 +25,7 @@ export const doSessionCall = async (
   return { response, updatedSessionId };
 };
 
-const setupSupertestCall = (st: supertest.Test, context: SupetestTaskContext): supertest.Test => {
+const setupSupertestCall = (st: supertest.Test, context: SupetestTestContext): supertest.Test => {
   if (context.applicationType) {
     st.set('Content-Type', context.applicationType);
   }
@@ -50,7 +50,7 @@ export const setupSupertestContext = (context: ApiTestContext<SessionTestContext
       ? supertest(context.app).post(context.startingUrl)
       : supertest(context.app).get(context.startingUrl);
 
-  const stContext = context as unknown as SupetestTaskContext;
+  const stContext = context as unknown as SupetestTestContext;
 
   const st = setupSupertestCall(agent, stContext);
   stContext.st = st;

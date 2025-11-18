@@ -3,17 +3,17 @@ import { SessionEnabledRequestContext, setupRequestContext } from '../utils/test
 import { SessionTestContext, setupSessionContext } from '../utils/testing/context/session.ts';
 
 import { SystemHttpRequestType } from '../types/request.ts';
-import { TaskContext } from 'vitest';
-import { UserAppTaskContext } from './utils/testcontext.ts';
+import { TestContext } from 'vitest';
+import { UserAppTestContext } from './utils/testcontext.ts';
 import { session } from './session.ts';
 import { setupExpressContext } from '../utils/testing/context/appLocals.ts';
 
 describe('session', () => {
   // test.todo('Should generate a new session ID if no existing one is given.', () => {
-  //   describe<ApiTestContext<NoSessionTestContext> & TaskContext>('api.nosession.logout', () => {
-  beforeEach((context: TaskContext) => {
+  //   describe<ApiTestContext<NoSessionTestContext> & TestContext>('api.nosession.logout', () => {
+  beforeEach((context: TestContext) => {
     const sessionCtx: SessionTestContext = setupSessionContext(context);
-    const appContext: UserAppTaskContext = setupExpressContext(sessionCtx);
+    const appContext: UserAppTestContext = setupExpressContext(sessionCtx);
     setupRequestContext(appContext);
     setupResponseContext(appContext);
   });

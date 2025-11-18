@@ -4,13 +4,13 @@ import { getSignedCookieValue, setRequestSessionCookie } from './setSessionCooki
 import { SESSION_SECRET } from '../getSession.ts';
 import { SessionEnabledRequestContext } from '../utils/testing/context/request.ts';
 import { SessionId } from '../types.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { createTestRequestSessionData } from '../testUtils.ts';
 import { expectSetSessionCookieOnResponseMock } from '../utils/testing/cookieTestUtils.ts';
 import { setupExpressContext } from '../utils/testing/context/appLocals.ts';
 
 describe('setSessionCookie', () => {
-  beforeEach((context: TaskContext) => {
+  beforeEach((context: TestContext) => {
     const sessionContext: SessionTestContext = setupSessionContext(context, { secret: SESSION_SECRET });
     setupExpressContext(sessionContext);
   });

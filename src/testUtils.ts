@@ -1,5 +1,5 @@
 import { Cookie, Store } from './express-session/index.ts';
-import { Mock, MockInstance, TaskContext } from 'vitest';
+import { Mock, MockInstance, TestContext } from 'vitest';
 import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.ts';
 import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.ts';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
@@ -19,7 +19,8 @@ export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
 export interface MockReqRespSet<
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
+  // eslint-ignore-next @stylistic/js/comma-dangle
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 > {
   clearMockReq: () => void;
   clearMockRes: () => void;
@@ -42,7 +43,8 @@ export interface MockReqRespSet<
  */
 export const getMockReqResp = <
   RequestType extends SystemHttpRequestType = SystemHttpRequestType<UserSessionData>,
-  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>
+  // eslint-ignore-next @stylistic/js/comma-dangle
+  ResponseType extends SystemHttpResponseType = SystemHttpResponseType<UserSessionData>,
 >(
   requestProps?: MockRequest | undefined,
   mockResponseData?: Partial<ResponseType>
@@ -185,7 +187,7 @@ export interface MockRequestWithSession extends MockRequest {
 }
 
 export const createContextForSessionTest = (
-  context: SessionDataTestContext & SessionTestContext & TaskContext,
+  context: SessionDataTestContext & SessionTestContext & TestContext,
   requestDataDefaults: MockRequestWithSession = {},
   sessionStoreDefaults: Partial<UserSessionData> = {}
 ): void => {

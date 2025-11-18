@@ -8,7 +8,7 @@ import {
 import { verifyHandlerFunctionCallsNext, verifyHandlerFunctionCallsNextWithError } from '../../middlewareTestUtils.ts';
 
 import { HttpStatusCode } from '../../httpStatusCodes.ts';
-import { TaskContext } from 'vitest';
+import { TestContext } from 'vitest';
 import { createHandlerTestContext } from '../../utils/testing/handlerTestutils.ts';
 import { handleSessionIdRequired } from './handleSessionIdRequired.ts';
 import { setupSupertestContext } from '../../utils/testing/supertestUtils.ts';
@@ -24,7 +24,7 @@ describe('handler.handleSessionIdRequired', () => {
 describe('api.handleSessionIdRequired', () => {
   beforeEach(
     (
-      context: ApiTestContext<WithSessionTestContext> & MiddlewareHandlerTestContext & SessionTestContext & TaskContext
+      context: ApiTestContext<WithSessionTestContext> & MiddlewareHandlerTestContext & SessionTestContext & TestContext
     ) => {
       context.preSessionMiddleware = [handleSessionIdRequired];
       setupSessionContext(context);
