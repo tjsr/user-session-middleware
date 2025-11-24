@@ -65,7 +65,6 @@
     "@types/node": "^22.19.1",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
-    "@types/uuid": "^11.0.0",
     "@vitest/coverage-v8": "^4.0.13",
     "expect-cookies": "^0.3.1",
     "linkteam": "^0.0.18",
