@@ -12,6 +12,7 @@ declare module 'express' {
 
   interface Response {
     locals: SystemResponseLocals<UserSessionData>;
+    sendfile?: (path: string, options?: object, callback?: (err: Error) => void) => void;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type

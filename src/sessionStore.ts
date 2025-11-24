@@ -1,10 +1,9 @@
-import * as expressSession from 'express-session';
-
 import { Connection, Pool } from 'mysql2';
 import { PoolOptions, elideValues, getPoolConfig } from '@tjsr/mysql-pool-utils';
 import mySQLStore, { MySQLStore } from 'express-mysql-session';
 
 import { checkDeletePrivileges } from './store/mysqlStorePermissions.ts';
+import expressSession from 'express-session';
 
 let POOL_OPTIONS: PoolOptions;
 
@@ -16,7 +15,9 @@ const getPoolOptions = (): PoolOptions => {
 };
 
 type USMSessionStoreOptions = mySQLStore.Options & {
-  bigNumberStrings: boolean|undefined, supportBigNumbers: boolean | undefined };
+  bigNumberStrings: boolean | undefined;
+  supportBigNumbers: boolean | undefined;
+};
 
 let SESSION_STORE_OPTIONS: USMSessionStoreOptions;
 
@@ -46,7 +47,7 @@ const getSessionStoreOptions = (): USMSessionStoreOptions => {
   }
   return SESSION_STORE_OPTIONS;
 };
-  
+
 let mysqlSessionStoreSingleton: MySQLStore;
 export const getMysqlSessionStore = (): MySQLStore => {
   const sessionStoreOptions: USMSessionStoreOptions = getSessionStoreOptions();
@@ -55,25 +56,24 @@ export const getMysqlSessionStore = (): MySQLStore => {
       if (process.env['PRINT_SESSION_DB_CONN'] === 'true') {
         console.debug(`Session store options: ${JSON.stringify(sessionStoreOptions, elideValues)}`);
       }
-      
+
       const MysqlSessionStore = mySQLStore(expressSession);
-      const mysqlSessionStore: MySQLStore = new MysqlSessionStore(
-        sessionStoreOptions /* session store options */
-      );
+      const mysqlSessionStore: MySQLStore = new MysqlSessionStore(sessionStoreOptions /* session store options */);
       mysqlSessionStore.validateOptions(sessionStoreOptions);
       const sessionConnection: Connection | Pool = mysqlSessionStore.connection;
-      checkDeletePrivileges(sessionConnection).then((complete: boolean) => {
-        if (complete) {
-          console.log('Successfully checked delete privileges on MySQL session table.');
-          mysqlSessionStoreSingleton = mysqlSessionStore;
-        } else {
-          throw new Error('Failed to complete privilege check on MySQL session table.');
-        }
-
-      }).catch((err) => {
-        console.error('Failed checking delete privileges', err);
-        throw err;
-      });
+      checkDeletePrivileges(sessionConnection)
+        .then((complete: boolean) => {
+          if (complete) {
+            console.log('Successfully checked delete privileges on MySQL session table.');
+            mysqlSessionStoreSingleton = mysqlSessionStore;
+          } else {
+            throw new Error('Failed to complete privilege check on MySQL session table.');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed checking delete privileges', err);
+          throw err;
+        });
     } catch (err) {
       console.error('Failed getting MySQL session store', err);
       throw err;

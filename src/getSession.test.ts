@@ -14,7 +14,6 @@ import expressSession, { MemoryStore } from 'express-session';
 
 import { SystemHttpRequestType } from './types/request.ts';
 import { TestContext } from 'vitest';
-import { generateSessionIdForTest } from './utils/testing/testIdUtils.ts';
 import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 import { validate } from 'uuid';
 
@@ -106,9 +105,7 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=true'
   });
 
   test('Should not return session.id value.', (context: SessionEnabledRequestContext) => {
-    context.testRequestData['session'] = {
-      id: generateSessionIdForTest(context),
-    };
+    setupSessionContext(context);
 
     const reqContext = setupRequestContext(context, context.testRequestData);
     const sessionId = sessionIdFromRequest(reqContext.request);
@@ -146,7 +143,8 @@ describe<SessionDataTestContext>('sessionIdFromRequest.regenerateSessionId=false
   });
 
   test('Should return session.id.', (context: SessionDataTestContext & SessionTestContext & TestContext) => {
-    const generatedSessionId = generateSessionIdForTest(context);
+    setupSessionContext(context);
+    const generatedSessionId = context.testRequestData['sessionId'];
     context.sessionOptions.name = 'test.connect.sid';
     context.testRequestData['session'] = {
       id: generatedSessionId,

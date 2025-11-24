@@ -76,11 +76,6 @@ export const getMockRequestResponse: <ResponseType extends SystemHttpResponseTyp
   _mockResponseData?: Partial<ResponseType>
 ) => MockReqRespSet = getMockReqResp;
 
-/**
- * @deprecated This method should not be called directly. User setupRequestContext(AppContext, reqData).
- */
-export const getMockRequest = getMockReq;
-export const getMockResponse = getMockRes;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMockPromisePair = (template: any): [Promise<void>, Mock] => {
