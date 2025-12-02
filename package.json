@@ -64,7 +64,7 @@
     "@types/node": "^24.10.1",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
-    "@vitest/coverage-v8": "^4.0.14",
+    "@vitest/coverage-v8": "^4.0.15",
     "expect-cookies": "^0.3.1",
     "linkteam": "^0.0.18",
     "prettier-plugin-sort-members": "^0.2.4",
