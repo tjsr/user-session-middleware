@@ -1,4 +1,4 @@
-import * as expressSession from 'express-session';
+import expressSession from 'express-session';
 
 import { Connection, Pool } from 'mysql2';
 import { PoolOptions, elideValues, getPoolConfig } from '@tjsr/mysql-pool-utils';
