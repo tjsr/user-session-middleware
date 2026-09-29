@@ -64,7 +64,7 @@
     "@types/node": "^24.10.4",
     "@types/request-ip": "^0.0.41",
     "@types/supertest": "^6.0.3",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/coverage-v8": "^4.1.0",
     "expect-cookies": "^0.3.1",
     "linkteam": "^0.0.18",
     "prettier-plugin-sort-members": "^0.2.4",
@@ -72,7 +72,7 @@
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.10",
+    "vitest": "^4.1.0",
     "vitest-mock-express": "^2.2.0"
   },
   "dependencies": {
@@ -93,6 +93,7 @@
     "braces": ">=3.0.3",
     "mysql2": ">=3.10.0",
     "glob": ">=11.0.0",
+    "vitest@^2.1.4": "3.2.6",
     "rimraf@<=4": "$rimraf"
   },
   "optionalDependencies": {
