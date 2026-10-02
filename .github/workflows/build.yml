@@ -42,8 +42,7 @@ jobs:
     - run: npm run test
     - run: npm run build
 
-    - name: Run lint at end on all other branches
+    - name: Validate package contents on non-release branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
-      run: |
-        npm publish --dry-run
+      run: npm pack --dry-run
   
