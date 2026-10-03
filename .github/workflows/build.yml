@@ -17,6 +17,9 @@ jobs:
         node-version: ${{ vars.NODE_VERSION }}
         registry-url: 'https://npm.pkg.github.com'
 
+    - name: Use configured npm version
+      run: npm install --global npm@${{ vars.NPM_VERSION }}
+
     - name: Cache node modules
       id: cache-npm
       uses: actions/cache@main
