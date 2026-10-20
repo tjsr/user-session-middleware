@@ -84,7 +84,7 @@
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.19.0",
     "snowflake-uuid": "^1.0.0",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.2"
   },
   "peerDependencies": {
     "express": "^4.21.2"
