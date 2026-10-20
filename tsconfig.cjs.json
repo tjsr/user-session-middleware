@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist/cjs",
     "module": "commonjs",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "target": "ESNext",
     "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
     "declarationMap": true /* Create sourcemaps for d.ts files. */

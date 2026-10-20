@@ -71,7 +71,7 @@
     "rimraf": "^6.1.2",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vitest": "^4.0.10",
     "vitest-mock-express": "^2.2.0"
   },
