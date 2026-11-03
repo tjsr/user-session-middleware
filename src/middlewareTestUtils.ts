@@ -1,4 +1,4 @@
- 
+
 
 import express from 'express';
 import { Assertion } from 'vitest';
@@ -35,7 +35,7 @@ export type HandlerErrorResult = {
 
 const expectVerifyHandlerFunction = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-   
+
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -71,7 +71,7 @@ const expectVerifyHandlerFunction = <
 
 export const verifyHandlerFunctionCallsNextWithError = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-   
+
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -93,7 +93,7 @@ export const verifyHandlerFunctionCallsNextWithError = <
 
 export const verifyHandlerFunctionCallsNext = <
   RequestType extends SystemHttpRequestType,
-   
+
   ResponseType extends SystemHttpResponseType,
 >(
   handlerFunction: HandlerFunction,

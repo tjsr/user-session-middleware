@@ -33,7 +33,7 @@ export type { UserSessionOptions } from './types/sessionOptions.ts';
 export type { UserModel } from './types/model.ts';
 export type {
   UserSessionMiddlewareErrorHandler,
-   
+
   UserSessionMiddlewareRequestHandler,
 } from './types/middlewareHandlerTypes.ts';
 export type { SystemRequestOrExpressRequest, SystemResponseOrExpressResponse } from './types/optionalReqRes.ts';

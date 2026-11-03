@@ -32,7 +32,7 @@ export interface MockReqRespSet<
   spies?: Map<Function, MockInstance>;
 }
 
- 
+
 /**
  * @param {MockRequest | undefined} requestProps Values that should be provided as defaults or
  * overrides on the request.
@@ -49,7 +49,7 @@ export const getMockReqResp = <
   requestProps?: MockRequest | undefined,
   mockResponseData?: Partial<ResponseType>
 ): MockReqRespSet => {
-   
+
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
   const request: RequestType & { app: express.Application } = getMockReq(requestProps);
