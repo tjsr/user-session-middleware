@@ -3,10 +3,15 @@ run-name: Build user-session-middleware build on ${{ github.ref_name }}.
 on: [push]
 jobs:
   build-user-session-middleware:
+    name: Node ${{ matrix.node }} (${{ matrix.support }})
     strategy:
       fail-fast: false
       matrix:
-        node: [22, 24]
+        include:
+          - node: 22
+            support: diagnostic
+          - node: 24
+            support: supported
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -40,6 +45,29 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
+    # Temporary authenticated lock generation; removed once generated files are committed.
+    - name: Resolve verified dependency releases
+      run: |
+        node --input-type=commonjs <<'NODE'
+        const fs = require('node:fs');
+        const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+        p.dependencies['@tjsr/simple-env-utils'] = '^0.1.11';
+        p.devDependencies['@tjsr/testutils'] = '^0.0.12';
+        p.engines = { ...p.engines, node: '>=24.21.0' };
+        fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+        NODE
+        npm install --package-lock-only --ignore-scripts
+
+    - name: Save generated dependency lock
+      uses: actions/upload-artifact@v7
+      with:
+        name: dependency-lock-node-${{ matrix.node }}
+        path: |
+          package.json
+          package-lock.json
+        if-no-files-found: error
+        retention-days: 1
+
     - run: npm ci
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
@@ -53,5 +81,5 @@ jobs:
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
-        npm publish --dry-run
+        npm publish --dry-run --tag ci
   
