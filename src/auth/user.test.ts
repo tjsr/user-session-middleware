@@ -45,7 +45,7 @@ describe('getUserIdFromSession', () => {
   });
 
   test<UserIdTestContext>('Should reject with an error if no session is defined', async ({ sessionOptions }) => {
-    expect(() => getUserIdFromSession(sessionOptions.userIdNamespace, undefined!, true)).rejects.toThrowError(
+    await expect(() => getUserIdFromSession(sessionOptions.userIdNamespace, undefined!, true)).rejects.toThrowError(
       expect.any(SessionNotGeneratedError)
     );
   });
@@ -62,7 +62,7 @@ describe('getUserIdFromSession', () => {
       userId: undefined,
     };
 
-    expect(
+    await expect(
       async () =>
         await getUserIdFromSession(sessionOptions.userIdNamespace, testSessionData as Session & UserSessionData, true)
     ).rejects.toThrowError(expect.any(SessionUserInfoError));
