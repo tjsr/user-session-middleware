@@ -20,7 +20,7 @@ type ParamsWrapper = {
 };
 
 export type HandlerExpectionResult = {
-  expected: Assertion<express.NextFunction>;
+  expected: Assertion<void, express.NextFunction>;
   next: express.NextFunction;
   nextParams: ParamsWrapper;
   response: express.Response;
