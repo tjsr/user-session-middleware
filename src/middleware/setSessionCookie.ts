@@ -1,7 +1,7 @@
 import { SessionSecretSet } from '@tjsr/testutils';
 import { UserSessionOptions } from '../types/sessionOptions.ts';
 import assert from 'assert';
-import cookie from 'cookie';
+import { stringifySetCookie } from 'cookie';
 import express from 'express';
 import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 import signature from 'cookie-signature';
@@ -27,10 +27,13 @@ const setSignedSessionCookie = (
 ): void => {
   console.debug(setRequestSessionCookie, `Setting ${cookieName} cookie to ${sessionId}.`);
 
-  const cookieOptions: cookie.SerializeOptions = { httpOnly: true, path: '/', sameSite: 'strict' };
+  const cookieOptions = { httpOnly: true, path: '/', sameSite: 'strict' as const };
   const signedCookieValue = getSignedCookieValue(sessionId, secret);
   if (COOKIE_WITH_HEADER) {
-    const cookieString = cookie.serialize(cookieName, signedCookieValue, cookieOptions);
+    const cookieString = stringifySetCookie(
+      { ...cookieOptions, name: cookieName, value: signedCookieValue },
+      { encode: encodeURIComponent }
+    );
     response.set('Set-Cookie', cookieString);
   } else {
     response.cookie(cookieName, signedCookieValue, cookieOptions);
