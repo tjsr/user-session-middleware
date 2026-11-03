@@ -12,6 +12,8 @@ jobs:
             support: diagnostic
           - node: 24
             support: supported
+          - node: 26
+            support: supported
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,10 +38,10 @@ jobs:
         # npm cache files are stored in `~/.npm` on Linux/macOS
         path: ~/.npm
         # todo - change this so we are less restrictive on package-lock changes
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-${{ matrix.node }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
+          ${{ runner.os }}-${{ matrix.node }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-${{ matrix.node }}-build-
           ${{ runner.os }}-
 
     - name: Install latest npm
@@ -58,5 +60,5 @@ jobs:
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
-        npm publish --dry-run --tag ci
+        npm pack --dry-run
   
