@@ -60,5 +60,5 @@ jobs:
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
-        npm publish --dry-run --tag ci
+        npm pack --dry-run
   
