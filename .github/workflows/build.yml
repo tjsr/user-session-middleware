@@ -3,23 +3,33 @@ run-name: Build user-session-middleware build on ${{ github.ref_name }}.
 on: [push]
 jobs:
   build-user-session-middleware:
+    name: Node ${{ matrix.node }} (${{ matrix.support }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node: 22
+            support: diagnostic
+          - node: 24
+            support: supported
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Check out repository code
-      uses: actions/checkout@main
+      uses: actions/checkout@v7
 
     # Setup .npmrc file to publish to GitHub Packages
     - name: Use Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: ${{ vars.NODE_VERSION }}
+        node-version: ${{ matrix.node }}
+        check-latest: true
         registry-url: 'https://npm.pkg.github.com'
 
     - name: Cache node modules
       id: cache-npm
-      uses: actions/cache@main
+      uses: actions/cache@v5
       env:
         cache-name: cache-node-modules
       with:
@@ -31,6 +41,9 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+
+    - name: Install latest npm
+      run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
     - run: npm ci
 
@@ -45,5 +58,5 @@ jobs:
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
-        npm publish --dry-run
+        npm publish --dry-run --tag ci
   
