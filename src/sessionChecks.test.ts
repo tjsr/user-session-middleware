@@ -1,14 +1,15 @@
-import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
-import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.ts';
 
 import { SessionData } from 'express-session';
-import { SessionDataTestContext } from './api/utils/testcontext.ts';
-import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
-import { SessionNotGeneratedError } from './errors/errorClasses.ts';
 import { SessionOptions } from 'express-session';
-import { clearIgnoreLogFilters } from './setup-tests.ts';
-import { regenerateSessionIdIfNoSessionData } from './sessionChecks.ts';
 import session from 'express-session';
+
+import { SessionDataTestContext } from './api/utils/testcontext.ts';
+import { SessionNotGeneratedError } from './errors/errorClasses.ts';
+import { regenerateSessionIdIfNoSessionData } from './sessionChecks.ts';
+import { clearIgnoreLogFilters } from './setup-tests.ts';
+import { createContextForSessionTest, createTestRequestSessionData } from './testUtils.ts';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
+import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
 
 describe('endResponseWhenNoSessionId', () => {
   test('Should not fail because we have no tests.', () => expect(true).toBe(true));

@@ -1,24 +1,26 @@
-import * as expressSession from './express-session/index.ts';
+
+
+import { IncomingHttpHeaders } from 'http';
+
+import { isProductionMode } from '@tjsr/simple-env-utils';
+import session from 'express-session';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   ConfigurationOptionRequiredError,
   MiddlewareConfigurationError,
   SetCookieHeaderNotPermittedError,
 } from './errors/errorClasses.ts';
-
-import { IncomingHttpHeaders } from 'http';
-import { RequestHandler } from './express/index.ts';
-import { SessionId } from './types.ts';
-import { SessionMiddlewareError } from './errors/SessionMiddlewareError.ts';
-import { SystemHttpRequestType } from './types/request.ts';
 import { UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.ts';
+import { SessionMiddlewareError } from './errors/SessionMiddlewareError.ts';
+import { RequestHandler } from './express/index.ts';
+import * as expressSession from './express-session/index.ts';
+import { getCookieKeyFromRequest } from './session/sessionCookie.ts';
+import { SystemHttpRequestType } from './types/request.ts';
 import { UserSessionData } from './types/session.ts';
 import { UserSessionOptions } from './types/sessionOptions.ts';
-import { getCookieKeyFromRequest } from './session/sessionCookie.ts';
+import { SessionId } from './types.ts';
 import { getDefaultUserIdNamespace } from './user/userIdNamespace.ts';
-import { isProductionMode } from '@tjsr/simple-env-utils';
-import session from 'express-session';
-import { v4 as uuidv4 } from 'uuid';
 
 const memoryStore = new expressSession.MemoryStore();
 
@@ -90,9 +92,9 @@ export const requestHasSessionId = (
 export const sessionIdFromRequest = <
   RequestType extends SystemHttpRequestType<DataType>,
   DataType extends UserSessionData = UserSessionData
-  >(
-    req: RequestType
-  ): string => {
+>(
+  req: RequestType
+): string => {
   const cookieKey = getCookieKeyFromRequest(req);
   if (req.regenerateSessionId) {
     const generatedId = uuidv4();

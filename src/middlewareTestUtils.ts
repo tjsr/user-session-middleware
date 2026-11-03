@@ -1,14 +1,15 @@
-/* eslint-disable indent */
 
+
+import express from 'express';
 import { Assertion } from 'vitest';
 import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
+
 import { SessionHandlerError } from './errors/SessionHandlerError.ts';
+import { getMockReqResp } from './testUtils.ts';
+import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.ts';
 import { SystemHttpRequestType } from './types/request.ts';
 import { SystemHttpResponseType } from './types/response.ts';
 import { UserSessionData } from './types/session.ts';
-import { UserSessionMiddlewareRequestHandler } from './types/middlewareHandlerTypes.ts';
-import express from 'express';
-import { getMockReqResp } from './testUtils.ts';
 
 // export type HandlerFunction = <RequestType extends SystemHttpRequestType<SystemSessionDataType>>(
 //   _req: RequestType, _res: express.Response, _next: express.NextFunction
@@ -34,7 +35,7 @@ export type HandlerErrorResult = {
 
 const expectVerifyHandlerFunction = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-  // eslint-disable-next-line @stylistic/js/comma-dangle
+
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -70,7 +71,7 @@ const expectVerifyHandlerFunction = <
 
 export const verifyHandlerFunctionCallsNextWithError = <
   RequestType extends SystemHttpRequestType<UserSessionData>,
-  // eslint-disable-next-line @stylistic/js/comma-dangle
+
   ResponseType extends SystemHttpResponseType<UserSessionData>,
 >(
   handlerFunction: HandlerFunction,
@@ -92,7 +93,7 @@ export const verifyHandlerFunctionCallsNextWithError = <
 
 export const verifyHandlerFunctionCallsNext = <
   RequestType extends SystemHttpRequestType,
-  // eslint-disable-next-line @stylistic/js/comma-dangle
+
   ResponseType extends SystemHttpResponseType,
 >(
   handlerFunction: HandlerFunction,

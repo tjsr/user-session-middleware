@@ -1,14 +1,15 @@
+
+import { SessionData } from "express-session";
+
+import { Barrier } from './asyncUtils.js';
 import {
   RegeneratedSessionIdIncorrectError,
   RegeneratingSessionIdError,
   SessionNotGeneratedError
 } from './errors/errorClasses.js';
-
-import { Barrier } from './asyncUtils.js';
-import { SessionData } from "express-session";
-import { SessionId } from './types.js';
 import { SystemHttpRequestType } from './types/request.js';
 import { UserSessionData } from './types/session.js';
+import { SessionId } from './types.js';
 
 export const regenerateSessionIdIfNoSessionData = async (
   retrievedSessionData: SessionData | null | undefined,

@@ -1,15 +1,16 @@
+import { requireEnv } from '@tjsr/simple-env-utils';
+import { validate } from 'uuid';
+
+import { USER_ID_NAMESPACE_KEY } from './auth/userNamespace.ts';
 import { NamespaceUUIDFormatError, UUIDNamespaceNotDefinedError } from './errors/middlewareErrorClasses.ts';
+import express from './express/index.ts';
 import {
   postLoginUserSessionMiddleware,
   preLoginUserSessionMiddleware,
   sessionUserRouteHandlers,
 } from './sessionMiddlewareHandlers.ts';
-
-import { USER_ID_NAMESPACE_KEY } from './auth/userNamespace.ts';
 import { UserSessionOptions } from './types/sessionOptions.ts';
-import express from './express/index.ts';
-import { requireEnv } from '@tjsr/simple-env-utils';
-import { validate } from 'uuid';
+
 
 export const useUserSessionMiddleware = (app: express.Application, sessionOptions: UserSessionOptions) => {
   if (sessionOptions.debugCallHandlers) {

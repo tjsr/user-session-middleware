@@ -1,14 +1,14 @@
-import { ApiTestContext, SessionDataTestContext, setupApiTest } from './api/utils/testcontext.ts';
-import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
-import express, { NextFunction } from './express/index.ts';
-
-import { HttpStatusCode } from './httpStatusCodes.ts';
-import { SystemHttpRequestType } from './types/request.ts';
 import { TestContext } from 'vitest';
-import { UserIdTestContext } from './utils/testing/context/idNamespace.ts';
+
+import { ApiTestContext, SessionDataTestContext, setupApiTest } from './api/utils/testcontext.ts';
+import express, { NextFunction } from './express/index.ts';
+import { HttpStatusCode } from './httpStatusCodes.ts';
 import { addDataToSessionStore } from './testUtils.ts';
-import { mockSession } from './utils/testing/mocks.ts';
+import { SystemHttpRequestType } from './types/request.ts';
 import { setupMiddlewareContext } from './utils/testing/context/appLocals.ts';
+import { UserIdTestContext } from './utils/testing/context/idNamespace.ts';
+import { SessionTestContext, WithSessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
+import { mockSession } from './utils/testing/mocks.ts';
 import { setupSupertestContext } from './utils/testing/supertestUtils.ts';
 
 describe<UserIdTestContext>('assignUserIdToRequestSessionHandler', () => {
