@@ -1,5 +1,6 @@
-import { uuid5 } from './types.ts';
 import { validate } from 'uuid';
+
+import { uuid5 } from './types.ts';
 
 const LIBRARY_DEFAULT_USERID_UUID_NAMESPACE = 'd850e0d9-a02c-4a25-9ade-9711b942b8ba';
 

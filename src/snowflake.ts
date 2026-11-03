@@ -1,5 +1,6 @@
-import { SnowflakeType } from './types.ts';
 import { Worker } from 'snowflake-uuid';
+
+import { SnowflakeType } from './types.ts';
 
 const generator = new Worker(0, 1, {
   datacenterIdBits: 5,

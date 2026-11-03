@@ -1,20 +1,21 @@
-import { IdNamespace, UserId, uuid5 } from './types.ts';
 
-import { NamespaceNotProvidedError } from './errors/middlewareErrorClasses.ts';
-import { SaveSessionError } from './errors/errorClasses.ts';
 import { Session } from 'express-session';
-import { SystemHttpRequestType } from './types/request.ts';
-import { UserSessionData } from './types/session.ts';
+import { v5 as uuidv5 } from 'uuid';
+
 import { createUserIdFromEmail } from './auth/user.ts';
-import express from './express/index.ts';
 import { getAppUserIdNamespace } from './auth/userNamespace.ts';
-import { getSnowflake } from './snowflake.ts';
+import { SaveSessionError } from './errors/errorClasses.ts';
+import { NamespaceNotProvidedError } from './errors/middlewareErrorClasses.ts';
+import express from './express/index.ts';
 import { requireRequestSessionId } from './session/sessionChecks.ts';
 import { requireSessionIDValuesMatch } from './session/sessionChecks.ts';
 import { requireSessionId } from './session/sessionChecks.ts';
 import { requireSessionInitialized } from './session/sessionChecks.ts';
 import { requireSessionIsIsString } from './session/sessionChecks.ts';
-import { v5 as uuidv5 } from 'uuid';
+import { getSnowflake } from './snowflake.ts';
+import { SystemHttpRequestType } from './types/request.ts';
+import { UserSessionData } from './types/session.ts';
+import { IdNamespace, UserId, uuid5 } from './types.ts';
 
 const SAVE_AFTER_ASSIGN_USER_ID = true;
 

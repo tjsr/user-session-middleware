@@ -1,9 +1,8 @@
 import { createUserIdFromEmail, getUserIdFromRequest, getUserIdFromSession } from './auth/user.ts';
-import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.ts';
-
 import { HttpStatusCode } from './httpStatusCodes.ts';
-import { createRandomId } from './utils/createRandomId.ts';
 import { createRandomUserId } from './sessionUser.ts';
+import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.ts';
+import { createRandomId } from './utils/createRandomId.ts';
 
 export { getMysqlSessionStore } from './sessionStore.ts';
 
@@ -34,7 +33,7 @@ export type { UserSessionOptions } from './types/sessionOptions.ts';
 export type { UserModel } from './types/model.ts';
 export type {
   UserSessionMiddlewareErrorHandler,
-  // eslint-disable-next-line @stylistic/js/comma-dangle
+   
   UserSessionMiddlewareRequestHandler,
 } from './types/middlewareHandlerTypes.ts';
 export type { SystemRequestOrExpressRequest, SystemResponseOrExpressResponse } from './types/optionalReqRes.ts';

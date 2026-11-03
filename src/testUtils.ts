@@ -1,19 +1,19 @@
-import { Cookie, Store } from './express-session/index.ts';
 import { Mock, MockInstance, TestContext } from 'vitest';
-import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.ts';
-import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.ts';
 import { getMockReq, getMockRes } from 'vitest-mock-express';
-import { mockExpress, mockSession } from './utils/testing/mocks.ts';
-
 import { MockRequest } from 'vitest-mock-express/dist/src/request/index.js';
+
 import { SessionDataTestContext } from './api/utils/testcontext.ts';
-import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
+import express, { ErrorRequestHandler, Handler, NextFunction, RequestHandler } from './express/index.ts';
+import { Cookie, Store } from './express-session/index.ts';
+import { createResponseLocals } from './middleware/handlers/handleLocalsCreation.ts';
 import { SystemHttpRequestType } from './types/request.ts';
 import { SystemHttpResponseType } from './types/response.ts';
 import { UserSessionData } from './types/session.ts';
-import { createResponseLocals } from './middleware/handlers/handleLocalsCreation.ts';
-import { markHandlersCalled } from './utils/testing/markHandlers.ts';
 import { storeSetAsPromise } from './utils/sessionSetPromise.ts';
+import { SessionEnabledRequestContext } from './utils/testing/context/request.ts';
+import { SessionTestContext, WithSessionTestContext } from './utils/testing/context/session.ts';
+import { markHandlersCalled } from './utils/testing/markHandlers.ts';
+import { mockExpress, mockSession } from './utils/testing/mocks.ts';
 
 export const NIL_UUID = '00000000-0000-0000-0000-000000000000';
 
@@ -32,7 +32,7 @@ export interface MockReqRespSet<
   spies?: Map<Function, MockInstance>;
 }
 
-/* eslint-disable indent */
+ 
 /**
  * @param {MockRequest | undefined} requestProps Values that should be provided as defaults or
  * overrides on the request.
@@ -49,7 +49,7 @@ export const getMockReqResp = <
   requestProps?: MockRequest | undefined,
   mockResponseData?: Partial<ResponseType>
 ): MockReqRespSet => {
-  /* eslint-enable indent */
+   
   // @ts-expect-error TS6311
   const { clearMockRes, next, res: response, _mockClear } = getMockRes<ResponseType>(mockResponseData);
   const request: RequestType & { app: express.Application } = getMockReq(requestProps);
