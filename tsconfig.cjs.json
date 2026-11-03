@@ -5,6 +5,10 @@
     "module": "commonjs",
     "moduleResolution": "Node",
     "target": "ESNext",
+    "paths": {
+      "@tjsr/simple-env-utils": ["./node_modules/@tjsr/simple-env-utils/dist/esm/utils.d.ts"],
+      "@tjsr/testutils": ["./node_modules/@tjsr/testutils/dist/esm/index.d.ts"]
+    },
     "declaration": true /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
     "declarationMap": true /* Create sourcemaps for d.ts files. */
   }
