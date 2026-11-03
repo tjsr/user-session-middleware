@@ -63,7 +63,7 @@
     "@types/express-mysql-session": "^3.0.6",
     "@types/node": "^24.10.4",
     "@types/request-ip": "^0.0.41",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.1",
     "@vitest/coverage-v8": "^5.0.5",
     "expect-cookies": "^0.3.1",
     "linkteam": "^0.0.18",
