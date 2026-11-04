@@ -49,7 +49,7 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
-    - run: npm ci
+    - run: npm ci --strict-peer-deps
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
@@ -78,6 +78,10 @@ jobs:
         NODE
 
     - run: npm run test
+    - name: Verify release baseline (read only)
+      if: matrix.node == 24
+      run: node scripts/check-release.cjs
+
     - run: npm run build
 
     - name: Run lint at end on all other branches
