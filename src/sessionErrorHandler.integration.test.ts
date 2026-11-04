@@ -2,10 +2,14 @@ import { once } from 'node:events';
 import { Server } from 'node:http';
 
 import express, { ErrorRequestHandler, Express } from 'express';
-import { MemoryStore } from 'express-session';
+import session, { MemoryStore } from 'express-session';
 
+import { setRetrieveUserDataFunction } from './auth/getDbUser.ts';
+import { LoginCredentialsError } from './errors/authenticationErrorClasses.ts';
+import { SessionNotGeneratedError } from './errors/errorClasses.ts';
 import { LoginBodyFormatError } from './errors/inputValidationErrorClasses.ts';
 import { useUserSessionMiddleware } from './useUserSessionMiddleware.ts';
+import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.ts';
 
 let server: Server | undefined;
 
@@ -86,4 +90,70 @@ test('delegates the original error when response headers were already sent', asy
 
   const response = await fetch(await listen(app));
   expect(await response.text()).toBe('partial response');
+});
+
+const installExpressSession = (app: Express): void => {
+  app.use(
+    session({
+      name: 'usm.sid',
+      resave: false,
+      saveUninitialized: true,
+      secret: 'session-message-test-only-secret',
+      store: new MemoryStore(),
+    })
+  );
+};
+
+test('finishes an authentication result response after a failed login', async () => {
+  const app = express();
+  installSessionMiddleware(app);
+  setRetrieveUserDataFunction(async () => {
+    throw new LoginCredentialsError();
+  });
+  try {
+    const response = await fetch(`${await listen(app)}/login`, {
+      body: JSON.stringify({ email: 'rejected@example.com' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
+    });
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ isLoggedIn: false, sessionId: expect.any(String) });
+  } finally {
+    // The existing setter permits clearing its callback at runtime.
+    setRetrieveUserDataFunction(undefined!);
+  }
+});
+
+test.each([true, false])('finishes an exported JSON helper response (next callback: %s)', async (withNext) => {
+  const app = express();
+  installExpressSession(app);
+  app.get('/message', async (_request, response, next) => {
+    await endWithJsonMessage(response, 401, 'Unauthorized', withNext ? next : undefined, { reason: 'fixture' });
+  });
+  const response = await fetch(`${await listen(app)}/message`);
+  expect(response.status).toBe(401);
+  expect(await response.json()).toEqual({ message: 'Unauthorized', reason: 'fixture' });
+});
+
+test('finishes a validation error response when application session configuration is missing', async () => {
+  const app = express();
+  installExpressSession(app);
+  app.get('/protected', validateHasUserId);
+  const response = await fetch(`${await listen(app)}/protected`);
+  expect(response.status).toBe(500);
+  expect(await response.json()).toEqual({ message: 'Invalid user' });
+});
+
+test('forwards an unhandled user-session lookup error to the application', async () => {
+  const app = express();
+  app.locals['sessionOptions'] = { userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' };
+  app.get('/protected', validateHasUserId);
+  const handler: ErrorRequestHandler = (error, _request, response, _next) => {
+    expect(error).toBeInstanceOf(SessionNotGeneratedError);
+    response.status(503).json({ message: 'application handled lookup failure' });
+  };
+  app.use(handler);
+  const response = await fetch(`${await listen(app)}/protected`);
+  expect(response.status).toBe(503);
+  expect(await response.json()).toEqual({ message: 'application handled lookup failure' });
 });

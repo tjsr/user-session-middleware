@@ -84,7 +84,7 @@ jobs:
 
       - name: Verify prospective release version
         if: github.ref == 'refs/heads/fix/express-5-compatibility'
-        run: npm ci --strict-peer-deps && node scripts/check-release.cjs 0.2.1
+        run: npm ci --strict-peer-deps && node scripts/check-release.cjs 0.2.1 "${{ inputs.patchlevel }}"
 
       - name: Bump and publish
         id: bump

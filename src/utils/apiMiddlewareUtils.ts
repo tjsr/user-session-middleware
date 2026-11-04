@@ -1,17 +1,14 @@
-/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as express from '../express/index.ts';
-
-import { HttpStatusCode } from '../httpStatusCodes.ts';
-import { UserId } from '../types.ts';
-import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.ts';
-import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
 import { getUserIdFromSession } from '../auth/user.ts';
+import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
+import * as express from '../express/index.ts';
+import { HttpStatusCode } from '../httpStatusCodes.ts';
+import { UserSessionMiddlewareRequestHandler } from '../types/middlewareHandlerTypes.ts';
+import { UserId } from '../types.ts';
 
 // import express as origExpressfrom 'express';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const endWithJsonMessage = async <ResponseType extends express.Response<JSON | any, any>>(
   res: ResponseType,
   status: number | HttpStatusCode,
@@ -19,22 +16,24 @@ export const endWithJsonMessage = async <ResponseType extends express.Response<J
   next?: express.NextFunction,
   additionalMessageFields: object = {}
 ): Promise<void> => {
-  res.status(status);
-  res.contentType('application/json');
-  const outputBody = {
-    ...additionalMessageFields,
-    message,
-  } as object as JSON;
-  res.send(outputBody);
-  const error = new Error(`${status}/${message}`);
-  return new Promise((resolve) => {
-    if (next) {
-      next(error);
-    } else {
-      res.end();
+  try {
+    if (res.headersSent) {
+      throw new Error(`${status}/${message}`);
     }
-    return resolve();
-  });
+    res.status(status);
+    res.contentType('application/json');
+    const outputBody = {
+      ...additionalMessageFields,
+      message,
+    } as object as JSON;
+    // Express.send ends the response, including any asynchronous session save.
+    res.send(outputBody);
+  } catch (error) {
+    if (!next) {
+      throw error;
+    }
+    next(error);
+  }
 };
 
 export const validateHasUserId: UserSessionMiddlewareRequestHandler = (
