@@ -8,8 +8,10 @@ overrides do not protect consumers. No declaration package release is available
 with the corrected driver dependency.
 
 The expanded source is retained in `express-mysql-session-types/`; the matching
-archive is the installed dependency. The main package references an immutable
-commit URL, and its lockfile records archive integrity. This is a local metadata
+archive is a source-local dependency with lockfile integrity, and npm bundles
+the installed provider and its dependency closure in the published middleware.
+Consumers receive those files inside the middleware tarball; they do not fetch
+a remote package URL or read a file from the middleware source checkout. This is a local metadata
 fork, not an unchanged registry artifact. Keeping the original declaration text,
 package name and version preserves TypeScript package identity, including the
 MySQL store class's private member. TypeScript 6 and 7 cross-assignment checks

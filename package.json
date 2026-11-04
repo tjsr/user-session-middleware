@@ -92,7 +92,7 @@
     "snowflake-uuid": "^1.0.0",
     "uuid": "^14.0.3",
     "@types/express": "5.0.6",
-    "@types/express-mysql-session": "https://raw.githubusercontent.com/tjsr/user-session-middleware/81210f7fbaf6cd188c0c0b59fd80dcdc73bf6f32/vendor/express-mysql-session-types-3.0.8-mysql2-3.10.2.tgz",
+    "@types/express-mysql-session": "file:vendor/express-mysql-session-types-3.0.8-mysql2-3.10.2.tgz",
     "@types/express-session": "^1.19.0"
   },
   "peerDependencies": {
@@ -129,5 +129,8 @@
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
-  }
+  },
+  "bundledDependencies": [
+    "@types/express-mysql-session"
+  ]
 }

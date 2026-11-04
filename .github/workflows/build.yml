@@ -57,7 +57,7 @@ jobs:
         const provider = lock.packages['node_modules/@types/express-mysql-session'];
         assert.equal(provider.version, '3.0.8');
         assert.equal(provider.dependencies.mysql2, '3.10.2');
-        assert.ok(provider.resolved.includes('81210f7fbaf6cd188c0c0b59fd80dcdc73bf6f32'));
+        assert.equal(provider.resolved, 'file:vendor/express-mysql-session-types-3.0.8-mysql2-3.10.2.tgz');
         assert.equal(lock.packages['node_modules/@tjsr/mysql-pool-utils'].version, '0.2.2');
         for (const [key, record] of Object.entries(lock.packages)) {
           if (record.hasInstallScript) {
@@ -139,7 +139,7 @@ jobs:
           assert.equal(process.env.GITHUB_REPOSITORY, 'tjsr/user-session-middleware');
           assert.equal(process.env.GITHUB_REF, 'refs/heads/fix/express-5-compatibility');
           assert.equal(lock.packages['node_modules/@types/express-mysql-session'].dependencies.mysql2, '3.10.2');
-          assert.ok(lock.packages['node_modules/@types/express-mysql-session'].resolved.includes('81210f7fbaf6cd188c0c0b59fd80dcdc73bf6f32'));
+          assert.equal(lock.packages['node_modules/@types/express-mysql-session'].resolved, 'file:vendor/express-mysql-session-types-3.0.8-mysql2-3.10.2.tgz');
           for (const record of Object.values(lock.packages)) {
             if (record.resolved && record.resolved.startsWith('https://')) {
               const url = new URL(record.resolved);
