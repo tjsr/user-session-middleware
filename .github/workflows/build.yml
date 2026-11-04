@@ -48,34 +48,7 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
-    - name: Regenerate Express 5 public dependency records (temporary maintenance step)
-      run: |
-        cp package-lock.json "$RUNNER_TEMP/usm-lock-before.json"
-        npm install --package-lock-only --ignore-scripts --strict-peer-deps
-        if [ '${{ matrix.node }}' = '24' ]; then
-          node <<'NODE'
-        const assert = require('node:assert/strict');
-        const fs = require('node:fs');
-        const path = require('node:path');
-        const before = JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'usm-lock-before.json'))).packages;
-        const after = JSON.parse(fs.readFileSync('package-lock.json')).packages;
-        const changes = [];
-        for (const key of new Set([...Object.keys(before), ...Object.keys(after)])) {
-          if (!key || JSON.stringify(before[key]) === JSON.stringify(after[key])) continue;
-          const record = after[key] || before[key];
-          assert.ok(!key.includes('@tjsr/'), 'Private package records must remain unchanged');
-          if (record.resolved) assert.equal(new URL(record.resolved).origin, 'https://registry.npmjs.org', 'Only public npm records may be returned');
-          for (const field of ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']) {
-            assert.ok(!Object.keys(record[field] || {}).some(name => name.startsWith('@tjsr/')), 'Private dependency metadata must remain unchanged');
-          }
-          changes.push({ key, value: after[key] || null });
-        }
-        const text = Buffer.from(JSON.stringify(changes)).toString('base64');
-        for (let offset = 0; offset < text.length; offset += 5000) console.log('PUBLIC_LOCK_DELTA:' + text.slice(offset, offset + 5000));
-        NODE
-        fi
-
-    - run: npm ci
+    - run: npm ci --strict-peer-deps
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
@@ -98,6 +71,10 @@ jobs:
         NODE
 
     - run: npm run test
+    - name: Verify release baseline (read only)
+      if: matrix.node == 24
+      run: node scripts/check-release.cjs
+
     - run: npm run build
 
     - name: Run lint at end on all other branches

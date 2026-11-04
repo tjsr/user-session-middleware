@@ -13,11 +13,13 @@ const run = (command, args) => execFileSync(command, args, { cwd: directory, std
 try {
   const npm = process.env.npm_execpath || fs.realpathSync(execFileSync('which', ['npm'], { encoding: 'utf8' }).trim());
   assert.ok(npm, 'Run this check with npm run test:package');
-  const packed = JSON.parse(run(process.execPath, [npm, 'pack', process.env.PACKAGE_TEST_SPEC || root, '--ignore-scripts', '--json']));
+  const packed = JSON.parse(run(process.execPath, [npm, 'pack', process.env.PACKAGE_TEST_SPEC || root, '--ignore-scripts', '--dry-run=false', '--json']));
   const packageDirectory = path.join(directory, 'node_modules/@tjsr/user-session-middleware');
   fs.mkdirSync(packageDirectory, { recursive: true });
   run('tar', ['-xzf', firstNpmRecord(packed).filename, '-C', packageDirectory, '--strip-components=1']);
   const manifest = JSON.parse(fs.readFileSync(path.join(packageDirectory, 'package.json'), 'utf8'));
+  assert.equal(manifest.name, require('../package.json').name);
+  assert.equal(manifest.version, require('../package.json').version);
   for (const condition of ['import', 'require']) {
     for (const field of ['types', 'default']) {
       assert.ok(fs.existsSync(path.join(packageDirectory, manifest.exports['.'][condition][field])), `${condition}.${field} is missing from the packed distribution`);
@@ -32,7 +34,7 @@ export { id, middleware };
 `;
   for (const extension of ['mts', 'cts']) {
     fs.writeFileSync(path.join(directory, `consumer.${extension}`), fixture);
-    run(process.execPath, [path.join(root, 'node_modules/typescript/bin/tsc'), '--noEmit', '--strict', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--target', 'ES2022', '--lib', 'ES2022', '--types', 'node', `consumer.${extension}`]);
+    run(process.execPath, [path.join(root, 'node_modules/typescript/bin/tsc'), '--ignoreConfig', '--noEmit', '--strict', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--target', 'ES2022', '--lib', 'ES2022', '--types', 'node', `consumer.${extension}`]);
   }
   const assertion = `if (typeof utils.useUserSessionMiddleware !== 'function' || utils.createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 'package@example.com').length !== 36) throw new Error('Missing runtime export');`;
   fs.writeFileSync(path.join(directory, 'runtime.mjs'), `import * as utils from '@tjsr/user-session-middleware';\n${assertion}\n`);
