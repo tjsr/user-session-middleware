@@ -16,7 +16,7 @@
     "build": "rimraf dist && tsc",
     "prebuild:dev": "linkteam -i",
     "build:dev": "tsc -w",
-    "build:dist": "rimraf dist && tsc -p tsconfig.publish.json && tsc -p tsconfig.cjs.json",
+    "build:dist": "rimraf dist && tsc -p tsconfig.publish.json && tsc -p tsconfig.cjs.json && node scripts/write-cjs-package.cjs",
     "check": "npx npm-check",
     "clean": "npx rimraf build dist coverage",
     "clean:all": "npx rimraf build dist coverage node_modules",
@@ -27,7 +27,8 @@
     "prepublishOnly": "npm run clean",
     "test": "vitest --run && npm run lint",
     "test:first": "vitest --run --bail=1 && npm run lint",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:package": "npm run build:dist && node scripts/test-package.cjs"
   },
   "nodemonConfig": {
     "watch": [

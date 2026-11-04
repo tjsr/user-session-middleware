@@ -84,4 +84,5 @@ jobs:
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
         npm pack --dry-run
+        node scripts/test-package.cjs
   
