@@ -76,7 +76,7 @@ First, `npm install` for dependencies.  To verify everything is okay, `npm build
 
 For details, questions, or requests, contact Tim Rowe <tim@tjsr.id.au>
 
-Version 0.2.1 requires mysql-pool-utils 0.2.2 and targets Express 5.3 or later
+Version 0.2.2 requires mysql-pool-utils 0.2.2 and targets Express 5.3 or later
 within Express 5, with matching
 Express 5 TypeScript types. Node 24.21.0+ and npm 12.1.0+ are required by
 its dependencies; Node 24/26 are supported and Node 22 is diagnostic in CI.
@@ -88,3 +88,20 @@ Version 0.2.1 finishes handled JSON and authentication error responses without
 forwarding them into Express's default error handler. Unhandled errors and
 errors after headers have been sent still propagate to the application.
 Packed ESM and CommonJS checks make real HTTP requests to verify response completion.
+
+Version 0.2.2 supplies the production declaration dependencies needed by strict
+TypeScript consumers. The public options retain express-session's SessionOptions
+contract, including Buffer/KeyObject secrets, key rotation, and per-request cookie
+callbacks. The defaults builder merges its cookie defaults into each callback
+result; the deprecated manual-cookie helper and its test fixtures require string
+secrets.
+
+The unchanged MIT-licensed express-mysql-session 3.0.8 declarations are bundled
+with a documented metadata-only patch: their mysql2 dependency is 3.10.2 instead
+of 3.9.8, matching express-mysql-session 3.0.3. The archive, expanded source,
+license, upstream integrity and maintenance notes are in [vendor/README.md](vendor/README.md).
+Consumers receive the provider and its dependency closure in the middleware
+package without remote-package opt-ins or source-checkout paths.
+
+The verified [0.2.2 publication](https://github.com/tjsr/user-session-middleware/actions/runs/41916962187)
+passed exact published ESM/CommonJS type, runtime and real HTTP package checks.
