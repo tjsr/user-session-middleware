@@ -48,6 +48,31 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
+    - name: Regenerate the dependency lock (temporary maintenance step)
+      run: |
+        npm install --package-lock-only --ignore-scripts --strict-peer-deps
+        node <<'NODE'
+        const assert = require('node:assert/strict');
+        const lock = require('./package-lock.json');
+        assert.equal(lock.packages['node_modules/@tjsr/mysql-pool-utils'].version, '0.2.2');
+        for (const record of Object.values(lock.packages)) {
+          if (record.resolved && record.resolved.startsWith('https://')) {
+            const url = new URL(record.resolved);
+            assert.ok(!url.username && !url.password, 'Authenticated URLs must not enter a lockfile');
+          }
+        }
+        console.log('Generated strict dependency lock for mysql-pool-utils 0.2.2.');
+        NODE
+
+    - name: Retain generated lock for authenticated download
+      if: matrix.node == 24
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      with:
+        name: middleware-express5-dependency-lock
+        path: package-lock.json
+        retention-days: 1
+        if-no-files-found: error
+
     - run: npm ci --strict-peer-deps
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
