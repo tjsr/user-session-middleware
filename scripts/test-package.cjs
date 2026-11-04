@@ -40,11 +40,40 @@ export { id, middleware, applicationField };
     run(process.execPath, [path.join(root, 'node_modules/typescript/bin/tsc'), '--ignoreConfig', '--noEmit', '--strict', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--target', 'ES2022', '--lib', 'ES2022', '--types', 'node', `consumer.${extension}`]);
   }
   const assertion = `if (typeof utils.useUserSessionMiddleware !== 'function' || utils.createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 'package@example.com').length !== 36) throw new Error('Missing runtime export');`;
-  fs.writeFileSync(path.join(directory, 'runtime.mjs'), `import * as utils from '@tjsr/user-session-middleware';\n${assertion}\n`);
-  fs.writeFileSync(path.join(directory, 'runtime.cjs'), `const utils = require('@tjsr/user-session-middleware');\n${assertion}\n`);
+  const httpCheck = `
+(async () => {
+  const app = express();
+  utils.useUserSessionMiddleware(app, {
+    name: 'usm.sid', resave: false, saveUninitialized: false,
+    secret: 'packed-http-test-only-secret', store: new session.MemoryStore(),
+    userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+  });
+  app.get('/message', async (_request, response, next) => {
+    await utils.endWithJsonMessage(response, 401, 'Unauthorized', next);
+  });
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise((resolve, reject) => {
+    server.once('listening', resolve);
+    server.once('error', reject);
+  });
+  try {
+    const origin = 'http://127.0.0.1:' + server.address().port;
+    for (const [route, status] of [['/login', 400], ['/message', 401]]) {
+      const response = await fetch(origin + route);
+      assert.equal(response.status, status);
+      assert.equal(response.headers.get('content-type')?.split(';')[0], 'application/json');
+      assert.equal(typeof (await response.json()).message, 'string');
+    }
+  } finally {
+    await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+  }
+})().catch(error => { console.error(error); process.exitCode = 1; });
+`;
+  fs.writeFileSync(path.join(directory, 'runtime.mjs'), `import assert from 'node:assert/strict';\nimport express from 'express';\nimport session from 'express-session';\nimport * as utils from '@tjsr/user-session-middleware';\n${assertion}\n${httpCheck}`);
+  fs.writeFileSync(path.join(directory, 'runtime.cjs'), `const assert = require('node:assert/strict');\nconst express = require('express');\nconst session = require('express-session');\nconst utils = require('@tjsr/user-session-middleware');\n${assertion}\n${httpCheck}`);
   run(process.execPath, ['runtime.mjs']);
   run(process.execPath, ['runtime.cjs']);
-  console.log('Packed ESM/CommonJS declarations and runtime exports passed.');
+  console.log('Packed ESM/CommonJS declarations, runtime exports and HTTP error responses passed.');
 } catch (error) {
   if (error.stdout) process.stderr.write(error.stdout);
   if (error.stderr) process.stderr.write(error.stderr);

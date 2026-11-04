@@ -8,6 +8,7 @@ import { setRetrieveUserDataFunction } from './auth/getDbUser.ts';
 import { LoginCredentialsError } from './errors/authenticationErrorClasses.ts';
 import { SessionNotGeneratedError } from './errors/errorClasses.ts';
 import { LoginBodyFormatError } from './errors/inputValidationErrorClasses.ts';
+import { UserSessionOptions } from './types/sessionOptions.ts';
 import { useUserSessionMiddleware } from './useUserSessionMiddleware.ts';
 import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.ts';
 
@@ -28,15 +29,17 @@ const listen = async (app: Express): Promise<string> => {
   return `http://127.0.0.1:${address.port}`;
 };
 
+const sessionOptions = (): UserSessionOptions => ({
+  name: 'usm.sid',
+  resave: false,
+  saveUninitialized: false,
+  secret: 'session-error-http-test-only-secret',
+  store: new MemoryStore(),
+  userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+});
+
 const installSessionMiddleware = (app: Express): void => {
-  useUserSessionMiddleware(app, {
-    name: 'usm.sid',
-    resave: false,
-    saveUninitialized: false,
-    secret: 'session-error-http-test-only-secret',
-    store: new MemoryStore(),
-    userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-  });
+  useUserSessionMiddleware(app, sessionOptions());
 };
 
 test('finishes handled login errors with the default Express error path', async () => {
@@ -146,7 +149,7 @@ test('finishes a validation error response when application session configuratio
 
 test('forwards an unhandled user-session lookup error to the application', async () => {
   const app = express();
-  app.locals['sessionOptions'] = { userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' };
+  app.locals['sessionOptions'] = sessionOptions();
   app.get('/protected', validateHasUserId);
   const handler: ErrorRequestHandler = (error, _request, response, _next) => {
     expect(error).toBeInstanceOf(SessionNotGeneratedError);
