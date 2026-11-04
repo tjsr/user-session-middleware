@@ -13,7 +13,6 @@ import {
 } from './getSession.ts';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.ts';
 import { SystemHttpRequestType } from './types/request.ts';
-import { UserSessionBaseOptions } from './types/sessionOptions.ts';
 import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
 import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
@@ -39,10 +38,10 @@ export const addAppLocalsToRequest = (request: SystemHttpRequestType, locals?: R
 
 describe('expressSessionConfig', () => {
   type ExpressSessionTestContextOptions = TestContext & {
-    options: UserSessionBaseOptions;
+    options: expressSession.SessionOptions;
   };
 
-  const defaultOptions: UserSessionBaseOptions = defaultExpressSessionOptions();
+  const defaultOptions: expressSession.SessionOptions = defaultExpressSessionOptions();
 
   beforeEach((context: ExpressSessionTestContextOptions) => {
     context.options = {

@@ -7,7 +7,14 @@ import express from 'express';
 import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 import { UserSessionOptions } from '../types/sessionOptions.ts';
 
-type SessionSecretSet = UserSessionOptions['secret'];
+type SessionSecretSet = string | string[];
+
+export const requireStringSessionSecret = (secret: UserSessionOptions['secret']): SessionSecretSet => {
+  if (typeof secret === 'string' || (Array.isArray(secret) && secret.every((value) => typeof value === 'string'))) {
+    return secret;
+  }
+  throw new Error('Deprecated cookie helper requires string secrets; use the session middleware for binary keys.');
+};
 
 export const COOKIE_WITH_HEADER = true;
 
@@ -62,7 +69,7 @@ export const setRequestSessionCookie = (
   }
 
   if (!sessionSecret) {
-    sessionSecret = sessionOptions.secret;
+    sessionSecret = requireStringSessionSecret(sessionOptions.secret);
   }
 
   setSignedSessionCookie(sessionOptions.name!, request.sessionID, response, sessionSecret);

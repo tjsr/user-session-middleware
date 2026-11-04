@@ -1,3 +1,4 @@
+import { createSecretKey } from 'node:crypto';
 import { once } from 'node:events';
 import { Server } from 'node:http';
 
@@ -8,6 +9,7 @@ import { setRetrieveUserDataFunction } from './auth/getDbUser.ts';
 import { LoginCredentialsError } from './errors/authenticationErrorClasses.ts';
 import { SessionNotGeneratedError } from './errors/errorClasses.ts';
 import { LoginBodyFormatError } from './errors/inputValidationErrorClasses.ts';
+import { defaultExpressSessionOptions } from './getSession.ts';
 import { UserSessionOptions } from './types/sessionOptions.ts';
 import { useUserSessionMiddleware } from './useUserSessionMiddleware.ts';
 import { endWithJsonMessage, validateHasUserId } from './utils/apiMiddlewareUtils.ts';
@@ -160,3 +162,49 @@ test('forwards an unhandled user-session lookup error to the application', async
   expect(response.status).toBe(503);
   expect(await response.json()).toEqual({ message: 'application handled lookup failure' });
 });
+
+for (const withDefaults of [false, true]) {
+  test.each([
+    ['Buffer', Buffer.from('buffer-secret-for-http-session-test')],
+    ['KeyObject', createSecretKey(Buffer.from('key-object-secret-for-http-session-test'))],
+    [
+      'rotating keys',
+      [Buffer.from('rotating-buffer-key-for-http-test'), createSecretKey(Buffer.from('old-key-for-http-test'))],
+    ],
+  ])(
+    `reuses a signed session with %s and per-request cookie options (defaults: ${withDefaults})`,
+    async (_name, secret) => {
+      const app = express();
+      const cookie = vi.fn((request: express.Request) => ({
+        httpOnly: true,
+        path: request.path,
+        sameSite: 'lax' as const,
+        secure: false,
+      }));
+      const options: UserSessionOptions = { ...sessionOptions(), cookie, secret };
+      useUserSessionMiddleware(app, withDefaults ? { ...options, ...defaultExpressSessionOptions(options) } : options);
+      app.get('/counter', (request, response) => {
+        const visits = Number(request.session.email || '0') + 1;
+        request.session.email = String(visits);
+        response.json({ id: request.sessionID, visits });
+      });
+      const origin = await listen(app);
+      const initial = await fetch(`${origin}/counter`, { headers: { 'x-cookie-fixture': 'initial' } });
+      expect(initial.status).toBe(200);
+      const first = await initial.json();
+      expect(first.visits).toBe(1);
+      const setCookie = initial.headers.get('set-cookie');
+      expect(setCookie).toContain('Path=/counter');
+      expect(setCookie).toContain('HttpOnly');
+      expect(setCookie).toContain('SameSite=Lax');
+      const reused = await fetch(`${origin}/counter`, {
+        headers: { cookie: setCookie!.split(';')[0]!, 'x-cookie-fixture': 'reused' },
+      });
+      expect(reused.status).toBe(200);
+      expect(await reused.json()).toEqual({ id: first.id, visits: 2 });
+      expect(cookie.mock.calls.map(([request]) => request.headers['x-cookie-fixture'])).toEqual(
+        expect.arrayContaining(['initial', 'reused'])
+      );
+    }
+  );
+}
