@@ -191,7 +191,17 @@ for (const withDefaults of [false, true]) {
       const origin = await listen(app);
       const initial = await fetch(`${origin}/counter`, { headers: { 'x-cookie-fixture': 'initial' } });
       expect(initial.status).toBe(200);
-      const first = await initial.json();
+      const first: unknown = await initial.json();
+      if (
+        !first ||
+        typeof first !== 'object' ||
+        !('id' in first) ||
+        typeof first.id !== 'string' ||
+        !('visits' in first) ||
+        typeof first.visits !== 'number'
+      ) {
+        throw new Error('Expected a session id and numeric visit count');
+      }
       expect(first.visits).toBe(1);
       const setCookie = initial.headers.get('set-cookie');
       expect(setCookie).toContain('Path=/counter');
