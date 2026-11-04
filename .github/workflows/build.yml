@@ -80,6 +80,8 @@ jobs:
         NODE
 
     - run: npm run test
+    - name: Lint the error handler implementation
+      run: node node_modules/eslint/bin/eslint.js --config eslint.config.mjs src/middleware/sessionErrorHandler.ts
     - name: Verify release baseline (read only)
       if: matrix.node == 24
       run: node scripts/check-release.cjs
