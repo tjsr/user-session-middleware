@@ -50,6 +50,10 @@ try {
   const providerRequire = createRequire(libraryRequire.resolve('@types/express-mysql-session/package.json'));
   assert.equal(storeRequire('mysql2/package.json').version, '3.10.2');
   assert.equal(providerRequire('mysql2/package.json').version, '3.10.2');
+  assert.equal(providerRequire('./package.json').tjsrVendorPatch.sourceIntegrity,
+    'sha512-ljtWFQZHQDIzr/FfQYa/twmdm871uJOMJz7a6hPRBaeBpw49pCBxUYfb56N3troI8i8uHsKjYJ1lpZhSlYl25w==');
+  assert.deepEqual(fs.readFileSync(providerRequire.resolve('./index.d.ts')),
+    fs.readFileSync(path.join(packageDirectory, 'vendor/express-mysql-session-types/index.d.ts')));
   const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware, type UserSessionOptions } from '@tjsr/user-session-middleware';
 import type { Response } from 'express';
 import { createSecretKey } from 'node:crypto';
