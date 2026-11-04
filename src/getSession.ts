@@ -16,7 +16,7 @@ import * as expressSession from './express-session/index.ts';
 import { getCookieKeyFromRequest } from './session/sessionCookie.ts';
 import { SystemHttpRequestType } from './types/request.ts';
 import { UserSessionData } from './types/session.ts';
-import { UserSessionBaseOptions, UserSessionOptions } from './types/sessionOptions.ts';
+import { UserSessionOptions } from './types/sessionOptions.ts';
 import { SessionId } from './types.ts';
 import { getDefaultUserIdNamespace } from './user/userIdNamespace.ts';
 
@@ -139,9 +139,9 @@ export const defaultExpressSessionCookieOptions = (
 };
 
 export const defaultExpressSessionOptions = (
-  options?: Partial<UserSessionBaseOptions> | undefined
-): UserSessionBaseOptions => {
-  const defaults: UserSessionBaseOptions = {
+  options?: Partial<expressSession.SessionOptions> | undefined
+): expressSession.SessionOptions => {
+  const defaults: expressSession.SessionOptions = {
     genid: options?.genid,
     name: options?.name || SESSION_ID_COOKIE,
     resave: options?.resave || false,
@@ -150,10 +150,14 @@ export const defaultExpressSessionOptions = (
     secret: options?.secret || SESSION_SECRET,
     store: options?.store || memoryStore,
   };
+  const cookieOptions = options?.cookie;
   return {
     ...defaults,
     ...options,
-    cookie: defaultExpressSessionCookieOptions(options?.cookie),
+    cookie:
+      typeof cookieOptions === 'function'
+        ? (request) => defaultExpressSessionCookieOptions(cookieOptions(request))
+        : defaultExpressSessionCookieOptions(cookieOptions),
   };
 };
 

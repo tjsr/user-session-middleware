@@ -4,13 +4,7 @@ import { IdNamespace, MakeRequired } from '../types.ts';
 
 type Path = string;
 
-// The middleware signs string secrets and merges static cookie options.
-export interface UserSessionBaseOptions extends expressSession.SessionOptions {
-  cookie?: expressSession.CookieOptions;
-  secret: string | string[];
-}
-
-export interface UserSessionOptions extends UserSessionBaseOptions {
+export interface UserSessionOptions extends expressSession.SessionOptions {
   debugCallHandlers?: boolean;
   debugSessionOptions?: boolean;
 

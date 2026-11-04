@@ -1,17 +1,17 @@
-import { ApiTestContext, SupetestTestContext } from '../../api/utils/testcontext.ts';
-import { validateContextApp, validateSessionOptions } from './apiTestUtils.ts';
-
-import { SessionId } from '../../types.ts';
-import { SessionTestContext } from './context/session.ts';
-import { StrictUserSessionOptions } from '../../types/sessionOptions.ts';
-import { getSupertestSessionIdCookie } from './cookieTestUtils.ts';
 import { setSessionCookie } from '@tjsr/testutils';
 import supertest from 'supertest';
+
+import { StrictTestSessionOptions, validateContextApp, validateSessionOptions } from './apiTestUtils.ts';
+import { ApiTestContext, SupetestTestContext } from '../../api/utils/testcontext.ts';
+import { SessionId } from '../../types.ts';
+import { SessionTestContext } from './context/session.ts';
+import { getSupertestSessionIdCookie } from './cookieTestUtils.ts';
+
 
 export const doSessionCall = async (
   st: supertest.Test,
   sessionId: SessionId | undefined,
-  sessionOptions: StrictUserSessionOptions
+  sessionOptions: StrictTestSessionOptions
 ): Promise<{ response: supertest.Response; updatedSessionId: SessionId | undefined }> => {
   st.set('Content-Type', 'application/json').accept('application/json');
 
@@ -34,7 +34,7 @@ const setupSupertestCall = (st: supertest.Test, context: SupetestTestContext): s
   }
 
   if (context.currentSessionId && context.sessionOptions) {
-    const options: StrictUserSessionOptions = validateSessionOptions(context.sessionOptions);
+    const options: StrictTestSessionOptions = validateSessionOptions(context.sessionOptions);
     setSessionCookie(st, options.name, context.currentSessionId, options.secret);
   }
   return st;
