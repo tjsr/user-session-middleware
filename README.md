@@ -76,10 +76,15 @@ First, `npm install` for dependencies.  To verify everything is okay, `npm build
 
 For details, questions, or requests, contact Tim Rowe <tim@tjsr.id.au>
 
-Version 0.2.0 requires mysql-pool-utils 0.2.2 and targets Express 5.3 or later
+Version 0.2.1 requires mysql-pool-utils 0.2.2 and targets Express 5.3 or later
 within Express 5, with matching
 Express 5 TypeScript types. Node 24.21.0+ and npm 12.1.0+ are required by
 its dependencies; Node 24/26 are supported and Node 22 is diagnostic in CI.
 The test-only vitest-mock-express type dependency is aligned with the project's
 Express 5 types. Its factories contain no Express runtime dependency; real HTTP
 login/session tests also run against Express 5.
+
+Version 0.2.1 finishes handled JSON and authentication error responses without
+forwarding them into Express's default error handler. Unhandled errors and
+errors after headers have been sent still propagate to the application.
+Packed ESM and CommonJS checks make real HTTP requests to verify response completion.
