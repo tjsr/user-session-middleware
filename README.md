@@ -72,3 +72,10 @@ First, `npm install` for dependencies.  To verify everything is okay, `npm build
 ## Contact
 
 For details, questions, or requests, contact Tim Rowe <tim@tjsr.id.au>
+
+This release targets Express 5.3 or later within Express 5, with matching
+Express 5 TypeScript types. Node 24.21.0+ and npm 12.1.0+ are required by
+its dependencies; Node 24/26 are supported and Node 22 is diagnostic in CI.
+The test-only vitest-mock-express type dependency is aligned with the project's
+Express 5 types. Its factories contain no Express runtime dependency; real HTTP
+login/session tests also run against Express 5.

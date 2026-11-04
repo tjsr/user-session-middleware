@@ -1,6 +1,6 @@
 {
   "name": "@tjsr/user-session-middleware",
-  "version": "0.0.38-dev.2",
+  "version": "0.1.2",
   "description": "User session handling middleware and utilities",
   "type": "module",
   "main": "dist/esm/index.js",
@@ -8,8 +8,14 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     }
   },
   "scripts": {
@@ -23,7 +29,7 @@
     "link": "linkteam -i",
     "lint": "eslint --config eslint.config.mjs src/*.ts",
     "lint:fix": "eslint --fix src/*.ts",
-    "prepack": "npm test && npm run build:dist",
+    "prepack": "npm test && npm run build:dist && node scripts/test-package.cjs",
     "prepublishOnly": "npm run clean",
     "test": "vitest --run && npm run lint",
     "test:first": "vitest --run --bail=1 && npm run lint",
@@ -60,11 +66,11 @@
     "@tjsr/testutils": "^0.0.12",
     "@types/cookie": "^0.6.0",
     "@types/cookie-signature": "^1.1.2",
-    "@types/express": "^4.17.25",
+    "@types/express": "5.0.6",
     "@types/express-mysql-session": "^3.0.6",
-    "@types/node": "^24.10.4",
+    "@types/node": "^24.19.2",
     "@types/request-ip": "^0.0.41",
-    "@types/supertest": "^6.0.3",
+    "@types/supertest": "^7.2.1",
     "@vitest/coverage-v8": "^5.0.5",
     "expect-cookies": "^0.3.1",
     "linkteam": "^0.0.18",
@@ -74,7 +80,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5",
-    "vitest-mock-express": "^2.2.0"
+    "vitest-mock-express": "^2.2.0",
+    "express": "5.3.0"
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.2.1",
@@ -88,7 +95,7 @@
     "uuid": "^14.0.3"
   },
   "peerDependencies": {
-    "express": "^4.21.2 || ^5.3.0"
+    "express": "^5.3.0"
   },
   "overrides": {
     "braces": ">=3.0.3",
@@ -108,10 +115,14 @@
     ]
   },
   "engines": {
-    "node": ">=24.21.0"
+    "node": ">=24.21.0",
+    "npm": ">=12.1.0"
   },
   "allowScripts": {
     "esbuild@0.21.5": true,
     "esbuild@0.27.1": true
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
