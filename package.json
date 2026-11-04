@@ -77,7 +77,7 @@
     "vitest-mock-express": "^2.2.0"
   },
   "dependencies": {
-    "@tjsr/mysql-pool-utils": "^0.2.1",
+    "@tjsr/mysql-pool-utils": "^0.2.2",
     "@tjsr/simple-env-utils": "^0.1.11",
     "cookie": "^2.0.2",
     "cookie-signature": "^1.2.2",
