@@ -1,5 +1,3 @@
-
-
 import { IncomingHttpHeaders } from 'http';
 
 import { isProductionMode } from '@tjsr/simple-env-utils';
@@ -152,10 +150,14 @@ export const defaultExpressSessionOptions = (
     secret: options?.secret || SESSION_SECRET,
     store: options?.store || memoryStore,
   };
+  const cookieOptions = options?.cookie;
   return {
     ...defaults,
     ...options,
-    cookie: defaultExpressSessionCookieOptions(options?.cookie),
+    cookie:
+      typeof cookieOptions === 'function'
+        ? (request) => defaultExpressSessionCookieOptions(cookieOptions(request))
+        : defaultExpressSessionCookieOptions(cookieOptions),
   };
 };
 

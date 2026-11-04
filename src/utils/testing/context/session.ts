@@ -1,16 +1,19 @@
-import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../getSession.ts';
-
-import { MemoryStore } from '../../../express-session/index.ts';
-import { SessionId } from '../../../types.ts';
+import { generateSessionIdForTestName } from '@tjsr/testutils';
 import { TestContext } from 'vitest';
+
+import { getTestContextUserIdNamespace } from './idNamespace.ts';
+import { MemoryStore } from '../../../express-session/index.ts';
+import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../getSession.ts';
+import { requireStringSessionSecret } from '../../../middleware/setSessionCookie.ts';
 import { UserSessionData } from '../../../types/session.ts';
 import { UserSessionOptions } from '../../../types/sessionOptions.ts';
-import { generateSessionIdForTestName } from '@tjsr/testutils';
-import { getTestContextUserIdNamespace } from './idNamespace.ts';
+import { SessionId } from '../../../types.ts';
+
+export type TestSessionOptions = UserSessionOptions & { secret: string | string[] };
 
 export type SessionTestContext = TestContext & {
   currentSessionId?: SessionId;
-  sessionOptions: UserSessionOptions;
+  sessionOptions: TestSessionOptions;
 };
 
 export type WithSessionTestContext = Omit<SessionTestContext, 'currentSessionId'> & { currentSessionId: SessionId };
@@ -37,13 +40,13 @@ const addSessionOptionsToContext = (
   options?: Partial<UserSessionOptions>
 ): UserSessionOptions => {
   if (context.sessionOptions === undefined) {
-    context.sessionOptions = {} as UserSessionOptions;
+    context.sessionOptions = { secret: 'test-secret', userIdNamespace: getTestContextUserIdNamespace(context) };
   }
   if (context.sessionOptions.name === undefined) {
     context.sessionOptions.name = options?.name || SESSION_ID_COOKIE;
   }
-  if (context.sessionOptions.secret === undefined) {
-    context.sessionOptions.secret = options?.secret || 'test-secret';
+  if (options?.secret !== undefined || context.sessionOptions.secret === undefined) {
+    context.sessionOptions.secret = requireStringSessionSecret(options?.secret || 'test-secret');
   }
   context.sessionOptions.store = options?.store || context.sessionOptions?.store || new MemoryStore();
   context.sessionOptions.saveUninitialized = booleanFallThrough(

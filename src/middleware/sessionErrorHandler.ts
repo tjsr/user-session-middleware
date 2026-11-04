@@ -1,8 +1,10 @@
 import { AssertionError } from 'node:assert';
+
 import { NextFunction } from 'express';
+
+import { addCalledHandler } from './handlerChainLog.ts';
 import { SessionHandlerError } from '../errors/SessionHandlerError.ts';
 import { UserSessionMiddlewareErrorHandler } from '../types/middlewareHandlerTypes.ts';
-import { addCalledHandler } from './handlerChainLog.ts';
 import { sendAuthResultBody } from './handlers/index.ts';
 
 export const sessionErrorHandler: UserSessionMiddlewareErrorHandler = (
@@ -12,6 +14,11 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler = (
   next: NextFunction
 ) => {
   addCalledHandler(response, sessionErrorHandler);
+
+  if (response.headersSent) {
+    next(error);
+    return;
+  }
 
   if (SessionHandlerError.isType(error) || error instanceof SessionHandlerError) {
     if (response.locals.sendAuthenticationResult) {
@@ -23,7 +30,11 @@ export const sessionErrorHandler: UserSessionMiddlewareErrorHandler = (
       response.json({ message: sessionError.message });
       console.error(sessionErrorHandler, 'Session error', sessionError);
     }
-  } else if (error instanceof AssertionError) {
+    // Express-session may finish the response asynchronously while saving it.
+    // Passing this handled error on would let Express destroy that response.
+    return;
+  }
+  if (error instanceof AssertionError) {
     console.error(sessionErrorHandler, 'Got assertion error', error);
   } else if (error.name) {
     console.warn('Got error of type with name', error.name, error);

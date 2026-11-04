@@ -1,20 +1,23 @@
+import supertest from 'supertest';
+
+import { SessionTestContext } from './context/session.ts';
+import { doSessionCall } from './supertestUtils.ts';
 import { ApiTestContext, ExpressAppWithLocals } from '../../api/utils/testcontext.ts';
-import { EmailAddress, SessionId } from '../../types.ts';
+import { RetrieveUserDataFn, setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
+import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.ts';
+import { MiddlewareConfigurationError } from '../../errors/errorClasses.ts';
 import {
   MiddlewareTestContextError,
   TestContextMissingAppError,
   TestContextMissingAppLocalsError,
 } from '../../errors/SessionMiddlewareError.ts';
-import { RetrieveUserDataFn, setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
-import { StrictUserSessionOptions, UserSessionOptions } from '../../types/sessionOptions.ts';
-
-import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.ts';
-import { MiddlewareConfigurationError } from '../../errors/errorClasses.ts';
-import { SessionTestContext } from './context/session.ts';
-import { UserModel } from '../../types/model.ts';
-import { doSessionCall } from './supertestUtils.ts';
 import express from '../../express/index.ts';
-import supertest from 'supertest';
+import { requireStringSessionSecret } from '../../middleware/setSessionCookie.ts';
+import { UserModel } from '../../types/model.ts';
+import { StrictUserSessionOptions, UserSessionOptions } from '../../types/sessionOptions.ts';
+import { EmailAddress, SessionId } from '../../types.ts';
+
+export type StrictTestSessionOptions = StrictUserSessionOptions & { secret: string | string[] };
 
 export const setLoginUserLookupWithContextUserData = <T extends UserModel>(
   userData: Map<string, unknown>
@@ -43,7 +46,7 @@ const loginWith = async (
   st: supertest.Test,
   email: EmailAddress,
   sessionId: SessionId | undefined,
-  sessionOptions: StrictUserSessionOptions
+  sessionOptions: StrictTestSessionOptions
 ): Promise<{ response: supertest.Response; updatedSessionId: SessionId | undefined }> => {
   if (email) {
     const loginBody = createLoginBody(email);
@@ -60,7 +63,7 @@ export const loginWithApp = async (
 ): Promise<{ response: supertest.Response; updatedSessionId: SessionId | undefined }> => {
   const st = supertest(app).post('/login');
 
-  const sessionOptions: StrictUserSessionOptions = validateSessionOptions(app.locals['sessionOptions']);
+  const sessionOptions: StrictTestSessionOptions = validateSessionOptions(app.locals['sessionOptions']);
 
   return loginWith(st, email, sessionId, sessionOptions);
 };
@@ -85,7 +88,7 @@ export const logoutWithContext = async (
   context: ApiTestContext<SessionTestContext>,
   sessionId?: SessionId
 ): Promise<supertest.Response> => {
-  const sessionOptions: StrictUserSessionOptions = validateContextApp(context);
+  const sessionOptions: StrictTestSessionOptions = validateContextApp(context);
   const st = supertest(context.app).get('/logout');
 
   const { response, updatedSessionId } = await doSessionCall(st, sessionId, sessionOptions);
@@ -112,17 +115,18 @@ const requireOptions = <CheckType extends object>(
   return true;
 };
 
-export const validateSessionOptions = (sessionOptions: UserSessionOptions): StrictUserSessionOptions => {
+export const validateSessionOptions = (sessionOptions: UserSessionOptions): StrictTestSessionOptions => {
   if (sessionOptions === undefined) {
     throw new MiddlewareTestContextError('ApiTestContext', 'app.locals.sessionOptions');
   }
 
   requireOptions(sessionOptions, 'UserSessionOptions', 'name', 'secret');
 
-  return sessionOptions as StrictUserSessionOptions;
+  const secret = requireStringSessionSecret(sessionOptions.secret);
+  return { ...sessionOptions, name: sessionOptions.name!, secret, store: sessionOptions.store! };
 };
 
-export const validateApp = (app: ExpressAppWithLocals): StrictUserSessionOptions => {
+export const validateApp = (app: ExpressAppWithLocals): StrictTestSessionOptions => {
   if (app === undefined) {
     throw new TestContextMissingAppError();
   }
@@ -133,6 +137,6 @@ export const validateApp = (app: ExpressAppWithLocals): StrictUserSessionOptions
   return validateSessionOptions(sessionOptions);
 };
 
-export const validateContextApp = (context: ApiTestContext): StrictUserSessionOptions => {
+export const validateContextApp = (context: ApiTestContext): StrictTestSessionOptions => {
   return validateApp(context.app);
 };

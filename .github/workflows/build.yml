@@ -3,10 +3,11 @@ run-name: Build user-session-middleware build on ${{ github.ref_name }}.
 on: [push]
 jobs:
   build-user-session-middleware:
-    name: Node ${{ matrix.node }} (${{ matrix.support }})
+    name: Node ${{ matrix.node }} / Express 5 (${{ matrix.support }})
     strategy:
       fail-fast: false
       matrix:
+        node: [22, 24, 26]
         include:
           - node: 22
             support: diagnostic
@@ -47,18 +48,48 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
-    - run: npm ci
+    - run: npm ci --strict-peer-deps
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
       continue-on-error: true
       run: npm list
 
+    # Mock factories must use the same Express types as the selected runtime.
+    - name: Verify Express compatibility target
+      env:
+        EXPRESS_VERSION: '5.3.0'
+      run: |
+        node <<'NODE'
+        const assert = require('node:assert/strict');
+        const { createRequire } = require('node:module');
+        assert.equal(require('express/package.json').version, process.env.EXPRESS_VERSION);
+        const expectedTypes = '5.0.6';
+        assert.equal(require('@types/express/package.json').version, expectedTypes);
+        const mockRequire = createRequire(require.resolve('vitest-mock-express'));
+        assert.equal(mockRequire.resolve('@types/express/package.json'), require.resolve('@types/express/package.json'));
+        const path = require('node:path');
+        const semver = require('semver');
+        const mysqlEntry = require.resolve('@tjsr/mysql-pool-utils');
+        const mysqlPackage = require(path.resolve(path.dirname(mysqlEntry), '../../package.json'));
+        const mysqlRequire = createRequire(mysqlEntry);
+        const driverVersion = mysqlRequire('mysql2/package.json').version;
+        assert.equal(mysqlPackage.version, '0.2.2');
+        assert.ok(semver.satisfies(driverVersion, mysqlPackage.dependencies.mysql2),
+          `mysql2 ${driverVersion} must satisfy ${mysqlPackage.dependencies.mysql2}`);
+        NODE
+
     - run: npm run test
+    - name: Lint middleware and test fixture compatibility
+      run: node node_modules/eslint/bin/eslint.js --config eslint.config.mjs src/middleware/sessionErrorHandler.ts src/utils/apiMiddlewareUtils.ts src/utils/apiMiddlewareUtils.test.ts src/middleware/setSessionCookie.ts src/utils/testing/context/session.ts src/utils/testing/apiTestUtils.ts src/utils/testing/supertestUtils.ts
+    - name: Verify release baseline (read only)
+      if: matrix.node == 24
+      run: node scripts/check-release.cjs
+
     - run: npm run build
 
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
         npm pack --dry-run
-  
+        node scripts/test-package.cjs

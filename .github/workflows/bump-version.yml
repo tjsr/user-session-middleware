@@ -35,8 +35,8 @@ jobs:
     name: "Bump version number and publish"
     env:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
-      NODE_VERSION: ${{ vars.NODE_VERSION }}
-      NPM_VERSION: ${{ vars.NPM_VERSION }}
+      NODE_VERSION: '24.21.0'
+      NPM_VERSION: '12.2.1'
       NODE_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       REQUIRES_PR: false
     
@@ -82,6 +82,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           npm-version: ${{ env.NPM_VERSION }}
 
+      - name: Verify prospective release version
+        if: github.ref == 'refs/heads/fix/express-5-compatibility'
+        run: npm ci --strict-peer-deps && node scripts/check-release.cjs 0.2.2 "${{ inputs.patchlevel }}"
+
       - name: Bump and publish
         id: bump
         uses: tjsr/gh-util-actions/version-bump-publish@main
@@ -92,6 +96,12 @@ jobs:
           no-publish: ${{ inputs.noPublish }}
           preid: ${{ github.ref != 'refs/heads/main' && 'dev' || 'release' }}
           requiresPr: ${{ env.USE_PR }}
+
+      - name: Verify the exact published artifact
+        if: steps.bump.outputs.published == 'true'
+        env:
+          PACKAGE_TEST_SPEC: '@tjsr/user-session-middleware@${{ steps.bump.outputs.version }}'
+        run: npm run test:package
 
       - name: "Confirm published: ${{ steps.bump.outputs.version }}"
         if: ${{ steps.bump.conclusion == 'success' }}
