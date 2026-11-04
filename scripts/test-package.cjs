@@ -54,23 +54,21 @@ try {
     'sha512-ljtWFQZHQDIzr/FfQYa/twmdm871uJOMJz7a6hPRBaeBpw49pCBxUYfb56N3troI8i8uHsKjYJ1lpZhSlYl25w==');
   assert.deepEqual(fs.readFileSync(providerRequire.resolve('./index.d.ts')),
     fs.readFileSync(path.join(packageDirectory, 'vendor/express-mysql-session-types/index.d.ts')));
-  const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware, type UserSessionOptions } from '@tjsr/user-session-middleware';
-import type { Response } from 'express';
+  const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware, type UserSessionOptions, type express, type session } from '@tjsr/user-session-middleware';
 import { createSecretKey } from 'node:crypto';
-import type { Store, SessionOptions } from 'express-session';
-const mysqlFactory: () => Store = getMysqlSessionStore;
+const mysqlFactory: () => session.Store = getMysqlSessionStore;
 const secret: UserSessionOptions['secret'] = 'fixture';
 const binarySecret: UserSessionOptions['secret'] = Buffer.from('fixture');
 const objectSecret: UserSessionOptions['secret'] = createSecretKey(Buffer.from('fixture'));
 const rotatingSecrets: UserSessionOptions['secret'] = [binarySecret, objectSecret];
 const cookieCallback: UserSessionOptions['cookie'] = request => ({ httpOnly: true, path: request.path });
-declare const upstreamOptions: SessionOptions;
+declare const upstreamOptions: session.SessionOptions;
 const options: UserSessionOptions = { ...upstreamOptions, userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' };
-const upstreamCompatible: SessionOptions = options;
+const upstreamCompatible: session.SessionOptions = options;
 declare const mysqlStore: ReturnType<typeof getMysqlSessionStore>;
 // @ts-expect-error The published MySQL store must retain its concrete type.
 mysqlStore.nonexistentMethod();
-declare const customResponse: Response<string, { applicationField: string }>;
+declare const customResponse: express.Response<string, { applicationField: string }>;
 const applicationField: string = customResponse.locals.applicationField;
 const id: string = createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 'package@example.com');
 const middleware: typeof useUserSessionMiddleware = useUserSessionMiddleware;
@@ -148,11 +146,19 @@ export { id, middleware, applicationField, mysqlFactory, secret, binarySecret, o
   assert.equal(consumerRequire('@types/express-mysql-session/package.json').version, '3.0.8');
   const identityFixture = `import { getMysqlSessionStore } from '@tjsr/user-session-middleware';
 import type { MySQLStore } from 'express-mysql-session';
+import type { Response } from 'express';
+import type { SessionOptions } from 'express-session';
+import type { UserSessionOptions } from '@tjsr/user-session-middleware';
 declare const middlewareStore: ReturnType<typeof getMysqlSessionStore>;
 declare const officialStore: MySQLStore;
 const fromMiddleware: MySQLStore = middlewareStore;
 const fromOfficial: ReturnType<typeof getMysqlSessionStore> = officialStore;
-export { fromMiddleware, fromOfficial };
+declare const upstreamOptions: SessionOptions;
+const userOptions: UserSessionOptions = { ...upstreamOptions, userIdNamespace: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' };
+const compatible: SessionOptions = userOptions;
+declare const response: Response<string, { applicationField: string }>;
+const applicationField: string = response.locals.applicationField;
+export { fromMiddleware, fromOfficial, compatible, applicationField };
 `;
   for (const extension of ['mts', 'cts']) {
     fs.writeFileSync(path.join(directory, `identity.${extension}`), identityFixture);
