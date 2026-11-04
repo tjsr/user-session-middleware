@@ -93,6 +93,15 @@ jobs:
         assert.equal(require('@types/express/package.json').version, expectedTypes);
         const mockRequire = createRequire(require.resolve('vitest-mock-express'));
         assert.equal(mockRequire.resolve('@types/express/package.json'), require.resolve('@types/express/package.json'));
+        const path = require('node:path');
+        const semver = require('semver');
+        const mysqlEntry = require.resolve('@tjsr/mysql-pool-utils');
+        const mysqlPackage = require(path.resolve(path.dirname(mysqlEntry), '../../package.json'));
+        const mysqlRequire = createRequire(mysqlEntry);
+        const driverVersion = mysqlRequire('mysql2/package.json').version;
+        assert.equal(mysqlPackage.version, '0.2.2');
+        assert.ok(semver.satisfies(driverVersion, mysqlPackage.dependencies.mysql2),
+          `mysql2 ${driverVersion} must satisfy ${mysqlPackage.dependencies.mysql2}`);
         NODE
 
     - run: npm run test
