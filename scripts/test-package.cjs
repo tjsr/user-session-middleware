@@ -26,11 +26,14 @@ try {
     }
   }
   const fixture = `import { createUserIdFromEmail, useUserSessionMiddleware } from '@tjsr/user-session-middleware';
+import type { Response } from 'express';
+const customResponse = null as unknown as Response<string, { applicationField: string }>;
+const applicationField: string = customResponse.locals.applicationField;
 const id: string = createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 'package@example.com');
 const middleware: typeof useUserSessionMiddleware = useUserSessionMiddleware;
 // @ts-expect-error The exported function must retain its email string argument type.
 createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 123);
-export { id, middleware };
+export { id, middleware, applicationField };
 `;
   for (const extension of ['mts', 'cts']) {
     fs.writeFileSync(path.join(directory, `consumer.${extension}`), fixture);
