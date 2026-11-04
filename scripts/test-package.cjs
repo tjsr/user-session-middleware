@@ -2,21 +2,33 @@ const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
 
 function firstNpmRecord(value) {
   return Array.isArray(value) ? value[0] : value.filename ? value : Object.values(value)[0];
 }
 
 const root = path.resolve(__dirname, '..');
-const directory = fs.mkdtempSync(path.join(root, '.package-test-'));
+const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'usm-package-test-'));
 const run = (command, args) => execFileSync(command, args, { cwd: directory, stdio: 'pipe' });
 try {
   const npm = process.env.npm_execpath || fs.realpathSync(execFileSync('which', ['npm'], { encoding: 'utf8' }).trim());
   assert.ok(npm, 'Run this check with npm run test:package');
+  fs.writeFileSync(path.join(directory, '.npmrc'), 'registry=https://registry.npmjs.org\n@tjsr:registry=https://npm.pkg.github.com\n');
   const packed = JSON.parse(run(process.execPath, [npm, 'pack', process.env.PACKAGE_TEST_SPEC || root, '--ignore-scripts', '--dry-run=false', '--json']));
   const packageDirectory = path.join(directory, 'node_modules/@tjsr/user-session-middleware');
-  fs.mkdirSync(packageDirectory, { recursive: true });
-  run('tar', ['-xzf', firstNpmRecord(packed).filename, '-C', packageDirectory, '--strip-components=1']);
+  const archive = firstNpmRecord(packed).filename;
+  fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify({
+    name: 'middleware-production-consumer', version: '1.0.0', private: true,
+    dependencies: { '@tjsr/user-session-middleware': 'file:' + path.resolve(directory, archive) },
+  }));
+  // Install only the tarball's declared production closure; never run its hooks.
+  run(process.execPath, [npm, 'install', '--dry-run=false', '--omit=dev', '--ignore-scripts', '--strict-peer-deps',
+    '--no-package-lock', '--no-audit', '--no-fund']);
+  for (const developmentOnly of ['vitest', 'vitest-mock-express', 'typescript']) {
+    assert.ok(!fs.existsSync(path.join(directory, 'node_modules', developmentOnly)),
+      `Consumer must not inherit development-only ${developmentOnly}`);
+  }
   const manifest = JSON.parse(fs.readFileSync(path.join(packageDirectory, 'package.json'), 'utf8'));
   assert.equal(manifest.name, require('../package.json').name);
   assert.equal(manifest.version, require('../package.json').version);
@@ -25,15 +37,20 @@ try {
       assert.ok(fs.existsSync(path.join(packageDirectory, manifest.exports['.'][condition][field])), `${condition}.${field} is missing from the packed distribution`);
     }
   }
-  const fixture = `import { createUserIdFromEmail, useUserSessionMiddleware } from '@tjsr/user-session-middleware';
+  const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware } from '@tjsr/user-session-middleware';
 import type { Response } from 'express';
+import type { Store } from 'express-session';
+const mysqlFactory: () => Store = getMysqlSessionStore;
+declare const mysqlStore: ReturnType<typeof getMysqlSessionStore>;
+// @ts-expect-error The published MySQL store must retain its concrete type.
+mysqlStore.nonexistentMethod();
 const customResponse = null as unknown as Response<string, { applicationField: string }>;
 const applicationField: string = customResponse.locals.applicationField;
 const id: string = createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 'package@example.com');
 const middleware: typeof useUserSessionMiddleware = useUserSessionMiddleware;
 // @ts-expect-error The exported function must retain its email string argument type.
 createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 123);
-export { id, middleware, applicationField };
+export { id, middleware, applicationField, mysqlFactory };
 `;
   for (const extension of ['mts', 'cts']) {
     fs.writeFileSync(path.join(directory, `consumer.${extension}`), fixture);
@@ -73,7 +90,7 @@ export { id, middleware, applicationField };
   fs.writeFileSync(path.join(directory, 'runtime.cjs'), `const assert = require('node:assert/strict');\nconst express = require('express');\nconst session = require('express-session');\nconst utils = require('@tjsr/user-session-middleware');\n${assertion}\n${httpCheck}`);
   run(process.execPath, ['runtime.mjs']);
   run(process.execPath, ['runtime.cjs']);
-  console.log('Packed ESM/CommonJS declarations, runtime exports and HTTP error responses passed.');
+  console.log('Production-only packed ESM/CommonJS declarations, runtime exports and HTTP error responses passed.');
 } catch (error) {
   if (error.stdout) process.stderr.write(error.stdout);
   if (error.stderr) process.stderr.write(error.stderr);
