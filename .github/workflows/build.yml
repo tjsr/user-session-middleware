@@ -58,13 +58,24 @@ jobs:
 
     - name: Select Express 5 runtime and matching types
       if: matrix.express == '5.3.0'
-      run: npm install --no-save --ignore-scripts --strict-peer-deps express@5.3.0 @types/express@5.0.6
+      run: |
+        npm pkg set 'devDependencies.express=5.3.0' 'devDependencies.@types/express=5.0.6'
+        npm install --ignore-scripts --strict-peer-deps
 
+    # Mock factories must use the same Express types as the selected runtime.
     - name: Verify Express compatibility target
       env:
         EXPRESS_VERSION: ${{ matrix.express }}
       run: |
-        node -e "const assert = require('node:assert/strict'); assert.equal(require('express/package.json').version, process.env.EXPRESS_VERSION); assert.equal(require('@types/express/package.json').version, process.env.EXPRESS_VERSION.startsWith('5.') ? '5.0.6' : '4.17.25');"
+        node <<'NODE'
+        const assert = require('node:assert/strict');
+        const { createRequire } = require('node:module');
+        assert.equal(require('express/package.json').version, process.env.EXPRESS_VERSION);
+        const expectedTypes = process.env.EXPRESS_VERSION.startsWith('5.') ? '5.0.6' : '4.17.25';
+        assert.equal(require('@types/express/package.json').version, expectedTypes);
+        const mockRequire = createRequire(require.resolve('vitest-mock-express'));
+        assert.equal(mockRequire.resolve('@types/express/package.json'), require.resolve('@types/express/package.json'));
+        NODE
 
     - run: npm run test
     - run: npm run build

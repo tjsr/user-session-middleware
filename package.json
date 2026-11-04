@@ -93,7 +93,10 @@
     "braces": ">=3.0.3",
     "mysql2": ">=3.10.0",
     "glob": ">=11.0.0",
-    "rimraf@<=4": "$rimraf"
+    "rimraf@<=4": "$rimraf",
+    "vitest-mock-express": {
+      "@types/express": "$@types/express"
+    }
   },
   "optionalDependencies": {
     "nodemon": "^3.1.14"
