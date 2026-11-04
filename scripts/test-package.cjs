@@ -6,9 +6,11 @@ const { pathToFileURL } = require('node:url');
 // Builds and lifecycle tests run before this check. Inspect the actual pack list
 // without running them recursively; no registry publishing is involved.
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const [pack] = JSON.parse(execFileSync(npm, ['pack', '--dry-run', '--ignore-scripts', '--json'], {
+const packed = JSON.parse(execFileSync(npm, ['pack', '--dry-run', '--ignore-scripts', '--json'], {
   encoding: 'utf8',
 }));
+const pack = Array.isArray(packed) ? packed[0] : packed.filename ? packed : Object.values(packed)[0];
+assert.ok(pack && Array.isArray(pack.files), 'Unexpected npm pack JSON response');
 const files = new Set(pack.files.map((file) => file.path));
 for (const path of ['dist/esm/index.js', 'dist/esm/index.d.ts', 'dist/cjs/index.js',
   'dist/cjs/index.d.ts', 'dist/cjs/package.json']) {
