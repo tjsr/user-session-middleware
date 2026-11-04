@@ -1,26 +1,25 @@
 import * as EmailValidator from 'email-validator';
-import * as express from '../express/index.ts';
 
-import { EmailValidationError, LoginBodyFormatError, NoEmailError } from '../errors/inputValidationErrorClasses.ts';
+import { passAuthOrUnknownError } from '../auth/authErrorUtils.ts';
+import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.ts';
+import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
+import { LoginCredentialsError } from '../errors/authenticationErrorClasses.ts';
 import { RegeneratingSessionIdError, SaveSessionError } from '../errors/errorClasses.ts';
+import { EmailValidationError, LoginBodyFormatError, NoEmailError } from '../errors/inputValidationErrorClasses.ts';
+import * as express from '../express/index.ts';
+import { NextFunction } from '../express/index.ts';
+import { Session } from '../express-session/index.ts';
+import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.ts';
+import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.ts';
+import { saveSessionPromise } from '../sessionUser.ts';
+import { SystemResponseLocals } from '../types/locals.ts';
 import {
   UserSessionMiddlewareErrorHandler,
   UserSessionMiddlewareRequestHandler,
 } from '../types/middlewareHandlerTypes.ts';
-import { addCalledHandler, assertPrerequisiteHandler } from '../middleware/handlerChainLog.ts';
-
-import { IdNamespace } from '../types.ts';
-import { LoginCredentialsError } from '../errors/authenticationErrorClasses.ts';
-import { NextFunction } from '../express/index.ts';
-import { Session } from '../express-session/index.ts';
 import { SystemHttpRequestType } from '../types/request.ts';
-import { SystemResponseLocals } from '../types/locals.ts';
 import { UserSessionData } from '../types/session.ts';
-import { getAppUserIdNamespace } from '../auth/userNamespace.ts';
-import { handleResponseLocalsCreation } from '../middleware/handlers/handleLocalsCreation.ts';
-import { passAuthOrUnknownError } from '../auth/authErrorUtils.ts';
-import { retrieveUserDataForSession } from '../auth/retrieveUserDataForSession.ts';
-import { saveSessionPromise } from '../sessionUser.ts';
+import { IdNamespace } from '../types.ts';
 
 export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = (
   request,
@@ -30,7 +29,6 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = 
   addCalledHandler(response, checkLogin);
   assertPrerequisiteHandler(response, handleResponseLocalsCreation);
 
-  const email: string = request.body.email;
   if (request.body === undefined) {
     const err: LoginBodyFormatError = new LoginBodyFormatError('No body on login request');
     console.debug('No body on login request', err);
@@ -38,6 +36,7 @@ export const checkLogin: UserSessionMiddlewareRequestHandler<UserSessionData> = 
     return;
   }
 
+  const email: string = request.body.email;
   if (!email) {
     const err = new NoEmailError(request.session.id);
     console.error(`No email on login for session ${request.session.id} while checking login.`);

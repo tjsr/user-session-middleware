@@ -1,12 +1,13 @@
+import supertest from 'supertest';
+import { TestContext } from 'vitest';
+
 import { ApiTestContext, setupApiTest, verifyAuthResponseBody, verifyAuthSessionId } from './utils/testcontext.ts';
 import { hasRetrieveUserDataFunction, setRetrieveUserDataFunction } from '../auth/getDbUser.ts';
-import { loginWithContext, setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.ts';
-
 import { HttpStatusCode } from '../httpStatusCodes.ts';
-import { NoSessionTestContext } from '../utils/testing/context/session.ts';
-import { SessionId } from '../types.ts';
-import { TestContext } from 'vitest';
 import { forceHandlerAssertions } from '../middleware/handlerChainLog.ts';
+import { SessionId } from '../types.ts';
+import { loginWithContext, setLoginUserLookupWithContextUserData } from '../utils/testing/apiTestUtils.ts';
+import { NoSessionTestContext } from '../utils/testing/context/session.ts';
 
 describe('api.login', () => {
   beforeAll(() => {
@@ -29,6 +30,20 @@ describe('api.login', () => {
   test('Login must have a request body', async (context: ApiTestContext) => {
     const response = await loginWithContext(context, null!);
     expect(response.statusCode).toEqual(HttpStatusCode.BAD_REQUEST);
+  });
+
+  test('GET login without a parsed body returns a validation error', async (context: ApiTestContext) => {
+    const response = await supertest(context.app).get('/login');
+    expect(response.statusCode).toEqual(HttpStatusCode.BAD_REQUEST);
+    expect(response.headers['content-type']).toMatch(/application\/json/);
+    expect(response.body).toEqual({ message: expect.any(String) });
+  });
+
+  test('Non-JSON login body returns a validation error', async (context: ApiTestContext) => {
+    const response = await supertest(context.app).post('/login').type('text').send('email=test@example.com');
+    expect(response.statusCode).toEqual(HttpStatusCode.BAD_REQUEST);
+    expect(response.headers['content-type']).toMatch(/application\/json/);
+    expect(response.body).toEqual({ message: expect.any(String) });
   });
 
   test('email in login body must be a valid email address', async (context: ApiTestContext) => {
