@@ -42,6 +42,8 @@ try {
   const vendorArchive = path.join(packageDirectory, 'vendor/express-mysql-session-types-3.0.8-mysql2-3.10.2.tgz');
   assert.equal(createHash('sha256').update(fs.readFileSync(vendorArchive)).digest('hex'),
     '20e2990371ad72a391dab1e1039bfb45b1cc0d6a0956335846047b069f400b62');
+  assert.deepEqual(manifest.bundledDependencies, ['@types/express-mysql-session']);
+  assert.ok(fs.existsSync(path.join(packageDirectory, 'node_modules/@types/express-mysql-session/LICENSE')));
   const consumerRequire = createRequire(path.join(directory, 'package.json'));
   const libraryRequire = createRequire(path.join(packageDirectory, 'package.json'));
   const storeRequire = createRequire(libraryRequire.resolve('express-mysql-session'));
