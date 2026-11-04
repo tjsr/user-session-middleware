@@ -37,10 +37,15 @@ try {
       assert.ok(fs.existsSync(path.join(packageDirectory, manifest.exports['.'][condition][field])), `${condition}.${field} is missing from the packed distribution`);
     }
   }
-  const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware } from '@tjsr/user-session-middleware';
+  const fixture = `import { createUserIdFromEmail, getMysqlSessionStore, useUserSessionMiddleware, type UserSessionOptions } from '@tjsr/user-session-middleware';
 import type { Response } from 'express';
 import type { Store } from 'express-session';
 const mysqlFactory: () => Store = getMysqlSessionStore;
+const secret: UserSessionOptions['secret'] = 'fixture';
+// @ts-expect-error Middleware cookie signing supports string secrets.
+const binarySecret: UserSessionOptions['secret'] = new Uint8Array([1]);
+// @ts-expect-error Middleware defaults merge static cookie options.
+const cookieCallback: UserSessionOptions['cookie'] = () => ({ httpOnly: true });
 declare const mysqlStore: ReturnType<typeof getMysqlSessionStore>;
 // @ts-expect-error The published MySQL store must retain its concrete type.
 mysqlStore.nonexistentMethod();
@@ -50,7 +55,7 @@ const id: string = createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8',
 const middleware: typeof useUserSessionMiddleware = useUserSessionMiddleware;
 // @ts-expect-error The exported function must retain its email string argument type.
 createUserIdFromEmail('6ba7b810-9dad-11d1-80b4-00c04fd430c8', 123);
-export { id, middleware, applicationField, mysqlFactory };
+export { id, middleware, applicationField, mysqlFactory, secret };
 `;
   for (const extension of ['mts', 'cts']) {
     fs.writeFileSync(path.join(directory, `consumer.${extension}`), fixture);

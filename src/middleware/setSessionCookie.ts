@@ -1,10 +1,13 @@
-import { SessionSecretSet } from '@tjsr/testutils';
-import { UserSessionOptions } from '../types/sessionOptions.ts';
 import assert from 'assert';
+
 import { stringifySetCookie } from 'cookie';
-import express from 'express';
-import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 import signature from 'cookie-signature';
+import express from 'express';
+
+import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
+import { UserSessionOptions } from '../types/sessionOptions.ts';
+
+type SessionSecretSet = UserSessionOptions['secret'];
 
 export const COOKIE_WITH_HEADER = true;
 

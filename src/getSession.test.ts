@@ -13,11 +13,11 @@ import {
 } from './getSession.ts';
 import { checkForDefault, checkForOverride, getMockRequest } from './testUtils.ts';
 import { SystemHttpRequestType } from './types/request.ts';
+import { UserSessionBaseOptions } from './types/sessionOptions.ts';
 import { setupExpressContext } from './utils/testing/context/appLocals.ts';
 import { SessionEnabledRequestContext, setupRequestContext } from './utils/testing/context/request.ts';
 import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
 import { generateSessionIdForTest } from './utils/testing/testIdUtils.ts';
-
 
 type RequestAppLocals = SystemHttpRequestType['app']['locals'];
 
@@ -39,10 +39,10 @@ export const addAppLocalsToRequest = (request: SystemHttpRequestType, locals?: R
 
 describe('expressSessionConfig', () => {
   type ExpressSessionTestContextOptions = TestContext & {
-    options: expressSession.SessionOptions;
+    options: UserSessionBaseOptions;
   };
 
-  const defaultOptions: expressSession.SessionOptions = defaultExpressSessionOptions();
+  const defaultOptions: UserSessionBaseOptions = defaultExpressSessionOptions();
 
   beforeEach((context: ExpressSessionTestContextOptions) => {
     context.options = {
@@ -51,7 +51,7 @@ describe('expressSessionConfig', () => {
       saveUninitialized: false,
       secret: 'overridden-secret',
       store: new MemoryStore(),
-    } as expressSession.SessionOptions;
+    };
   });
 
   test('Should take default value for each property', (context: ExpressSessionTestContextOptions) => {

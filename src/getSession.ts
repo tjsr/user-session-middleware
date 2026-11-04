@@ -1,5 +1,3 @@
-
-
 import { IncomingHttpHeaders } from 'http';
 
 import { isProductionMode } from '@tjsr/simple-env-utils';
@@ -18,7 +16,7 @@ import * as expressSession from './express-session/index.ts';
 import { getCookieKeyFromRequest } from './session/sessionCookie.ts';
 import { SystemHttpRequestType } from './types/request.ts';
 import { UserSessionData } from './types/session.ts';
-import { UserSessionOptions } from './types/sessionOptions.ts';
+import { UserSessionBaseOptions, UserSessionOptions } from './types/sessionOptions.ts';
 import { SessionId } from './types.ts';
 import { getDefaultUserIdNamespace } from './user/userIdNamespace.ts';
 
@@ -141,9 +139,9 @@ export const defaultExpressSessionCookieOptions = (
 };
 
 export const defaultExpressSessionOptions = (
-  options?: Partial<expressSession.SessionOptions> | undefined
-): expressSession.SessionOptions => {
-  const defaults: expressSession.SessionOptions = {
+  options?: Partial<UserSessionBaseOptions> | undefined
+): UserSessionBaseOptions => {
+  const defaults: UserSessionBaseOptions = {
     genid: options?.genid,
     name: options?.name || SESSION_ID_COOKIE,
     resave: options?.resave || false,
