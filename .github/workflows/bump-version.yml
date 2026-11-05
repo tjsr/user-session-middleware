@@ -33,6 +33,9 @@ permissions:
 jobs:
   bump:
     name: "Bump version number and publish"
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+      published: ${{ steps.bump.outputs.published }}
     env:
       NODE_CACHE_KEY: "npm-cache-${{ github.run_id }}-${{ github.run_number }}"
       NODE_VERSION: ${{ vars.NODE_VERSION }}
@@ -101,3 +104,22 @@ jobs:
             exit 1
           fi
           echo "Published: ${{ steps.bump.outputs.version }}"
+
+  notify-consumers:
+    needs: bump
+    if: needs.bump.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.TJSR_AUTOMATION_TOKEN }}
+      PACKAGE_NAME: '@tjsr/user-session-middleware'
+      PACKAGE_VERSION: ${{ needs.bump.outputs.version }}
+    steps:
+      - name: Dispatch dependency updates
+        run: |
+          test -n "$GH_TOKEN" || { echo 'TJSR_AUTOMATION_TOKEN is required to notify downstream repositories.'; exit 1; }
+          for repository in tjsr/tagtool tjsr/absee; do
+            gh api --method POST "repos/$repository/dispatches" \
+              -f event_type=tjsr-package-published \
+              -f "client_payload[package]=$PACKAGE_NAME" \
+              -f "client_payload[version]=$PACKAGE_VERSION"
+          done
