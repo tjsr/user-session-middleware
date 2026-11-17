@@ -1,9 +1,9 @@
 import { getMockRes } from 'vitest-mock-express';
 
 import { HttpStatusCode } from '../httpStatusCodes.ts';
-import { endWithJsonMessage } from './apiMiddlewareUtils.ts';
 import { SystemHttpResponseType } from '../types/response.ts';
 import { UserSessionData } from '../types/session.ts';
+import { endWithJsonMessage } from './apiMiddlewareUtils.ts';
 
 describe('endWithJsonMessage', () => {
   test('finishes the handled response without calling next when a callback is provided.', async () => {

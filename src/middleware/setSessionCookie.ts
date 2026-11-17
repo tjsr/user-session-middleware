@@ -4,8 +4,8 @@ import { stringifySetCookie } from 'cookie';
 import signature from 'cookie-signature';
 import express from 'express';
 
-import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 import { UserSessionOptions } from '../types/sessionOptions.ts';
+import { getSessionOptionsFromRequest } from './requestVerifiers.ts';
 
 type SessionSecretSet = string | string[];
 
