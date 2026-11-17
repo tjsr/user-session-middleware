@@ -8,8 +8,14 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     }
   },
   "scripts": {
@@ -23,7 +29,7 @@
     "link": "linkteam -i",
     "lint": "eslint --config eslint.config.mjs src/*.ts",
     "lint:fix": "eslint --fix src/*.ts",
-    "prepack": "npm test && npm run build:dist",
+    "prepack": "npm test && npm run build:dist && node scripts/test-package.cjs",
     "prepublishOnly": "npm run clean",
     "test": "vitest --run && npm run lint",
     "test:first": "vitest --run --bail=1 && npm run lint",
@@ -72,7 +78,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5",
-    "vitest-mock-express": "^2.2.0"
+    "vitest-mock-express": "^2.2.0",
+    "express": "5.3.0"
   },
   "dependencies": {
     "@tjsr/mysql-pool-utils": "^0.2.2",
@@ -89,7 +96,7 @@
     "@types/express-session": "^1.19.0"
   },
   "peerDependencies": {
-    "express": "^4.21.2 || ^5.3.0"
+    "express": "^5.3.0"
   },
   "overrides": {
     "braces": ">=3.0.3",
@@ -109,7 +116,8 @@
     ]
   },
   "engines": {
-    "node": ">=24.21.0"
+    "node": ">=24.21.0",
+    "npm": ">=12.1.0"
   },
   "allowScripts": {
     "esbuild@0.21.5": true,
