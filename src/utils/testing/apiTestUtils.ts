@@ -1,7 +1,5 @@
 import supertest from 'supertest';
 
-import { SessionTestContext } from './context/session.ts';
-import { doSessionCall } from './supertestUtils.ts';
 import { ApiTestContext, ExpressAppWithLocals } from '../../api/utils/testcontext.ts';
 import { RetrieveUserDataFn, setRetrieveUserDataFunction } from '../../auth/getDbUser.ts';
 import { LoginCredentialsError } from '../../errors/authenticationErrorClasses.ts';
@@ -16,6 +14,8 @@ import { requireStringSessionSecret } from '../../middleware/setSessionCookie.ts
 import { UserModel } from '../../types/model.ts';
 import { StrictUserSessionOptions, UserSessionOptions } from '../../types/sessionOptions.ts';
 import { EmailAddress, SessionId } from '../../types.ts';
+import { SessionTestContext } from './context/session.ts';
+import { doSessionCall } from './supertestUtils.ts';
 
 export type StrictTestSessionOptions = StrictUserSessionOptions & { secret: string | string[] };
 

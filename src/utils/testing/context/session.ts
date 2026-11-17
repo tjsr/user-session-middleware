@@ -1,13 +1,13 @@
 import { generateSessionIdForTestName } from '@tjsr/testutils';
 import { TestContext } from 'vitest';
 
-import { getTestContextUserIdNamespace } from './idNamespace.ts';
 import { MemoryStore } from '../../../express-session/index.ts';
 import { SESSION_ID_COOKIE, getUserSessionMiddlewareOptions } from '../../../getSession.ts';
 import { requireStringSessionSecret } from '../../../middleware/setSessionCookie.ts';
 import { UserSessionData } from '../../../types/session.ts';
 import { UserSessionOptions } from '../../../types/sessionOptions.ts';
 import { SessionId } from '../../../types.ts';
+import { getTestContextUserIdNamespace } from './idNamespace.ts';
 
 export type TestSessionOptions = UserSessionOptions & { secret: string | string[] };
 
