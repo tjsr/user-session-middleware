@@ -10,6 +10,7 @@ registries:
     token: ${{ secrets.NPM_TOKEN }}
 updates:
   - package-ecosystem: 'npm'
+    rebase-strategy: auto
     directory: '/'
     registries:
     - npm-github
@@ -29,16 +30,20 @@ updates:
       linter:
         applies-to: version-updates
         patterns:
-        - "@typescript-eslint/*"
-        - "eslint-*"
-        - "eslint"
-        - "@tjsr/eslint-config"
+          - "@tjsr/eslint-config"
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "typescript-eslint"
+          - "@stylistic/*"
       vitest:
         applies-to: version-updates
         patterns:
         - "vitest"
         - "@vitest/*"
   - package-ecosystem: "github-actions"
+    rebase-strategy: auto
     directory: "/"
     schedule:
       # Check for updates to GitHub Actions every week
