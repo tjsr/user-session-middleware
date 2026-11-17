@@ -1,4 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["**/*.test.ts", "vitest.config.ts"]
+  "exclude": [
+    "**/*.test.ts",
+    "vitest.config.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": false,
+    "rewriteRelativeImportExtensions": true
+  }
 }

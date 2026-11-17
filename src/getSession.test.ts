@@ -18,7 +18,6 @@ import { SessionEnabledRequestContext, setupRequestContext } from './utils/testi
 import { SessionTestContext, setupSessionContext } from './utils/testing/context/session.ts';
 import { generateSessionIdForTest } from './utils/testing/testIdUtils.ts';
 
-
 type RequestAppLocals = SystemHttpRequestType['app']['locals'];
 
 const verifyAppOnRequest = (request: express.Request): Application => {
@@ -51,7 +50,7 @@ describe('expressSessionConfig', () => {
       saveUninitialized: false,
       secret: 'overridden-secret',
       store: new MemoryStore(),
-    } as expressSession.SessionOptions;
+    };
   });
 
   test('Should take default value for each property', (context: ExpressSessionTestContextOptions) => {

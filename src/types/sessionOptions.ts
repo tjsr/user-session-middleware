@@ -1,8 +1,9 @@
-import { IdNamespace, MakeRequired } from '../types.ts';
-
 import expressSession from 'express-session';
 
+import { IdNamespace, MakeRequired } from '../types.ts';
+
 type Path = string;
+
 export interface UserSessionOptions extends expressSession.SessionOptions {
   debugCallHandlers?: boolean;
   debugSessionOptions?: boolean;

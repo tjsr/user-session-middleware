@@ -3,10 +3,11 @@ run-name: Build user-session-middleware build on ${{ github.ref_name }}.
 on: [push]
 jobs:
   build-user-session-middleware:
-    name: Node ${{ matrix.node }} (${{ matrix.support }})
+    name: Node ${{ matrix.node }} / Express 5 (${{ matrix.support }})
     strategy:
       fail-fast: false
       matrix:
+        node: [22, 24, 26]
         include:
           - node: 22
             support: diagnostic
@@ -47,7 +48,7 @@ jobs:
     - name: Install latest npm
       run: npm install --global npm@latest --registry=https://registry.npmjs.org
 
-    - run: npm ci
+    - run: npm ci --strict-peer-deps
 
     - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
       name: List the state of node modules
@@ -55,10 +56,16 @@ jobs:
       run: npm list
 
     - run: npm run test
+    - name: Lint middleware and test fixture compatibility
+      run: node node_modules/eslint/bin/eslint.js --config eslint.config.mjs src/middleware/sessionErrorHandler.ts src/utils/apiMiddlewareUtils.ts src/utils/apiMiddlewareUtils.test.ts src/middleware/setSessionCookie.ts src/utils/testing/context/session.ts src/utils/testing/apiTestUtils.ts src/utils/testing/supertestUtils.ts
+    - name: Verify release baseline (read only)
+      if: matrix.node == 24
+      run: node scripts/check-release.cjs
+
     - run: npm run build
 
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
       run: |
         npm pack --dry-run
-  
+        node scripts/test-package.cjs
