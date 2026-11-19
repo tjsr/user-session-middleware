@@ -64,7 +64,7 @@
   "devDependencies": {
     "@tjsr/eslint-config": "github:tjsr/eslint-config#main",
     "@tjsr/testutils": "^0.0.12",
-    "@types/cookie": "^0.6.0",
+    "@types/cookie": "^1.0.0",
     "@types/cookie-signature": "^1.1.2",
     "@types/node": "^24.19.2",
     "@types/request-ip": "^0.0.41",
