@@ -6,7 +6,7 @@ vitest.config.ts.timestamp-*
 **/vitest.config.*
 **/*.test.*
 eslint.config.mjs
-.prettierrc.json
+prettier.config.mjs
 .npmrc
 src/**
 .npmcheckrc

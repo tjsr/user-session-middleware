@@ -27,21 +27,11 @@ updates:
       - dependency-name: 'express'
         update-types: ["version-update:semver-major"]
     groups:
-      linter:
+      development:
         applies-to: version-updates
+        dependency-type: development
         patterns:
-          - "@tjsr/eslint-config"
-          - "eslint"
-          - "eslint-*"
-          - "@eslint/*"
-          - "@typescript-eslint/*"
-          - "typescript-eslint"
-          - "@stylistic/*"
-      vitest:
-        applies-to: version-updates
-        patterns:
-        - "vitest"
-        - "@vitest/*"
+          - "*"
   - package-ecosystem: "github-actions"
     rebase-strategy: auto
     directory: "/"
